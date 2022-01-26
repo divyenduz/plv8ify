@@ -1,0 +1,14 @@
+{
+  "name": "plv8ify",
+  "version": "0.0.1",
+  "main": "index.js",
+  "license": "MIT",
+  "bin": {
+    "plv8ify": "index.js"
+  },
+  "prepublish": "chmod +x index.js",
+  "dependencies": {
+    "@turf/helpers": "6.5.0",
+    "esbuild": "^0.14.14"
+  }
+}
