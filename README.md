@@ -17,8 +17,8 @@
 ```js
 const { point: turfPoint } = require("@turf/helpers");
 
-export function main() {
-  const pt = turfPoint([-77.032, 38.913]);
+export function point(lat, long) {
+  const pt = turfPoint([lat, long]);
   return pt;
 }
 ```
