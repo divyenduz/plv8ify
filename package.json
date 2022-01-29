@@ -9,10 +9,11 @@
   "prepublish": "chmod +x index.js",
   "dependencies": {
     "@turf/helpers": "6.5.0",
-    "esbuild": "^0.14.14",
+    "dedent": "0.7.0",
+    "esbuild": "0.14.14",
     "ts-morph": "13.0.3"
   },
   "devDependencies": {
-    "@types/node": "^17.0.12"
+    "@types/node": "17.0.12"
   }
 }

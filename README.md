@@ -23,12 +23,16 @@ console.log(main());
 
 ## TODO
 
-- [ ] Custom function name
-- [ ] Input arguments
+- [ ] README
+- [x] Custom function name
+- [x] Export multiple functions
+- [x] Input arguments - basic setup
+- [ ] Emit intermediate file
+- [ ] Input arguments - support most data types
 - [ ] Input file name
-- [ ] Output file name
-- [ ] Intermediate file name
-- [ ] Remove intermediate file
+- [ ] Output folder name
 - [ ] Return type guessing
-- [ ] Typescript
+- [x] Typescript as input
+- [ ] Javascript as input
+- [ ] Typescript for plv8ify code
 - [ ] Stuff

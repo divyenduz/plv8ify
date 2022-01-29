@@ -1,5 +1,5 @@
 node_modules
-output.js
 input.js
 input.ts
-plv8.sql
+
+plv8ify-dist/
