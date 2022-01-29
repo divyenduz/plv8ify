@@ -61,3 +61,8 @@ export function main() {
 - Very early, only a small number of types supported
 - Only supports typescript as input at the moment
 - Scaling an application server is easier than scaling a database server, moving the logic in database as postgres functions makes it easier (IMO SQL is declarative, like React for data) to call the code/do some things but you are effectively shifting compute from application server to database server which might be a bad idea in most cases.
+
+## Prior Art
+
+- https://github.com/CSTARS/es6-to-plv8
+- https://github.com/clkao/plv8x

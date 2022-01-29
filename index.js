@@ -4,11 +4,15 @@ const arg = require('arg')
 const esbuild = require('esbuild')
 const fs = require('fs')
 const dedent = require('dedent')
+const nodeExternals = require('webpack-node-externals');
+
 
 const { Project } = require('ts-morph')
 
 const typeMap = {
-    'number': 'float8'
+    'number': 'float8',
+    'string': 'text',
+    'boolean': 'boolean',
 }
 
 async function main() {
@@ -36,7 +40,7 @@ async function main() {
         entryPoints: [inputFile],
         bundle: true,
         platform: 'browser',
-        external: ['fs'],
+        external: [nodeExternals()],
         write: false,
         outdir: outputFolder,
         target: 'es2015',
