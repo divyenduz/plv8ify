@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+const arg = require('arg')
 const esbuild = require('esbuild')
 const fs = require('fs')
 const dedent = require('dedent')
@@ -11,16 +12,29 @@ const typeMap = {
 }
 
 async function main() {
+    const args = arg({
+        '--write-esbuild-output': Boolean,
+    })
+
+    const writeEsbuildOutput = args['--write-esbuild-output'] || false
+
     const distFolder = 'plv8ify-dist'
     const esbuildResult = await esbuild.build({
         entryPoints: ['input.ts'],
         bundle: true,
-        platform: 'node',
+        platform: 'browser',
+        external: ['fs'],
         write: false,
-        outdir: distFolder
+        outdir: distFolder,
+        target: 'es2015',
+        globalName: 'plv8ify',
     }).catch(() => process.exit(1))
 
     const esbuildFile = esbuildResult.outputFiles.find(_ => true)
+
+    if (writeEsbuildOutput) {
+        fs.writeFileSync(`${distFolder}/output.js`, esbuildFile.text)
+    }
 
     const project = new Project()
     const sourceFile = project.addSourceFileAtPath("input.ts");
@@ -28,6 +42,11 @@ async function main() {
     const fns = sourceFile.getFunctions()
 
     fns.forEach(fnAst => {
+
+        if (!fnAst.isExported()) {
+            return
+        }
+
         const name = fnAst.getName()
         const scopedName = 'plv8ify_' + fnAst.getName()
         const params = fnAst.getParameters()
@@ -36,7 +55,7 @@ async function main() {
             .map(p => {
                 const name = p.getName()
                 const type = p.getType().getText()
-                const mappedType = typeMap[type]
+                const mappedType = typeMap[type] || 'JSONB'
                 return `${name} ${mappedType}`
             }).join(',')
 
@@ -47,10 +66,10 @@ async function main() {
             }).join(',')
 
         const plv8FunctionShell = dedent(`DROP FUNCTION IF EXISTS ${scopedName}(${paramsBind});
-CREATE OR REPLACE FUNCTION ${scopedName}(${paramsBind}) RETURNS JSON AS $$
+CREATE OR REPLACE FUNCTION ${scopedName}(${paramsBind}) RETURNS JSONB AS $$
 ${esbuildFile.text}
 
-return ${name}(${paramsCall})
+return plv8ify.${name}(${paramsCall})
 
 $$ LANGUAGE plv8 IMMUTABLE STRICT;`)
 
