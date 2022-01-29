@@ -14,26 +14,39 @@ const typeMap = {
 async function main() {
     const args = arg({
         '--write-esbuild-output': Boolean,
+        '--input-file': String,
+        '--output-folder': String,
+        '--scope-prefix': String,
+        '--fallback-type': String,
     })
 
-    const writeEsbuildOutput = args['--write-esbuild-output'] || false
+    if (args._.length === 0) {
+        throw new Error(`Please specify a command. Available commands: generate`)
+    }
 
-    const distFolder = 'plv8ify-dist'
+    const writeEsbuildOutput = args['--write-esbuild-output'] || false
+    const inputFile = args['--input-file'] || 'input.ts'
+    const outputFolder = args['--output-folder'] || 'plv8ify-dist'
+    const scopePrefix = args['--scope-prefix'] || 'plv8ify'
+    const fallbackType = args['--fallback-type'] || 'JSONB'
+
+    fs.mkdirSync(outputFolder, { recursive: true })
+
     const esbuildResult = await esbuild.build({
-        entryPoints: ['input.ts'],
+        entryPoints: [inputFile],
         bundle: true,
         platform: 'browser',
         external: ['fs'],
         write: false,
-        outdir: distFolder,
+        outdir: outputFolder,
         target: 'es2015',
-        globalName: 'plv8ify',
+        globalName: scopePrefix,
     }).catch(() => process.exit(1))
 
     const esbuildFile = esbuildResult.outputFiles.find(_ => true)
 
     if (writeEsbuildOutput) {
-        fs.writeFileSync(`${distFolder}/output.js`, esbuildFile.text)
+        fs.writeFileSync(`${outputFolder}/output.js`, esbuildFile.text)
     }
 
     const project = new Project()
@@ -48,14 +61,14 @@ async function main() {
         }
 
         const name = fnAst.getName()
-        const scopedName = 'plv8ify_' + fnAst.getName()
+        const scopedName = scopePrefix + '_' + fnAst.getName()
         const params = fnAst.getParameters()
 
         const paramsBind = params
             .map(p => {
                 const name = p.getName()
                 const type = p.getType().getText()
-                const mappedType = typeMap[type] || 'JSONB'
+                const mappedType = typeMap[type] || fallbackType
                 return `${name} ${mappedType}`
             }).join(',')
 
@@ -66,14 +79,14 @@ async function main() {
             }).join(',')
 
         const plv8FunctionShell = dedent(`DROP FUNCTION IF EXISTS ${scopedName}(${paramsBind});
-CREATE OR REPLACE FUNCTION ${scopedName}(${paramsBind}) RETURNS JSONB AS $$
+CREATE OR REPLACE FUNCTION ${scopedName}(${paramsBind}) RETURNS ${fallbackType} AS $$
 ${esbuildFile.text}
 
 return plv8ify.${name}(${paramsCall})
 
 $$ LANGUAGE plv8 IMMUTABLE STRICT;`)
 
-        const filename = `${distFolder}/${scopedName}.plv8.sql`
+        const filename = `${outputFolder}/${scopedName}.plv8.sql`
         try {
             fs.unlinkSync(filename)
         } catch (e) { }

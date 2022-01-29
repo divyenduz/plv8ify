@@ -1,6 +1,7 @@
 node_modules
 input.js
 input.ts
+*.input.ts
 *.geojson
 
 plv8ify-dist/
