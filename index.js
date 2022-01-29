@@ -50,7 +50,7 @@ async function main() {
     }
 
     const project = new Project()
-    const sourceFile = project.addSourceFileAtPath("input.ts");
+    const sourceFile = project.addSourceFileAtPath(inputFile);
 
     const fns = sourceFile.getFunctions()
 
