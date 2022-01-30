@@ -1,6 +1,6 @@
 {
   "name": "plv8ify",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "main": "index.js",
   "license": "MIT",
   "bin": {
@@ -15,12 +15,14 @@
     "webpack-node-externals": "3.0.0"
   },
   "devDependencies": {
-    "@types/node": "17.0.12",
     "@turf/boolean-point-in-polygon": "6.5.0",
     "@turf/helpers": "6.5.0",
     "@turf/invariant": "6.5.0",
     "@turf/polygon-to-linestring": "5.0.0",
+    "@turf/turf": "6.5.0",
+    "@types/node": "17.0.12",
     "date-fns": "2.28.0",
-    "@turf/turf": "6.5.0"
+    "react": "17.0.2",
+    "react-dom": "17.0.2"
   }
 }

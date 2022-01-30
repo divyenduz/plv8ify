@@ -67,6 +67,6 @@ export function point(lat, long) {
 - https://github.com/CSTARS/es6-to-plv8
 - https://github.com/clkao/plv8x
 
-## Source Code
+## Contact
 
-This project is closed source but I am more than happy to add anyone to the repository who is interested. Please DM me on https://twitter.com/divyenduz or email me at `mail at divyendusingh.com`
+If you want to reach out to me, please DM me on https://twitter.com/divyenduz or email me at `mail at divyendusingh.com`
