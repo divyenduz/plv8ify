@@ -2,7 +2,7 @@
 
 ## Introduction
 
-`plv8ify` uses esbuild to bundle an input typescript file and writes multiple SQL files (one for each exported function in the typescript file) containing Postgres functions using PLV8.
+`plv8ify` bundles typescript/javascript input and writes SQL file(s) containing Postgres functions using PLV8.
 
 ## Why
 
