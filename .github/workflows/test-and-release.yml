@@ -1,0 +1,48 @@
+name: Run Tests and Release
+# This workflow is triggered on pushes to the repository.
+on:
+  push:
+  workflow_dispatch:
+    inputs:
+
+env:
+  NO_COLOR: true
+  CI: 1
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+jobs:
+  build:
+    name: Test
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.9.1
+        with:
+          access_token: ${{ github.token }}
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+          cache: 'yarn'
+      # - uses: c-hive/gha-yarn-cache@v2
+
+      - name: Turnstyle
+        uses: softprops/turnstyle@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Dependencies
+        run: echo "Installing dependencies" && yarn install && echo "Done installing dependencies"
+
+      - name: Run Types Check
+        run: yarn tsc --noEmit
+
+      - name: Run Tests
+        run: yarn test
+
+      # Note: not 1.0.0 yet, semantic-release only supports versions >1.0.0
+      # - name: Release
+      #   if: endsWith(github.ref, '/main')
+      #   run: yarn semantic-release

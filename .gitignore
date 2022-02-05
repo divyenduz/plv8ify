@@ -9,3 +9,6 @@ input.tsx
 *.geojson
 
 plv8ify-dist/
+dist/
+
+.nyc_output

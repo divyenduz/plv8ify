@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "jsx": "react-jsx",
+    "declaration": true,
+    "esModuleInterop": true,
+    "baseUrl": "."
+  },
+  "exclude": ["node_modules", "src/tests", "dist", "src/fns/esbuild/test-fixtures/bad.fixture.ts"]
+}
