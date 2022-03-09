@@ -1,4 +1,4 @@
 export function sayHello(toWhom: string) {
-  const greet = `hello` + ' ' + toWhom
+  const greet = `hello` + '\n' + toWhom
   return greet
 }

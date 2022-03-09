@@ -59,7 +59,7 @@ export const getSQLFunction = ({
     ${
       // In inline mode, write the bundle text directly to the function
       match(mode)
-        .with('inline', () => dedent(`${bundledJs}`))
+        .with('inline', () => bundledJs)
         .otherwise(() => ``)
     }
     return plv8ify.${name}(${paramsCall})

@@ -44,7 +44,7 @@ var plv8ify = (() => {
     sayHello: () => sayHello
   });
   function sayHello(toWhom) {
-    const greet = \`hello \` + toWhom;
+    const greet = \`hello \` + '\n' + toWhom;
     return greet;
   }
   return __toCommonJS(input_fixture_exports);
