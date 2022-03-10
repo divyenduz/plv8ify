@@ -31,19 +31,20 @@ export function point(lat, long) {
 
 ## CLI Arguments
 
-| Generate Command Flags | Type                     | Description                                                                                              | Default        |
-| ---------------------- | ------------------------ | -------------------------------------------------------------------------------------------------------- | -------------- |
-| --debug                | Boolean                  | Print additional debug information                                                                       | `false`        |
-| --write-esbuild-output | Boolean                  | Write the intermediate bundled Javascript output from ESBuild                                            | `false`        |
-| --input-file           | String                   | Specify an input file path (only Typescript supported at the moment)                                     | `input.ts`     |
-| --output-folder        | String                   | Specify an output folder                                                                                 | `plv8ify-dist` |
-| --scope-prefix         | String                   | Specify a scope prefix, by default `plv8ify` adds `plv8ify_` as prefix for exported typescript functions | `plv8ify`      |
-| --fallback-type        | String                   | Specify a fallback type when `plv8ify` fails to map a detected Typescript type to a Postges type         | `JSONB`        |
-| --mode                 | 'inline' or 'start_proc' | Bundle the library inline in each function or bundle the libary to be used with plv8.start_proc          | `inline`       |
+| Generate Command Flags  | Type                     | Description                                                                                               | Default        |
+| ----------------------- | ------------------------ | --------------------------------------------------------------------------------------------------------- | -------------- |
+| --debug                 | Boolean                  | Print additional debug information                                                                        | `false`        |
+| --write-esbuild-output  | Boolean                  | Write the intermediate bundled Javascript output from ESBuild                                             | `false`        |
+| --input-file            | String                   | Specify an input file path (only Typescript supported at the moment)                                      | `input.ts`     |
+| --output-folder         | String                   | Specify an output folder                                                                                  | `plv8ify-dist` |
+| --scope-prefix          | String                   | Specify a scope prefix, by default `plv8ify`, adds `plv8ify_` as prefix for exported typescript functions | `plv8ify`      |
+| --pg-function-delimiter | String                   | Specify a delimiter for the generated Postgres function                                                   | `$plv8ify$`    |
+| --fallback-type         | String                   | Specify a fallback type when `plv8ify` fails to map a detected Typescript type to a Postges type          | `JSONB`        |
+| --mode                  | 'inline' or 'start_proc' | Bundle the library inline in each function or bundle the libary to be used with plv8.start_proc           | `inline`       |
 
 ## TODO
 
-- [ ] README
+- [x] README
 - [x] Custom function name
 - [x] Export multiple functions
 - [x] Input arguments - basic setup
@@ -56,7 +57,7 @@ export function point(lat, long) {
 - [ ] Javascript as input
 - [x] Typescript for plv8ify code
 - [ ] For each exported bundle, use tree-shaken bundle, currently, each bundle gets all of the Javascript
-- [ ] Test cases
+- [x] Test cases
 
 ## Caveats
 
