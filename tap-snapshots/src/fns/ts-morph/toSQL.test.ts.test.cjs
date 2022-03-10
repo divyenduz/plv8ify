@@ -16,9 +16,9 @@ $function$ LANGUAGE plv8 IMMUTABLE STRICT;
 
 exports[`src/fns/ts-morph/toSQL.test.ts TAP getSQLFunction with parameters > must match snapshot 1`] = `
 DROP FUNCTION IF EXISTS plv8ify_test();
-CREATE OR REPLACE FUNCTION plv8ify_test() RETURNS JSONB AS $$
+CREATE OR REPLACE FUNCTION plv8ify_test() RETURNS JSONB AS $plv8ify$
 console.log("hello")
 return plv8ify.plv8ify_test()
 
-$$ LANGUAGE plv8 IMMUTABLE STRICT;
+$plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;
 `

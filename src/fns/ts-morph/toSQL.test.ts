@@ -5,7 +5,7 @@ import { getSQLFunction } from './toSQL'
 tap.test('getSQLFunction with parameters', async (t) => {
   const sql = getSQLFunction({
     scopedName: 'plv8ify_test',
-    pgFunctionDelimiter: '$$',
+    pgFunctionDelimiter: '$plv8ify$',
     paramsBind: '',
     paramsCall: '',
     fallbackType: 'JSONB',
