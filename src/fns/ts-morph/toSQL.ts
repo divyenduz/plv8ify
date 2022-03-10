@@ -22,7 +22,7 @@ interface GetBindParamsArgs {
 export const getBindParams = ({
   params,
   fallbackType,
-  debug,
+  debug, // TODO: use a proper debugging library
 }: GetBindParamsArgs) => {
   return params
     .map((p) => {
@@ -39,6 +39,7 @@ export const getBindParams = ({
 
 interface GetSQLFunctionArgs {
   scopedName: string
+  pgFunctionDelimiter: string
   paramsBind: string
   paramsCall: string
   fallbackType: string
@@ -48,6 +49,7 @@ interface GetSQLFunctionArgs {
 
 export const getSQLFunction = ({
   scopedName,
+  pgFunctionDelimiter,
   paramsBind,
   paramsCall,
   fallbackType,
@@ -55,16 +57,16 @@ export const getSQLFunction = ({
   bundledJs,
 }: GetSQLFunctionArgs) => {
   return dedent(`DROP FUNCTION IF EXISTS ${scopedName}(${paramsBind});
-    CREATE OR REPLACE FUNCTION ${scopedName}(${paramsBind}) RETURNS ${fallbackType} AS $$
+    CREATE OR REPLACE FUNCTION ${scopedName}(${paramsBind}) RETURNS ${fallbackType} AS ${pgFunctionDelimiter}
     ${
       // In inline mode, write the bundle text directly to the function
       match(mode)
         .with('inline', () => dedent(`${bundledJs}`))
         .otherwise(() => ``)
     }
-    return plv8ify.${name}(${paramsCall})
+    return plv8ify.${scopedName}(${paramsCall})
     
-    $$ LANGUAGE plv8 IMMUTABLE STRICT;`)
+    ${pgFunctionDelimiter} LANGUAGE plv8 IMMUTABLE STRICT;`)
 }
 
 interface GetSQLFunctionFileNameArgs {
