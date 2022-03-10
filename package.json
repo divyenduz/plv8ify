@@ -38,6 +38,6 @@
     "dev": "yarn esr src/index.ts generate --input-file src/tests/input.ts",
     "build": "rm -rf dist; tsc",
     "prepublish": "yarn build",
-    "test": "tap --node-arg=--require=esbuild-register --test-ignore='src/tests|dist'"
+    "test": "tap --node-arg=--require=esbuild-register --test-ignore='src/tests|dist' --no-check-coverage"
   }
 }

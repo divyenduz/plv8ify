@@ -29,6 +29,5 @@ tap.test('getBundleJs - bad syntax', async (t) => {
     outputFolder: 'plv8ify-dist',
     scopePrefix: 'plv8ify',
   })
-  console.log({ js })
   t.rejects(js)
 })

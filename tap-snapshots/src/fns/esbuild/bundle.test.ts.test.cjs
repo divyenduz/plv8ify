@@ -5,14 +5,6 @@
  * Make sure to inspect the output below.  Do not ignore changes!
  */
 'use strict'
-exports[`src/fns/esbuild/bundle.test.ts TAP getBundleJs - bad syntax > must match snapshot 1`] = `
-plv8ify = (() => {
-  // src/fns/esbuild/test-fixtures/bad.fixture.ts
-  x;
-})();
-
-`
-
 exports[`src/fns/esbuild/bundle.test.ts TAP getBundleJs - inline mode > must match snapshot 1`] = `
 var plv8ify = (() => {
   var __defProp = Object.defineProperty;

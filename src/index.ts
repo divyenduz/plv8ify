@@ -53,7 +53,7 @@ async function main() {
   const inputFile = args['--input-file'] || 'input.ts'
   const outputFolder = args['--output-folder'] || 'plv8ify-dist'
   const scopePrefix = args['--scope-prefix'] || 'plv8ify'
-  const pgFunctionDelimiter = args['--pg-function-delimiter'] || '$$'
+  const pgFunctionDelimiter = args['--pg-function-delimiter'] || '$plv8ify$'
   const fallbackType = args['--fallback-type'] || 'JSONB'
   const mode = (args['--mode'] || 'inline') as Mode
   const debug = args['--debug'] || false
