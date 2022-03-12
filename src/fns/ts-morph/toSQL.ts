@@ -56,17 +56,16 @@ export const getSQLFunction = ({
   mode,
   bundledJs,
 }: GetSQLFunctionArgs) => {
-  return dedent(`DROP FUNCTION IF EXISTS ${scopedName}(${paramsBind});
-    CREATE OR REPLACE FUNCTION ${scopedName}(${paramsBind}) RETURNS ${fallbackType} AS ${pgFunctionDelimiter}
-    ${
-      // In inline mode, write the bundle text directly to the function
-      match(mode)
-        .with('inline', () => dedent(`${bundledJs}`))
-        .otherwise(() => ``)
-    }
-    return plv8ify.${scopedName}(${paramsCall})
-    
-    ${pgFunctionDelimiter} LANGUAGE plv8 IMMUTABLE STRICT;`)
+  return [
+    `DROP FUNCTION IF EXISTS ${scopedName}(${paramsBind});`,
+    `CREATE OR REPLACE FUNCTION ${scopedName}(${paramsBind}) RETURNS ${fallbackType} AS ${pgFunctionDelimiter}`,
+    match(mode)
+      .with('inline', () => bundledJs)
+      .otherwise(() => ''),
+    `return plv8ify.${scopedName}(${paramsCall})`,
+    '',
+    `${pgFunctionDelimiter} LANGUAGE plv8 IMMUTABLE STRICT;`,
+  ].join('\n')
 }
 
 interface GetSQLFunctionFileNameArgs {
