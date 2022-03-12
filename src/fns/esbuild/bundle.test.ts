@@ -31,3 +31,23 @@ tap.test('getBundleJs - bad syntax', async (t) => {
   })
   t.rejects(js)
 })
+
+tap.test('getBundleJs - newline template', async (t) => {
+  const js = await getBundledJs({
+    inputFile: './src/fns/esbuild/test-fixtures/newline-template.fixture.ts',
+    mode: 'start_proc',
+    outputFolder: 'plv8ify-dist',
+    scopePrefix: 'plv8ify',
+  })
+  t.matchSnapshot(js)
+})
+
+tap.test('getBundleJs - newline string', async (t) => {
+  const js = await getBundledJs({
+    inputFile: './src/fns/esbuild/test-fixtures/newline-string.fixture.ts',
+    mode: 'start_proc',
+    outputFolder: 'plv8ify-dist',
+    scopePrefix: 'plv8ify',
+  })
+  t.matchSnapshot(js)
+})
