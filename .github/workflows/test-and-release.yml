@@ -42,6 +42,10 @@ jobs:
       - name: Run Tests
         run: yarn test
 
+      - name: Release Patch
+        if: endsWith(github.ref, '/main')
+        run: yarn publish --patch
+
       # Note: not 1.0.0 yet, semantic-release only supports versions >1.0.0
       # - name: Release
       #   if: endsWith(github.ref, '/main')
