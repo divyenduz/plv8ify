@@ -48,6 +48,7 @@ jobs:
           git config --global user.email "mail@divyendusingh.com"
           git config --global user.name "Divyendu Singh"
           echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
+          yarn build
           yarn publish --patch
           git push origin main
 
