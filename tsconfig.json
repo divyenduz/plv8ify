@@ -12,6 +12,7 @@
     "**/*.test.ts",
     "**/*.fixture.ts",
     "examples/**/*",
+    "dist",
     "src/fns/esbuild/test-fixtures/bad.fixture.ts"
   ]
 }
