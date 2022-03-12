@@ -39,6 +39,7 @@ export const getBindParams = ({
 
 interface GetSQLFunctionArgs {
   scopedName: string
+  fnName: string
   pgFunctionDelimiter: string
   paramsBind: string
   paramsCall: string
@@ -49,6 +50,7 @@ interface GetSQLFunctionArgs {
 
 export const getSQLFunction = ({
   scopedName,
+  fnName,
   pgFunctionDelimiter,
   paramsBind,
   paramsCall,
@@ -62,7 +64,7 @@ export const getSQLFunction = ({
     match(mode)
       .with('inline', () => bundledJs)
       .otherwise(() => ''),
-    `return plv8ify.${scopedName}(${paramsCall})`,
+    `return plv8ify.${fnName}(${paramsCall})`,
     '',
     `${pgFunctionDelimiter} LANGUAGE plv8 IMMUTABLE STRICT;`,
   ].join('\n')
