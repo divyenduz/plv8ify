@@ -96,7 +96,8 @@ async function main() {
       return
     }
 
-    const scopedName = scopePrefix + '_' + fnAst.getName()
+    const fnName = fnAst.getName()
+    const scopedName = scopePrefix + '_' + fnName
     const params = fnAst.getParameters()
 
     // Js to SQL type mapping happens here
@@ -113,6 +114,7 @@ async function main() {
 
     const SQLFunction = getSQLFunction({
       scopedName,
+      fnName,
       pgFunctionDelimiter,
       paramsBind,
       paramsCall,
