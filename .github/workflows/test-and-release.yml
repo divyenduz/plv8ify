@@ -42,14 +42,12 @@ jobs:
       - name: Run Tests
         run: yarn test
 
-      - name: Run Tests
-        run: |
-          git config --global user.email "mail@divyendusingh.com"
-          git config --global user.name "Divyendu Singh"
-
       - name: Release Patch
         if: endsWith(github.ref, '/main')
         run: |
+          git config --global user.email "mail@divyendusingh.com"
+          git config --global user.name "Divyendu Singh"
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
           yarn publish --patch
           git push origin main
 

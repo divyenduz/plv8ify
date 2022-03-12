@@ -27,7 +27,8 @@ export function point(lat, long) {
 4. Step 3 emits SQL file with names like `./plv8-dist/plv8ify_point.plv8.sql` (one for each exported function)
 5. Execute the generated `./plv8-dist/plv8ify_point.plv8.sql` using a Postgres client
 6. Call the generated function using a Postgres client `SELECT plv8ify_point(52.5200,13.4050);`
-7. Steps 1-6 converted a Typescript file into a PLV8 executable function
+
+See all examples in the [examples folder](/examples). Use `yarn examples` to apply any changes to all the examples.
 
 ## CLI Arguments
 
@@ -41,23 +42,6 @@ export function point(lat, long) {
 | --pg-function-delimiter | String                   | Specify a delimiter for the generated Postgres function                                                   | `$plv8ify$`    |
 | --fallback-type         | String                   | Specify a fallback type when `plv8ify` fails to map a detected Typescript type to a Postges type          | `JSONB`        |
 | --mode                  | 'inline' or 'start_proc' | Bundle the library inline in each function or bundle the libary to be used with plv8.start_proc           | `inline`       |
-
-## TODO
-
-- [x] README
-- [x] Custom function name
-- [x] Export multiple functions
-- [x] Input arguments - basic setup
-- [x] Flag to Emit intermediate file
-- [ ] Input arguments - support most data types
-- [x] Input file name
-- [x] Output folder name
-- [ ] Return type guessing
-- [x] Typescript as input
-- [ ] Javascript as input
-- [x] Typescript for plv8ify code
-- [ ] For each exported bundle, use tree-shaken bundle, currently, each bundle gets all of the Javascript
-- [x] Test cases
 
 ## Caveats
 
