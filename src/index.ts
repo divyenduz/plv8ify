@@ -4,18 +4,18 @@ import { Project } from 'ts-morph'
 import { getBundledJs } from './fns/esbuild/bundle'
 import {
   getClientInitFileName,
-  getClientInitSQL,
+  getClientInitSQL
 } from './fns/plv8/startProc/client'
 import {
   getInitFunction,
   getInitFunctionFilename,
-  getInitFunctionName,
+  getInitFunctionName
 } from './fns/plv8/startProc/init'
 import { getParamsCall } from './fns/ts-morph/toJs'
 import {
   getBindParams,
   getSQLFunction,
-  getSQLFunctionFileName,
+  getSQLFunctionFileName
 } from './fns/ts-morph/toSQL'
 import { writeFile } from './utils'
 
@@ -64,7 +64,7 @@ async function main() {
     mode,
     inputFile,
     outputFolder,
-    scopePrefix,
+    scopePrefix: 'plv8ify',
   })
 
   // Optionally, write ESBuild output file
