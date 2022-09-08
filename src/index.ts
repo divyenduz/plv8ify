@@ -4,18 +4,18 @@ import { Project } from 'ts-morph'
 import { getBundledJs } from './fns/esbuild/bundle'
 import {
   getClientInitFileName,
-  getClientInitSQL
+  getClientInitSQL,
 } from './fns/plv8/startProc/client'
 import {
   getInitFunction,
   getInitFunctionFilename,
-  getInitFunctionName
+  getInitFunctionName,
 } from './fns/plv8/startProc/init'
 import { getParamsCall } from './fns/ts-morph/toJs'
 import {
   getBindParams,
   getSQLFunction,
-  getSQLFunctionFileName
+  getSQLFunctionFileName,
 } from './fns/ts-morph/toSQL'
 import { writeFile } from './utils'
 
@@ -107,6 +107,12 @@ async function main() {
     const scopedName = scopePrefix + '_' + fnName
     const params = fnAst.getParameters()
 
+    const comments = fnAst.getLeadingCommentRanges().map((cr) => cr.getText())
+    const localVolatility = (comments
+      .filter((comment) => comment.includes('//@plv8ify-volatility-'))
+      .map((comment) => comment.replace('//@plv8ify-volatility-', ''))[0] ||
+      volatility) as Volatility
+
     // Js to SQL type mapping happens here
     const paramsBind = getBindParams({
       params,
@@ -128,7 +134,7 @@ async function main() {
       fallbackType,
       mode,
       bundledJs,
-      volatility
+      volatility: localVolatility,
     })
 
     const filename = getSQLFunctionFileName({
