@@ -1,5 +1,5 @@
-DROP FUNCTION IF EXISTS plv8ify_point(lat float8,long float8);
-CREATE OR REPLACE FUNCTION plv8ify_point(lat float8,long float8) RETURNS JSONB AS $plv8ify$
+DROP FUNCTION IF EXISTS plv8ify_stablePoint(lat float8,long float8);
+CREATE OR REPLACE FUNCTION plv8ify_stablePoint(lat float8,long float8) RETURNS JSONB AS $plv8ify$
 var plv8ify = (() => {
   var __defProp = Object.defineProperty;
   var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
@@ -410,6 +410,6 @@ var plv8ify = (() => {
   return __toCommonJS(input_exports);
 })();
 
-return plv8ify.point(lat,long)
+return plv8ify.stablePoint(lat,long)
 
-$plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;
+$plv8ify$ LANGUAGE plv8 STABLE STRICT;

@@ -1,5 +1,4 @@
 // TS to SQL helpers
-import dedent from 'dedent'
 import { ParameterDeclaration } from 'ts-morph'
 import { match } from 'ts-pattern'
 
