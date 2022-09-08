@@ -3,7 +3,7 @@ import dedent from 'dedent'
 import { ParameterDeclaration } from 'ts-morph'
 import { match } from 'ts-pattern'
 
-import { Mode } from '../..'
+import { Mode, Volatility } from '../..'
 
 const typeMap = {
   number: 'float8',
@@ -46,6 +46,7 @@ interface GetSQLFunctionArgs {
   fallbackType: string
   mode: Mode
   bundledJs: string
+  volatility: Volatility
 }
 
 export const getSQLFunction = ({
@@ -57,6 +58,7 @@ export const getSQLFunction = ({
   fallbackType,
   mode,
   bundledJs,
+  volatility
 }: GetSQLFunctionArgs) => {
   return [
     `DROP FUNCTION IF EXISTS ${scopedName}(${paramsBind});`,
@@ -66,7 +68,7 @@ export const getSQLFunction = ({
       .otherwise(() => ''),
     `return plv8ify.${fnName}(${paramsCall})`,
     '',
-    `${pgFunctionDelimiter} LANGUAGE plv8 IMMUTABLE STRICT;`,
+    `${pgFunctionDelimiter} LANGUAGE plv8 ${volatility} STRICT;`,
   ].join('\n')
 }
 
