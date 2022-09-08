@@ -1,12 +1,23 @@
 import dedent = require('dedent')
+import { Volatility } from 'src'
 
 export const getInitFunctionName = (scopePrefix) => scopePrefix + '_init'
 
-export const getInitFunction = (fnName: string, source: string) =>
+interface Options {
+  fnName: string
+  source: string
+  volatility: Volatility
+}
+
+export const getInitFunction = ({
+  fnName, 
+  source,
+  volatility
+}: Options) =>
   dedent(`DROP FUNCTION IF EXISTS ${fnName}();
 CREATE OR REPLACE FUNCTION ${fnName}() RETURNS VOID AS $$
 ${source}
-$$ LANGUAGE plv8 IMMUTABLE STRICT;
+$$ LANGUAGE plv8 ${volatility} STRICT;
 `)
 
 export const getInitFunctionFilename = (outputFolder: string, fnName: string) =>

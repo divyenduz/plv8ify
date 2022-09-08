@@ -23,6 +23,7 @@ import arg = require('arg')
 import fs = require('fs')
 
 export type Mode = 'inline' | 'start_proc'
+export type Volatility = 'VOLATILE' | 'STABLE' | 'IMMUTABLE'
 
 async function main() {
   // CLI Args
@@ -34,6 +35,7 @@ async function main() {
     '--pg-function-delimiter': String,
     '--fallback-type': String,
     '--mode': String,
+    '--volatility': String,
     '--debug': Boolean,
   })
 
@@ -56,6 +58,7 @@ async function main() {
   const pgFunctionDelimiter = args['--pg-function-delimiter'] || '$plv8ify$'
   const fallbackType = args['--fallback-type'] || 'JSONB'
   const mode = (args['--mode'] || 'inline') as Mode
+  const volatility = (args['--volatility'] || 'IMMUTABLE') as Volatility
   const debug = args['--debug'] || false
 
   fs.mkdirSync(outputFolder, { recursive: true })
@@ -79,7 +82,11 @@ async function main() {
   if (mode === 'start_proc') {
     // -- PLV8 + Server
     const initFunctionName = getInitFunctionName(scopePrefix)
-    const initFunction = getInitFunction(initFunctionName, bundledJs)
+    const initFunction = getInitFunction({
+      fnName: initFunctionName,
+      source: bundledJs,
+      volatility,
+    })
     const initFileName = getInitFunctionFilename(outputFolder, initFunctionName)
     writeFile(initFileName, initFunction)
 
@@ -121,6 +128,7 @@ async function main() {
       fallbackType,
       mode,
       bundledJs,
+      volatility
     })
 
     const filename = getSQLFunctionFileName({
