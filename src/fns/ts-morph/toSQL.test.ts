@@ -12,6 +12,7 @@ tap.test('getSQLFunction with parameters', async (t) => {
     fallbackType: 'JSONB',
     mode: 'inline',
     bundledJs: 'console.log("hello")',
+    volatility: 'IMMUTABLE'
   })
   t.matchSnapshot(sql)
 })
@@ -26,6 +27,7 @@ tap.test('getSQLFunction with delimiter', async (t) => {
     fallbackType: 'JSONB',
     mode: 'inline',
     bundledJs: 'console.log("hello")',
+    volatility: 'IMMUTABLE'
   })
   t.matchSnapshot(sql)
 })

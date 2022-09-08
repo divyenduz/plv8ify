@@ -3,7 +3,7 @@ import dedent from 'dedent'
 import { ParameterDeclaration } from 'ts-morph'
 import { match } from 'ts-pattern'
 
-import { Mode, Volatility } from '../..'
+import { Mode, Volatility } from '../../'
 
 const typeMap = {
   number: 'float8',

@@ -1,5 +1,5 @@
 import dedent = require('dedent')
-import { Volatility } from 'src'
+import { Volatility } from '../../../'
 
 export const getInitFunctionName = (scopePrefix) => scopePrefix + '_init'
 
