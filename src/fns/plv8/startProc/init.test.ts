@@ -14,8 +14,12 @@ tap.test('getInitFunctionName', async (t) => {
 tap.test('getInitFunction', async (t) => {
   const initFunctionName = getInitFunctionName('plv8ify')
   const initFunction = getInitFunction(
-    initFunctionName,
-    `plv8.elog(NOTICE, plv8.version);`
+    {
+      fnName: initFunctionName,
+      source: `plv8.elog(NOTICE, plv8.version);`,
+      volatility: 'IMMUTABLE'
+    }
+
   )
 
   t.matchSnapshot(initFunction)
