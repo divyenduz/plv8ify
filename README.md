@@ -32,16 +32,17 @@ See all examples in the [examples folder](/examples). Use `yarn examples` to app
 
 ## CLI Arguments
 
-| Generate Command Flags  | Type                     | Description                                                                                               | Default        |
-| ----------------------- | ------------------------ | --------------------------------------------------------------------------------------------------------- | -------------- |
-| --debug                 | Boolean                  | Print additional debug information                                                                        | `false`        |
-| --write-esbuild-output  | Boolean                  | Write the intermediate bundled Javascript output from ESBuild                                             | `false`        |
-| --input-file            | String                   | Specify an input file path (only Typescript supported at the moment)                                      | `input.ts`     |
-| --output-folder         | String                   | Specify an output folder                                                                                  | `plv8ify-dist` |
-| --scope-prefix          | String                   | Specify a scope prefix, by default `plv8ify`, adds `plv8ify_` as prefix for exported typescript functions | `plv8ify`      |
-| --pg-function-delimiter | String                   | Specify a delimiter for the generated Postgres function                                                   | `$plv8ify$`    |
-| --fallback-type         | String                   | Specify a fallback type when `plv8ify` fails to map a detected Typescript type to a Postges type          | `JSONB`        |
-| --mode                  | 'inline' or 'start_proc' | Bundle the library inline in each function or bundle the libary to be used with plv8.start_proc           | `inline`       |
+| Generate Command Flags  | Type                                  | Description                                                                                                                                                                                                              | Default        |
+| ----------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------- |
+| --debug                 | Boolean                               | Print additional debug information                                                                                                                                                                                       | `false`        |
+| --write-esbuild-output  | Boolean                               | Write the intermediate bundled Javascript output from ESBuild                                                                                                                                                            | `false`        |
+| --input-file            | String                                | Specify an input file path (only Typescript supported at the moment)                                                                                                                                                     | `input.ts`     |
+| --output-folder         | String                                | Specify an output folder                                                                                                                                                                                                 | `plv8ify-dist` |
+| --scope-prefix          | String                                | Specify a scope prefix, by default `plv8ify`, adds `plv8ify_` as prefix for exported typescript functions                                                                                                                | `plv8ify`      |
+| --pg-function-delimiter | String                                | Specify a delimiter for the generated Postgres function                                                                                                                                                                  | `$plv8ify$`    |
+| --fallback-type         | String                                | Specify a fallback type when `plv8ify` fails to map a detected Typescript type to a Postges type                                                                                                                         | `JSONB`        |
+| --mode                  | 'inline' or 'start_proc'              | Bundle the library inline in each function or bundle the libary to be used with plv8.start_proc                                                                                                                          | `inline`       |
+| --volatility            | 'IMMUTABLE' or 'STABLE' or 'VOLATILE' | Change the volatility of all the generated functions. To change volatility of a specific function use the comment format `//@plv8ify-volatility-STABLE` in the input typescript file (see `examples/turf-js/input.ts`). Note that for now only single-line comment syntax is supported. | `IMMUTABLE`    |
 
 ## Caveats
 
