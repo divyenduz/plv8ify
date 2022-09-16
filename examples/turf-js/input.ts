@@ -10,3 +10,8 @@ export function stablePoint(lat: number, long: number) {
   const pt = turfPoint([lat, long])
   return pt
 }
+
+export function stablePointAsString(lat: number, long: number) {
+  const pt = JSON.stringify(turfPoint([lat, long]))
+  return pt
+}

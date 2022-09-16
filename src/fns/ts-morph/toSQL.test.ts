@@ -9,7 +9,7 @@ tap.test('getSQLFunction with parameters', async (t) => {
     pgFunctionDelimiter: '$plv8ify$',
     paramsBind: '',
     paramsCall: '',
-    fallbackType: 'JSONB',
+    returnType: 'JSONB',
     mode: 'inline',
     bundledJs: 'console.log("hello")',
     volatility: 'IMMUTABLE'
@@ -24,7 +24,7 @@ tap.test('getSQLFunction with delimiter', async (t) => {
     pgFunctionDelimiter: '$function$',
     paramsBind: '',
     paramsCall: '',
-    fallbackType: 'JSONB',
+    returnType: 'JSONB',
     mode: 'inline',
     bundledJs: 'console.log("hello")',
     volatility: 'IMMUTABLE'
