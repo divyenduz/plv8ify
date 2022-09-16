@@ -4,18 +4,19 @@ import { Project } from 'ts-morph'
 import { getBundledJs } from './fns/esbuild/bundle'
 import {
   getClientInitFileName,
-  getClientInitSQL,
+  getClientInitSQL
 } from './fns/plv8/startProc/client'
 import {
   getInitFunction,
   getInitFunctionFilename,
-  getInitFunctionName,
+  getInitFunctionName
 } from './fns/plv8/startProc/init'
 import { getParamsCall } from './fns/ts-morph/toJs'
 import {
   getBindParams,
+  getReturnType,
   getSQLFunction,
-  getSQLFunctionFileName,
+  getSQLFunctionFileName
 } from './fns/ts-morph/toSQL'
 import { writeFile } from './utils'
 
@@ -125,13 +126,18 @@ async function main() {
       params,
     })
 
+    const returnType = getReturnType({
+      type: fnAst,
+      fallbackType,
+    })
+
     const SQLFunction = getSQLFunction({
       scopedName,
       fnName,
       pgFunctionDelimiter,
       paramsBind,
       paramsCall,
-      fallbackType,
+      returnType,
       mode,
       bundledJs,
       volatility: localVolatility,
