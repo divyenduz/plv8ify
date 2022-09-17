@@ -396,7 +396,8 @@ var plv8ify = (() => {
   var input_exports = {};
   __export(input_exports, {
     point: () => point,
-    stablePoint: () => stablePoint
+    stablePoint: () => stablePoint,
+    stablePointAsString: () => stablePointAsString
   });
   var { point: turfPoint } = require_js();
   function point(lat, long) {
@@ -405,6 +406,10 @@ var plv8ify = (() => {
   }
   function stablePoint(lat, long) {
     const pt = turfPoint([lat, long]);
+    return pt;
+  }
+  function stablePointAsString(lat, long) {
+    const pt = JSON.stringify(turfPoint([lat, long]));
     return pt;
   }
   return __toCommonJS(input_exports);

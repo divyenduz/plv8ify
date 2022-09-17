@@ -1,5 +1,5 @@
 // TS to SQL helpers
-import { ParameterDeclaration } from 'ts-morph'
+import { FunctionDeclaration, ParameterDeclaration } from 'ts-morph'
 import { match } from 'ts-pattern'
 
 import { Mode, Volatility } from '../../'
@@ -8,6 +8,19 @@ const typeMap = {
   number: 'float8',
   string: 'text',
   boolean: 'boolean',
+}
+
+interface GetReturnTypeArgs {
+  type: FunctionDeclaration
+  fallbackType: string
+}
+
+export const getReturnType = ({
+  type,
+  fallbackType,
+}: GetReturnTypeArgs): string => {
+  const ts = type.getReturnType().getText()
+  return typeMap[ts] || fallbackType
 }
 
 interface GetBindParamsArgs {
@@ -42,7 +55,7 @@ interface GetSQLFunctionArgs {
   pgFunctionDelimiter: string
   paramsBind: string
   paramsCall: string
-  fallbackType: string
+  returnType: string
   mode: Mode
   bundledJs: string
   volatility: Volatility
@@ -54,14 +67,14 @@ export const getSQLFunction = ({
   pgFunctionDelimiter,
   paramsBind,
   paramsCall,
-  fallbackType,
+  returnType,
   mode,
   bundledJs,
   volatility
 }: GetSQLFunctionArgs) => {
   return [
     `DROP FUNCTION IF EXISTS ${scopedName}(${paramsBind});`,
-    `CREATE OR REPLACE FUNCTION ${scopedName}(${paramsBind}) RETURNS ${fallbackType} AS ${pgFunctionDelimiter}`,
+    `CREATE OR REPLACE FUNCTION ${scopedName}(${paramsBind}) RETURNS ${returnType} AS ${pgFunctionDelimiter}`,
     match(mode)
       .with('inline', () => bundledJs)
       .otherwise(() => ''),
