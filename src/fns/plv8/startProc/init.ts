@@ -1,4 +1,3 @@
-import dedent = require('dedent')
 import { Volatility } from '../../../'
 
 export const getInitFunctionName = (scopePrefix) => scopePrefix + '_init'
@@ -10,15 +9,15 @@ interface Options {
 }
 
 export const getInitFunction = ({
-  fnName, 
+  fnName,
   source,
   volatility
 }: Options) =>
-  dedent(`DROP FUNCTION IF EXISTS ${fnName}();
+  `DROP FUNCTION IF EXISTS ${fnName}();
 CREATE OR REPLACE FUNCTION ${fnName}() RETURNS VOID AS $$
 ${source}
 $$ LANGUAGE plv8 ${volatility} STRICT;
-`)
+`
 
 export const getInitFunctionFilename = (outputFolder: string, fnName: string) =>
   `${outputFolder}/${fnName}.plv8.sql`
