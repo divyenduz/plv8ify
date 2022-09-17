@@ -40,7 +40,7 @@ export const getBundledJs = async ({
     .with('inline', () => esbuildFile.text)
     .with('start_proc', () =>
       // Remove var from var plv8ify to make it attach to the global scope in start_proc mode
-      esbuildFile.text.replace(`var ${scopePrefix} =`, `${scopePrefix} =`)
+      esbuildFile.text.replace(`var ${scopePrefix} =`, `this.${scopePrefix} =`)
     )
     .exhaustive()
   return bundlesJs
