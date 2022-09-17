@@ -1,6 +1,6 @@
 {
   "name": "plv8ify",
-  "version": "0.0.33",
+  "version": "0.0.34",
   "main": "dist/index.js",
   "license": "MIT",
   "bin": {
