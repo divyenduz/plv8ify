@@ -10,6 +10,7 @@ DROP FUNCTION IF EXISTS plv8ify_init();
 CREATE OR REPLACE FUNCTION plv8ify_init() RETURNS VOID AS $$
 plv8.elog(NOTICE, plv8.version);
 $$ LANGUAGE plv8 IMMUTABLE STRICT;
+
 `
 
 exports[`src/fns/plv8/startProc/init.test.ts TAP getInitFunctionFilename > must match snapshot 1`] = `

@@ -45,7 +45,7 @@ var plv8ify = (() => {
 `
 
 exports[`src/fns/esbuild/bundle.test.ts TAP getBundleJs - inline start_proc > must match snapshot 1`] = `
-plv8ify = (() => {
+this.plv8ify = (() => {
   var __defProp = Object.defineProperty;
   var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
   var __getOwnPropNames = Object.getOwnPropertyNames;
@@ -84,7 +84,7 @@ plv8ify = (() => {
 `
 
 exports[`src/fns/esbuild/bundle.test.ts TAP getBundleJs - newline string > must match snapshot 1`] = `
-plv8ify = (() => {
+this.plv8ify = (() => {
   var __defProp = Object.defineProperty;
   var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
   var __getOwnPropNames = Object.getOwnPropertyNames;
@@ -123,7 +123,7 @@ plv8ify = (() => {
 `
 
 exports[`src/fns/esbuild/bundle.test.ts TAP getBundleJs - newline template > must match snapshot 1`] = `
-plv8ify = (() => {
+this.plv8ify = (() => {
   var __defProp = Object.defineProperty;
   var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
   var __getOwnPropNames = Object.getOwnPropertyNames;

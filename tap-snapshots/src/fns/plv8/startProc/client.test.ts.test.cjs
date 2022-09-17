@@ -10,6 +10,8 @@ plv8ify-dist/start.plv8.sql
 `
 
 exports[`src/fns/plv8/startProc/client.test.ts TAP getClientInitSQL > must match snapshot 1`] = `
+
 SET plv8.start_proc = plv8ify_init;
 SELECT plv8_reset();
+
 `
