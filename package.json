@@ -43,6 +43,7 @@
     "example:turf-js": "yarn esr src/index.ts generate --input-file examples/turf-js/input.ts --output-folder examples/turf-js/plv8ify-dist",
     "example:turf-js-distance": "yarn esr src/index.ts generate --input-file examples/turf-js-distance/input.ts --output-folder examples/turf-js-distance/plv8ify-dist",
     "example:react-js": "yarn esr src/index.ts generate --input-file examples/react-js/input.tsx --output-folder examples/react-js/plv8ify-dist",
+    "example:trackfootball": "yarn esr src/index.ts generate --input-file examples/trackfootball/input.tsx --output-folder examples/trackfootball/plv8ify-dist",
     "example:object-hash": "yarn esr src/index.ts generate --input-file examples/object-hash/input.ts --output-folder examples/object-hash/plv8ify-dist",
     "examples": "yarn example:turf-js; yarn example:react-js; yarn example:object-hash; yarn example:turf-js-distance"
   }
