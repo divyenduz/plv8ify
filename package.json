@@ -42,10 +42,12 @@
     "prepublish": "yarn build",
     "test": "tap --node-arg=--require=esbuild-register --no-check-coverage",
     "dev": "yarn example:turf-js",
+    "example:hello": "yarn esr src/index.ts generate --input-file examples/hello/input.ts --output-folder examples/hello/plv8ify-dist",
+    "example:hello-start_proc": "yarn esr src/index.ts generate --input-file examples/hello-start_proc/input.ts --output-folder examples/hello-start_proc/plv8ify-dist --mode start_proc",
     "example:turf-js": "yarn esr src/index.ts generate --input-file examples/turf-js/input.ts --output-folder examples/turf-js/plv8ify-dist",
     "example:turf-js-distance": "yarn esr src/index.ts generate --input-file examples/turf-js-distance/input.ts --output-folder examples/turf-js-distance/plv8ify-dist",
     "example:react-js": "yarn esr src/index.ts generate --input-file examples/react-js/input.tsx --output-folder examples/react-js/plv8ify-dist",
     "example:object-hash": "yarn esr src/index.ts generate --input-file examples/object-hash/input.ts --output-folder examples/object-hash/plv8ify-dist",
-    "examples": "yarn example:turf-js; yarn example:react-js; yarn example:object-hash; yarn example:turf-js-distance"
+    "examples": "yarn example:hello; yarn example:hello-start_proc; yarn example:turf-js; yarn example:react-js; yarn example:object-hash; yarn example:turf-js-distance"
   }
 }
