@@ -11,12 +11,10 @@ export class EsBuild implements Bundler {
   async build({
     mode,
     inputFile,
-    outputFolder,
     scopePrefix
   }: BuildArgs) {
     const esbuildResult = await build({
       entryPoints: [inputFile],
-      outdir: outputFolder,
       globalName: scopePrefix,
       platform: 'browser',
       external: [nodeExternals()],

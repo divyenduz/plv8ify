@@ -70,7 +70,6 @@ async function main() {
   const bundledJs = await plv8ify.build({
     mode, // TODO: fixme, mode leaks plv8 stuff into the bundler, maybe that's wrong?
     inputFile,
-    outputFolder,
     scopePrefix: 'plv8ify',
   })
 

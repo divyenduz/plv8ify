@@ -1,7 +1,6 @@
 interface BuildArgs {
-  mode: 'inline' | 'start_proc' // TODO: fixme, common type globally
+  mode: 'inline' | 'start_proc' // TODO: fixme, common type globally, bundler shouldn't care about inline/start_proc from plv8
   inputFile: string
-  outputFolder: string
   scopePrefix: string
 }
 
