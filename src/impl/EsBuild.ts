@@ -1,25 +1,20 @@
-import { match } from 'ts-pattern'
+import { injectable } from "inversify";
+import "reflect-metadata";
 
-import { Mode } from '../..'
+import { build } from 'esbuild'
+import nodeExternals from 'webpack-node-externals'
+import { match } from "ts-pattern";
 
-import esbuild = require('esbuild')
-import nodeExternals = require('webpack-node-externals')
-
-interface GetBundledJsArgs {
-  mode: Mode
-  inputFile: string
-  outputFolder: string
-  scopePrefix: string
-}
-
-export const getBundledJs = async ({
-  mode,
-  inputFile,
-  outputFolder,
-  scopePrefix,
-}: GetBundledJsArgs) => {
-  const esbuildResult = await esbuild
-    .build({
+// TODO: this is exported only for tests, is that needed?
+@injectable()
+export class EsBuild implements Bundler {
+  async build({
+    mode,
+    inputFile,
+    outputFolder,
+    scopePrefix
+  }: BuildArgs) {
+    const esbuildResult = await build({
       entryPoints: [inputFile],
       outdir: outputFolder,
       globalName: scopePrefix,
@@ -44,4 +39,5 @@ export const getBundledJs = async ({
     )
     .exhaustive()
   return bundlesJs
+  }
 }

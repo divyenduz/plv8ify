@@ -1,10 +1,13 @@
 import tap from 'tap'
 
-import { getBundledJs } from './bundle'
+import { EsBuild } from './EsBuild'
+
+// TODO: move to bundler impl
 
 tap.test('getBundleJs - inline mode', async (t) => {
-  const js = await getBundledJs({
-    inputFile: './src/fns/esbuild/test-fixtures/input.fixture.ts',
+  const esbuild = new EsBuild()
+  const js = await esbuild.build({
+    inputFile: './src/test-fixtures/input.fixture.ts',
     mode: 'inline',
     outputFolder: 'plv8ify-dist',
     scopePrefix: 'plv8ify',
@@ -13,8 +16,9 @@ tap.test('getBundleJs - inline mode', async (t) => {
 })
 
 tap.test('getBundleJs - inline start_proc', async (t) => {
-  const js = await getBundledJs({
-    inputFile: './src/fns/esbuild/test-fixtures/input.fixture.ts',
+  const esbuild = new EsBuild()
+  const js = await esbuild.build({
+    inputFile: './src/test-fixtures/input.fixture.ts',
     mode: 'start_proc',
     outputFolder: 'plv8ify-dist',
     scopePrefix: 'plv8ify',
@@ -23,8 +27,9 @@ tap.test('getBundleJs - inline start_proc', async (t) => {
 })
 
 tap.test('getBundleJs - bad syntax', async (t) => {
-  const js = getBundledJs({
-    inputFile: './src/fns/esbuild/test-fixtures/bad.fixture.ts',
+  const esbuild = new EsBuild()
+  const js = esbuild.build({
+    inputFile: './src/test-fixtures/bad.fixture.ts',
     mode: 'start_proc',
     outputFolder: 'plv8ify-dist',
     scopePrefix: 'plv8ify',
@@ -33,8 +38,9 @@ tap.test('getBundleJs - bad syntax', async (t) => {
 })
 
 tap.test('getBundleJs - newline template', async (t) => {
-  const js = await getBundledJs({
-    inputFile: './src/fns/esbuild/test-fixtures/newline-template.fixture.ts',
+  const esbuild = new EsBuild()
+  const js = await esbuild.build({
+    inputFile: './src/test-fixtures/newline-template.fixture.ts',
     mode: 'start_proc',
     outputFolder: 'plv8ify-dist',
     scopePrefix: 'plv8ify',
@@ -43,8 +49,9 @@ tap.test('getBundleJs - newline template', async (t) => {
 })
 
 tap.test('getBundleJs - newline string', async (t) => {
-  const js = await getBundledJs({
-    inputFile: './src/fns/esbuild/test-fixtures/newline-string.fixture.ts',
+  const esbuild = new EsBuild()
+  const js = await esbuild.build({
+    inputFile: './src/test-fixtures/newline-string.fixture.ts',
     mode: 'start_proc',
     outputFolder: 'plv8ify-dist',
     scopePrefix: 'plv8ify',

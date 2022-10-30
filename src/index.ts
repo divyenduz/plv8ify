@@ -1,27 +1,28 @@
 #!/usr/bin/env node
+import arg from 'arg'
+import fs from 'fs'
+import 'reflect-metadata'
 import { Project } from 'ts-morph'
 
-import { getBundledJs } from './fns/esbuild/bundle'
+// import { getBundledJs } from './fns/esbuild/bundle'
 import {
   getClientInitFileName,
-  getClientInitSQL
+  getClientInitSQL,
 } from './fns/plv8/startProc/client'
 import {
   getInitFunction,
   getInitFunctionFilename,
-  getInitFunctionName
+  getInitFunctionName,
 } from './fns/plv8/startProc/init'
 import { getParamsCall } from './fns/ts-morph/toJs'
 import {
   getBindParams,
   getReturnType,
   getSQLFunction,
-  getSQLFunctionFileName
+  getSQLFunctionFileName,
 } from './fns/ts-morph/toSQL'
-import { writeFile } from './utils'
-
-import arg = require('arg')
-import fs = require('fs')
+import TYPES from './interfaces/types'
+import container from './inversify.config'
 
 export type Mode = 'inline' | 'start_proc'
 export type Volatility = 'VOLATILE' | 'STABLE' | 'IMMUTABLE'
@@ -64,8 +65,10 @@ async function main() {
 
   fs.mkdirSync(outputFolder, { recursive: true })
 
-  const bundledJs = await getBundledJs({
-    mode,
+  const plv8ify = container.get<PLV8ify>(TYPES.PLV8ify)
+
+  const bundledJs = await plv8ify.build({
+    mode, // TODO: fixme, mode leaks plv8 stuff into the bundler, maybe that's wrong?
     inputFile,
     outputFolder,
     scopePrefix: 'plv8ify',
@@ -73,7 +76,7 @@ async function main() {
 
   // Optionally, write ESBuild output file
   if (writeEsbuildOutput) {
-    writeFile(`${outputFolder}/output.js`, bundledJs)
+    plv8ify.write(`${outputFolder}/output.js`, bundledJs)
   }
 
   // TS-Morph to parse the input Typescript file
@@ -89,12 +92,12 @@ async function main() {
       volatility,
     })
     const initFileName = getInitFunctionFilename(outputFolder, initFunctionName)
-    writeFile(initFileName, initFunction)
+    plv8ify.write(initFileName, initFunction)
 
     // -- PLV8 + Client Initialization
     const clientInitSQL = getClientInitSQL()
     const startProcFileName = getClientInitFileName(outputFolder)
-    writeFile(startProcFileName, clientInitSQL)
+    plv8ify.write(startProcFileName, clientInitSQL)
   }
 
   // Emit SQL files for each exported function
@@ -147,7 +150,7 @@ async function main() {
       outputFolder,
       scopedName,
     })
-    writeFile(filename, SQLFunction)
+    plv8ify.write(filename, SQLFunction)
   })
 }
 

@@ -5,7 +5,7 @@
  * Make sure to inspect the output below.  Do not ignore changes!
  */
 'use strict'
-exports[`src/fns/esbuild/bundle.test.ts TAP getBundleJs - inline mode > must match snapshot 1`] = `
+exports[`src/impl/EsBuild.test.ts TAP getBundleJs - inline mode > must match snapshot 1`] = `
 var plv8ify = (() => {
   var __defProp = Object.defineProperty;
   var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
@@ -30,7 +30,7 @@ var plv8ify = (() => {
     };
   })(typeof WeakMap !== "undefined" ? /* @__PURE__ */ new WeakMap() : 0);
 
-  // src/fns/esbuild/test-fixtures/input.fixture.ts
+  // src/test-fixtures/input.fixture.ts
   var input_fixture_exports = {};
   __export(input_fixture_exports, {
     sayHello: () => sayHello
@@ -44,7 +44,7 @@ var plv8ify = (() => {
 
 `
 
-exports[`src/fns/esbuild/bundle.test.ts TAP getBundleJs - inline start_proc > must match snapshot 1`] = `
+exports[`src/impl/EsBuild.test.ts TAP getBundleJs - inline start_proc > must match snapshot 1`] = `
 this.plv8ify = (() => {
   var __defProp = Object.defineProperty;
   var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
@@ -69,7 +69,7 @@ this.plv8ify = (() => {
     };
   })(typeof WeakMap !== "undefined" ? /* @__PURE__ */ new WeakMap() : 0);
 
-  // src/fns/esbuild/test-fixtures/input.fixture.ts
+  // src/test-fixtures/input.fixture.ts
   var input_fixture_exports = {};
   __export(input_fixture_exports, {
     sayHello: () => sayHello
@@ -83,7 +83,7 @@ this.plv8ify = (() => {
 
 `
 
-exports[`src/fns/esbuild/bundle.test.ts TAP getBundleJs - newline string > must match snapshot 1`] = `
+exports[`src/impl/EsBuild.test.ts TAP getBundleJs - newline string > must match snapshot 1`] = `
 this.plv8ify = (() => {
   var __defProp = Object.defineProperty;
   var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
@@ -108,7 +108,7 @@ this.plv8ify = (() => {
     };
   })(typeof WeakMap !== "undefined" ? /* @__PURE__ */ new WeakMap() : 0);
 
-  // src/fns/esbuild/test-fixtures/newline-string.fixture.ts
+  // src/test-fixtures/newline-string.fixture.ts
   var newline_string_fixture_exports = {};
   __export(newline_string_fixture_exports, {
     sayHello: () => sayHello
@@ -122,7 +122,7 @@ this.plv8ify = (() => {
 
 `
 
-exports[`src/fns/esbuild/bundle.test.ts TAP getBundleJs - newline template > must match snapshot 1`] = `
+exports[`src/impl/EsBuild.test.ts TAP getBundleJs - newline template > must match snapshot 1`] = `
 this.plv8ify = (() => {
   var __defProp = Object.defineProperty;
   var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
@@ -147,7 +147,7 @@ this.plv8ify = (() => {
     };
   })(typeof WeakMap !== "undefined" ? /* @__PURE__ */ new WeakMap() : 0);
 
-  // src/fns/esbuild/test-fixtures/newline-template.fixture.ts
+  // src/test-fixtures/newline-template.fixture.ts
   var newline_template_fixture_exports = {};
   __export(newline_template_fixture_exports, {
     sayHello: () => sayHello
