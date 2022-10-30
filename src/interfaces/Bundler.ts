@@ -1,5 +1,7 @@
+type Mode = 'inline' | 'start_proc'
+
 interface BundleArgs {
-  mode: 'inline' | 'start_proc' // TODO: fixme, common type globally, bundler shouldn't care about inline/start_proc from plv8
+  mode: Mode
   inputFile: string
   scopePrefix: string
 }

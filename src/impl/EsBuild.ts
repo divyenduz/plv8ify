@@ -5,6 +5,8 @@ import { build } from 'esbuild'
 import nodeExternals from 'webpack-node-externals'
 import { match } from "ts-pattern";
 
+class BundlerError extends Error {}
+
 // TODO: this is exported only for tests, is that needed?
 @injectable()
 export class EsBuild implements Bundler {
@@ -22,7 +24,7 @@ export class EsBuild implements Bundler {
       write: false,
       target: 'es2015',
     })
-    .catch(() => new Error('esbuild failed'))
+    .catch(() => new BundlerError('esbuild failed'))
 
   if (esbuildResult instanceof Error) {
     throw esbuildResult

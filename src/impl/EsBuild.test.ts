@@ -2,11 +2,9 @@ import tap from 'tap'
 
 import { EsBuild } from './EsBuild'
 
-// TODO: move to bundler impl
-
 tap.test('getBundleJs - inline mode', async (t) => {
   const esbuild = new EsBuild()
-  const js = await esbuild.build({
+  const js = await esbuild.bundle({
     inputFile: './src/test-fixtures/input.fixture.ts',
     mode: 'inline',
     outputFolder: 'plv8ify-dist',
@@ -17,7 +15,7 @@ tap.test('getBundleJs - inline mode', async (t) => {
 
 tap.test('getBundleJs - inline start_proc', async (t) => {
   const esbuild = new EsBuild()
-  const js = await esbuild.build({
+  const js = await esbuild.bundle({
     inputFile: './src/test-fixtures/input.fixture.ts',
     mode: 'start_proc',
     outputFolder: 'plv8ify-dist',
@@ -28,7 +26,7 @@ tap.test('getBundleJs - inline start_proc', async (t) => {
 
 tap.test('getBundleJs - bad syntax', async (t) => {
   const esbuild = new EsBuild()
-  const js = esbuild.build({
+  const js = esbuild.bundle({
     inputFile: './src/test-fixtures/bad.fixture.ts',
     mode: 'start_proc',
     outputFolder: 'plv8ify-dist',
@@ -39,7 +37,7 @@ tap.test('getBundleJs - bad syntax', async (t) => {
 
 tap.test('getBundleJs - newline template', async (t) => {
   const esbuild = new EsBuild()
-  const js = await esbuild.build({
+  const js = await esbuild.bundle({
     inputFile: './src/test-fixtures/newline-template.fixture.ts',
     mode: 'start_proc',
     outputFolder: 'plv8ify-dist',
@@ -50,7 +48,7 @@ tap.test('getBundleJs - newline template', async (t) => {
 
 tap.test('getBundleJs - newline string', async (t) => {
   const esbuild = new EsBuild()
-  const js = await esbuild.build({
+  const js = await esbuild.bundle({
     inputFile: './src/test-fixtures/newline-string.fixture.ts',
     mode: 'start_proc',
     outputFolder: 'plv8ify-dist',

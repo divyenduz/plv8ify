@@ -2,7 +2,6 @@
 import arg from 'arg'
 import fs from 'fs'
 import 'reflect-metadata'
-import { Project } from 'ts-morph'
 
 // import { getBundledJs } from './fns/esbuild/bundle'
 import {
@@ -14,18 +13,8 @@ import {
   getInitFunctionFilename,
   getInitFunctionName,
 } from './fns/plv8/startProc/init'
-import { getParamsCall } from './fns/ts-morph/toJs'
-import {
-  getBindParams,
-  getReturnType,
-  getSQLFunction,
-  getSQLFunctionFileName,
-} from './fns/ts-morph/toSQL'
 import TYPES from './interfaces/types'
 import container from './inversify.config'
-
-export type Mode = 'inline' | 'start_proc'
-export type Volatility = 'VOLATILE' | 'STABLE' | 'IMMUTABLE'
 
 async function main() {
   // CLI Args
@@ -54,33 +43,31 @@ async function main() {
   }
 
   const writeEsbuildOutput = args['--write-esbuild-output'] || false
-  const inputFile = args['--input-file'] || 'input.ts'
-  const outputFolder = args['--output-folder'] || 'plv8ify-dist'
+  const inputFilePath = args['--input-file'] || 'input.ts'
+  const outputFolderPath = args['--output-folder'] || 'plv8ify-dist'
   const scopePrefix = args['--scope-prefix'] || 'plv8ify'
   const pgFunctionDelimiter = args['--pg-function-delimiter'] || '$plv8ify$'
-  const fallbackType = args['--fallback-type'] || 'JSONB'
+  const fallbackReturnType = args['--fallback-type'] || 'JSONB'
   const mode = (args['--mode'] || 'inline') as Mode
-  const volatility = (args['--volatility'] || 'IMMUTABLE') as Volatility
-  const debug = args['--debug'] || false
+  const defaultVolatility = (args['--volatility'] || 'IMMUTABLE') as Volatility
 
-  fs.mkdirSync(outputFolder, { recursive: true })
+  fs.mkdirSync(outputFolderPath, { recursive: true })
 
   const plv8ify = container.get<PLV8ify>(TYPES.PLV8ify)
+  plv8ify.init(inputFilePath)
 
   const bundledJs = await plv8ify.build({
     mode, // TODO: fixme, mode leaks plv8 stuff into the bundler, maybe that's wrong?
-    inputFile,
+    inputFile: inputFilePath,
     scopePrefix: 'plv8ify',
   })
 
   // Optionally, write ESBuild output file
   if (writeEsbuildOutput) {
-    plv8ify.write(`${outputFolder}/output.js`, bundledJs)
+    plv8ify.write(`${outputFolderPath}/output.js`, bundledJs)
   }
 
   // TS-Morph to parse the input Typescript file
-  const project = new Project()
-  const sourceFile = project.addSourceFileAtPath(inputFile)
 
   if (mode === 'start_proc') {
     // -- PLV8 + Server
@@ -88,68 +75,40 @@ async function main() {
     const initFunction = getInitFunction({
       fnName: initFunctionName,
       source: bundledJs,
-      volatility,
+      volatility: defaultVolatility,
     })
-    const initFileName = getInitFunctionFilename(outputFolder, initFunctionName)
+    const initFileName = getInitFunctionFilename(
+      outputFolderPath,
+      initFunctionName
+    )
     plv8ify.write(initFileName, initFunction)
 
     // -- PLV8 + Client Initialization
     const clientInitSQL = getClientInitSQL()
-    const startProcFileName = getClientInitFileName(outputFolder)
+    const startProcFileName = getClientInitFileName(outputFolderPath)
     plv8ify.write(startProcFileName, clientInitSQL)
   }
 
   // Emit SQL files for each exported function
-  const fns = sourceFile.getFunctions()
-  fns.forEach((fnAst) => {
-    if (!fnAst.isExported()) {
+  const fns = plv8ify.getFunctions()
+
+  fns.forEach((fn) => {
+    if (!fn.isExported) {
       return
     }
 
-    const fnName = fnAst.getName()
-    const scopedName = scopePrefix + '_' + fnName
-    const params = fnAst.getParameters()
-
-    const comments = fnAst.getLeadingCommentRanges().map((cr) => cr.getText())
-    const localVolatility = (comments
-      .filter((comment) => comment.includes('//@plv8ify-volatility-'))
-      .map((comment) => comment.replace('//@plv8ify-volatility-', ''))[0] ||
-      volatility) as Volatility
-
-    // Js to SQL type mapping happens here
-    const paramsBind = getBindParams({
-      params,
-      fallbackType,
-      debug,
-    })
-
-    // Strip types, comma-separated param names from the AST to be printed in a function call
-    const paramsCall = getParamsCall({
-      params,
-    })
-
-    const returnType = getReturnType({
-      type: fnAst,
-      fallbackType,
-    })
-
-    const SQLFunction = getSQLFunction({
-      scopedName,
-      fnName,
-      pgFunctionDelimiter,
-      paramsBind,
-      paramsCall,
-      returnType,
+    const plv8SqlFunction = plv8ify.getPLV8SQLFunction({
+      fn,
+      scopePrefix,
       mode,
+      defaultVolatility,
       bundledJs,
-      volatility: localVolatility,
+      pgFunctionDelimiter,
+      fallbackReturnType,
     })
 
-    const filename = getSQLFunctionFileName({
-      outputFolder,
-      scopedName,
-    })
-    plv8ify.write(filename, SQLFunction)
+    const filename = plv8ify.getFileName(outputFolderPath, fn, scopePrefix)
+    plv8ify.write(filename, plv8SqlFunction)
   })
 }
 

@@ -1,5 +1,3 @@
-import { Volatility } from '../../../'
-
 export const getInitFunctionName = (scopePrefix) => scopePrefix + '_init'
 
 interface Options {
@@ -8,11 +6,7 @@ interface Options {
   volatility: Volatility
 }
 
-export const getInitFunction = ({
-  fnName,
-  source,
-  volatility
-}: Options) =>
+export const getInitFunction = ({ fnName, source, volatility }: Options) =>
   `DROP FUNCTION IF EXISTS ${fnName}();
 CREATE OR REPLACE FUNCTION ${fnName}() RETURNS VOID AS $$
 ${source}
