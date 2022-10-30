@@ -1,4 +1,4 @@
 interface PLV8ify {
-  build: (options: BuildArgs) => Promise<string>
+  build: (options: BundleArgs) => Promise<string>
   write: (path: string, string: string) => void
 }

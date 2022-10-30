@@ -7,8 +7,8 @@ import TYPES from 'src/interfaces/types'
 @injectable()
 export class PLV8ifyCLI implements PLV8ify {
   @inject(TYPES.Bundler) private _bundler: Bundler;
-  build(options: BuildArgs) {
-    return this._bundler.build(options)
+  build(options: BundleArgs) {
+    return this._bundler.bundle(options)
   }
 
   private writeFile(filePath: string, content: string) {

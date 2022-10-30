@@ -8,11 +8,11 @@ import { match } from "ts-pattern";
 // TODO: this is exported only for tests, is that needed?
 @injectable()
 export class EsBuild implements Bundler {
-  async build({
+  async bundle({
     mode,
     inputFile,
     scopePrefix
-  }: BuildArgs) {
+  }: BundleArgs) {
     const esbuildResult = await build({
       entryPoints: [inputFile],
       globalName: scopePrefix,
