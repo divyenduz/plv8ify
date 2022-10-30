@@ -27,10 +27,14 @@ this.plv8ify = (() => {
   // examples/hello-start_proc/input.ts
   var input_exports = {};
   __export(input_exports, {
-    hello: () => hello
+    hello: () => hello,
+    world: () => world
   });
   function hello() {
     return "world";
+  }
+  function world() {
+    return "hello";
   }
   return __toCommonJS(input_exports);
 })();
