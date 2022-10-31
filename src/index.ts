@@ -3,7 +3,6 @@ import arg from 'arg'
 import fs from 'fs'
 import 'reflect-metadata'
 
-// import { getBundledJs } from './fns/esbuild/bundle'
 import {
   getClientInitFileName,
   getClientInitSQL,

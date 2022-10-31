@@ -1,8 +1,8 @@
 import fs from 'fs'
 import { inject, injectable } from 'inversify'
-import 'reflect-metadata'
 import TYPES from 'src/interfaces/types'
 import { match } from 'ts-pattern'
+import "reflect-metadata"
 
 interface GetPLV8SQLFunctionArgs {
   fn: TSFunction

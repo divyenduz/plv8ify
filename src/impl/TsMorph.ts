@@ -1,5 +1,4 @@
 import { injectable } from 'inversify'
-import 'reflect-metadata'
 import { FunctionDeclaration, Project, SourceFile } from 'ts-morph'
 
 // TODO: fixme, this is exported only for tests, is that needed?
@@ -17,7 +16,6 @@ export class TsMorph implements TSCompiler {
 
   private getFunctionReturnType(fn: FunctionDeclaration) {
     return fn.getReturnType().getText()
-    
   }
 
   private getFunctionParameters(fn: FunctionDeclaration) {
