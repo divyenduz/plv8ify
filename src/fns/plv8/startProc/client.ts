@@ -5,4 +5,4 @@ SELECT plv8_reset();
 `
 
 export const getClientInitFileName = (outputFolder: string) =>
-  `${outputFolder}/start.plv8.sql`
+  `${outputFolder}/plv8ify_start.plv8.sql`

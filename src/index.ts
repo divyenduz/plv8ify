@@ -66,8 +66,7 @@ async function main() {
     plv8ify.write(`${outputFolderPath}/output.js`, bundledJs)
   }
 
-  // TS-Morph to parse the input Typescript file
-
+  // TODO: fixme, this belongs inside PLV8ifyCLI class
   if (mode === 'start_proc') {
     // -- PLV8 + Server
     const initFunctionName = getInitFunctionName(scopePrefix)
@@ -88,12 +87,10 @@ async function main() {
     plv8ify.write(startProcFileName, clientInitSQL)
   }
 
-  const fns = plv8ify.getFunctions().filter((fn) => fn.isExported)
-  // Emit SQL files for each exported function
+  // Emit SQL files for each exported function in the input TS file
   const sqlFiles = plv8ify.getPLV8SQLFunctions({
-    fns,
-    scopePrefix,
     mode,
+    scopePrefix,
     defaultVolatility,
     bundledJs,
     pgFunctionDelimiter,

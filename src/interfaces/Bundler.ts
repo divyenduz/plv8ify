@@ -1,6 +1,6 @@
 interface BundleArgs {
   inputFile: string
-  scopePrefix: string
+  globalName: string
 }
 
 interface Bundler {

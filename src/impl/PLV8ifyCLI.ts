@@ -34,7 +34,7 @@ export class PLV8ifyCLI implements PLV8ify {
   async build({ mode, inputFile, scopePrefix }: BuildArgs) {
     const bundledJs = await this._bundler.bundle({
       inputFile,
-      scopePrefix,
+      globalName: scopePrefix,
     })
     const modeAdjustedBundledJs = match(mode)
       .with('inline', () => bundledJs)
@@ -57,23 +57,27 @@ export class PLV8ifyCLI implements PLV8ify {
     this.writeFile(path, string)
   }
 
-  getScopedName(fn: TSFunction, scopePrefix: string) {
+  private getScopedName(fn: TSFunction, scopePrefix: string) {
     const scopedName = scopePrefix + '_' + fn.name
     return scopedName
   }
 
-  getFileName(outputFolder: string, fn: TSFunction, scopePrefix: string) {
+  private getFileName(outputFolder: string, fn: TSFunction, scopePrefix: string) {
     const scopedName = this.getScopedName(fn, scopePrefix)
     return `${outputFolder}/${scopedName}.plv8.sql`
   }
 
-  getFunctions() {
+  private getFunctions() {
     return this._tsCompiler.getFunctions().map((fn) => {
       return {
         ...fn,
         returnType: this._typeMap[fn.returnType],
       }
     })
+  }
+
+  private getExportedFunctions() {
+    return this.getFunctions().filter(fn => fn.isExported)
   }
 
   private getFunctionVolatility(fn: TSFunction, defaultVolatility: Volatility) {
@@ -111,7 +115,6 @@ export class PLV8ifyCLI implements PLV8ify {
   }
 
   getPLV8SQLFunctions({
-    fns,
     scopePrefix,
     pgFunctionDelimiter,
     mode,
@@ -120,6 +123,7 @@ export class PLV8ifyCLI implements PLV8ify {
     defaultVolatility,
     outputFolder,
   }: GetPLV8SQLFunctionsArgs) {
+    const fns = this.getExportedFunctions()
     const sqls = fns.map((fn) => {
       return {
         filename: this.getFileName(outputFolder, fn, scopePrefix),

@@ -8,10 +8,10 @@ class BundlerError extends Error {}
 // TODO: fixme, this is exported only for tests, is that needed?
 @injectable()
 export class EsBuild implements Bundler {
-  async bundle({ inputFile, scopePrefix }: BundleArgs) {
+  async bundle({ inputFile, globalName }: BundleArgs) {
     const esbuildResult = await build({
       entryPoints: [inputFile],
-      globalName: scopePrefix,
+      globalName,
       platform: 'browser',
       external: [nodeExternals()],
       bundle: true,

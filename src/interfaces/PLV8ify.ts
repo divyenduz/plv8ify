@@ -8,7 +8,6 @@ interface BuildArgs {
 }
 
 interface GetPLV8SQLFunctionsArgs {
-  fns: TSFunction[]
   scopePrefix: string
   pgFunctionDelimiter: string
   mode: Mode
@@ -23,7 +22,7 @@ interface PLV8ify {
   build: (options: BuildArgs) => Promise<string>
   write: (path: string, string: string) => void
 
-  getScopedName(fn: TSFunction, scopePrefix: string): string
+  // getScopedName(fn: TSFunction, scopePrefix: string): string
 
   /**
    * @description Get the name of the SQL file containing the PLV8 function that will be written to disk
@@ -32,12 +31,11 @@ interface PLV8ify {
    * @param {string} scopePrefix
    * @returns {string} returns the path to the SQL file to be written
    */
-  getFileName(outputFolder: string, fn: TSFunction, scopePrefix: string): string
+  // getFileName(outputFolder: string, fn: TSFunction, scopePrefix: string): string
 
-  getFunctions: () => TSFunction[]
+  // getFunctions: () => TSFunction[]
 
   getPLV8SQLFunctions({
-    fns,
     scopePrefix,
     pgFunctionDelimiter,
     fallbackReturnType,
