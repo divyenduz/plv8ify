@@ -19,6 +19,12 @@ export class PLV8ifyCLI implements PLV8ify {
   @inject(TYPES.Bundler) private _bundler: Bundler;
   @inject(TYPES.TSCompiler) private _tsCompiler: TSCompiler;
 
+  private _typeMap = {
+    number: 'float8',
+    string: 'text',
+    boolean: 'boolean',
+  }
+
   init(inputFilePath: string) {
     this._tsCompiler.createSourceFile(inputFilePath)
   }
@@ -49,7 +55,12 @@ getScopedName(fn: TSFunction, scopePrefix: string) {
   }
 
   getFunctions() {
-    return this._tsCompiler.getFunctions()
+    return this._tsCompiler.getFunctions().map(fn => {
+      return {
+        ...fn,
+        returnType: this._typeMap[fn.returnType]
+      }
+    })
   }
 
   private getFunctionVolatility(fn: TSFunction, defaultVolatility: Volatility) {
@@ -68,17 +79,11 @@ getScopedName(fn: TSFunction, scopePrefix: string) {
     parameters: TSFunctionParameter[],
     fallbackReturnType: string
   ) {
-    // TODO: fixme, common place for typeMap
-    const typeMap = {
-      number: 'float8',
-      string: 'text',
-      boolean: 'boolean',
-    }
-
+    
     return parameters
       .map((p) => {
         const { name, type } = p
-        const mappedType = typeMap[type] || fallbackReturnType
+        const mappedType = this._typeMap[type] || fallbackReturnType
         return `${name} ${mappedType}`
       })
       .join(',')
@@ -130,13 +135,11 @@ getScopedName(fn: TSFunction, scopePrefix: string) {
     defaultVolatility
   }: GetPLV8SQLFunctionArgs) {
     const scopedName = scopePrefix + '_' + fn.name
-    // TODO: fixme, fix fallback type
     const sqlParametersString = this.getSQLParametersString(
       fn.parameters,
       fallbackReturnType
     )
     const jsParametersString = this.getJSParametersString(fn.parameters)
-    // TODO: fixme, fix default volatility
     const volatility = this.getFunctionVolatility(fn, defaultVolatility)
     const returnType = fn.returnType || fallbackReturnType
 

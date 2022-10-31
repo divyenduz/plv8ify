@@ -6,9 +6,9 @@ interface TSFunctionParameter {
 interface TSFunction {
   name: string
   isExported: boolean
-  parameters: TSFunctionParameter[] // TODO: fixme, any
+  parameters: TSFunctionParameter[]
   comments: string[]
-  returnType: string | undefined // TODO: fixme, undefined
+  returnType: string
 }
 
 interface TSCompiler {
