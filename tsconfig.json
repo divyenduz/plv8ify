@@ -15,6 +15,6 @@
     "node_modules",
     "examples/**/*",
     "dist",
-    "src/fns/esbuild/test-fixtures/bad.fixture.ts"
+    "src/test-fixtures/bad.fixture.ts"
   ]
 }
