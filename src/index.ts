@@ -9,7 +9,7 @@ import container from './inversify.config'
 async function main() {
   // CLI Args
   const args = arg({
-    '--write-esbuild-output': Boolean,
+    '--write-bundler-output': Boolean,
     '--input-file': String,
     '--output-folder': String,
     '--scope-prefix': String,
@@ -32,7 +32,7 @@ async function main() {
     process.exit(0)
   }
 
-  const writeEsbuildOutput = args['--write-esbuild-output'] || false
+  const writeBundlerOutput = args['--write-bundler-output'] || false
   const inputFilePath = args['--input-file'] || 'input.ts'
   const outputFolderPath = args['--output-folder'] || 'plv8ify-dist'
   const scopePrefix = args['--scope-prefix'] || 'plv8ify'
@@ -53,7 +53,7 @@ async function main() {
   })
 
   // Optionally, write ESBuild output file
-  if (writeEsbuildOutput) {
+  if (writeBundlerOutput) {
     plv8ify.write(`${outputFolderPath}/output.js`, bundledJs)
   }
 
