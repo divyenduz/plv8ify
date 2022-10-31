@@ -1,8 +1,8 @@
 import fs from 'fs'
 import { inject, injectable } from 'inversify'
+import 'reflect-metadata'
 import TYPES from 'src/interfaces/types'
 import { match } from 'ts-pattern'
-import "reflect-metadata"
 
 interface GetPLV8SQLFunctionArgs {
   fn: TSFunction
@@ -12,6 +12,12 @@ interface GetPLV8SQLFunctionArgs {
   bundledJs: string
   fallbackReturnType: string
   defaultVolatility: Volatility
+}
+
+interface GetInitSQLFunctionArgs {
+  fn: TSFunction
+  bundledJs: string
+  volatility: Volatility
 }
 
 // TODO: fixme, this is exported only for tests, is that needed?
@@ -62,7 +68,11 @@ export class PLV8ifyCLI implements PLV8ify {
     return scopedName
   }
 
-  private getFileName(outputFolder: string, fn: TSFunction, scopePrefix: string) {
+  private getFileName(
+    outputFolder: string,
+    fn: TSFunction,
+    scopePrefix: string
+  ) {
     const scopedName = this.getScopedName(fn, scopePrefix)
     return `${outputFolder}/${scopedName}.plv8.sql`
   }
@@ -77,7 +87,7 @@ export class PLV8ifyCLI implements PLV8ify {
   }
 
   private getExportedFunctions() {
-    return this.getFunctions().filter(fn => fn.isExported)
+    return this.getFunctions().filter((fn) => fn.isExported)
   }
 
   private getFunctionVolatility(fn: TSFunction, defaultVolatility: Volatility) {
@@ -138,7 +148,47 @@ export class PLV8ifyCLI implements PLV8ify {
         }),
       }
     })
-    return sqls
+
+    let startProcSQLs = []
+    if (mode === 'start_proc') {
+      // -- PLV8 + Server
+      const initFunctionName = scopePrefix + '_init'
+      const virtualInitFn = {
+        name: initFunctionName
+      } as TSFunction // TODO: fixme, risky because it doesn't have all the properties of a virtual function
+
+      const initFunction = this.getInitSQLFunction({
+        fn: virtualInitFn,
+        bundledJs,
+        volatility: defaultVolatility,
+      })
+      const initFileName = this.getFileName(
+        outputFolder,
+        virtualInitFn,
+        scopePrefix
+      )
+      startProcSQLs.concat({
+        filename: initFileName,
+        sql: initFunction,
+      })
+
+      const startFunctionName = scopePrefix + '_start'
+      const virtualStartFn = {
+        name: startFunctionName
+      } as TSFunction // TODO: fixme, risky because it doesn't have all the properties of a virtual function
+      const startProcSQLScript = this.getStartProcSQLScript()
+      const startProcFileName = this.getFileName(
+        outputFolder,
+        virtualStartFn,
+        scopePrefix
+      )
+      startProcSQLs.concat({
+        filename: startProcFileName,
+        sql: startProcSQLScript,
+      })
+    }
+
+    return sqls.concat(startProcSQLs)
   }
 
   getPLV8SQLFunction({
@@ -170,4 +220,19 @@ export class PLV8ifyCLI implements PLV8ify {
       `${pgFunctionDelimiter} LANGUAGE plv8 ${volatility} STRICT;`,
     ].join('\n')
   }
+
+  // TODO: fixme, can this be replaced with getPLV8SQLFunction
+  private getInitSQLFunction({ fn, bundledJs, volatility }: GetInitSQLFunctionArgs) {
+    return `DROP FUNCTION IF EXISTS ${fn.name}();
+CREATE OR REPLACE FUNCTION ${fn.name}() RETURNS VOID AS $$
+${bundledJs}
+$$ LANGUAGE plv8 ${volatility} STRICT;
+`
+  }
+
+  private getStartProcSQLScript = () =>
+  `
+SET plv8.start_proc = plv8ify_init;
+SELECT plv8_reset();
+`
 }

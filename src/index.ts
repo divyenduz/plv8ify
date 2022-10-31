@@ -3,15 +3,6 @@ import arg from 'arg'
 import fs from 'fs'
 import 'reflect-metadata'
 
-import {
-  getClientInitFileName,
-  getClientInitSQL,
-} from './fns/plv8/startProc/client'
-import {
-  getInitFunction,
-  getInitFunctionFilename,
-  getInitFunctionName,
-} from './fns/plv8/startProc/init'
 import TYPES from './interfaces/types'
 import container from './inversify.config'
 
@@ -64,27 +55,6 @@ async function main() {
   // Optionally, write ESBuild output file
   if (writeEsbuildOutput) {
     plv8ify.write(`${outputFolderPath}/output.js`, bundledJs)
-  }
-
-  // TODO: fixme, this belongs inside PLV8ifyCLI class
-  if (mode === 'start_proc') {
-    // -- PLV8 + Server
-    const initFunctionName = getInitFunctionName(scopePrefix)
-    const initFunction = getInitFunction({
-      fnName: initFunctionName,
-      source: bundledJs,
-      volatility: defaultVolatility,
-    })
-    const initFileName = getInitFunctionFilename(
-      outputFolderPath,
-      initFunctionName
-    )
-    plv8ify.write(initFileName, initFunction)
-
-    // -- PLV8 + Client Initialization
-    const clientInitSQL = getClientInitSQL()
-    const startProcFileName = getClientInitFileName(outputFolderPath)
-    plv8ify.write(startProcFileName, clientInitSQL)
   }
 
   // Emit SQL files for each exported function in the input TS file
