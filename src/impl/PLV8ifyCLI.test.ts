@@ -13,7 +13,7 @@ tap.test('getSQLFunction with parameters', async (t) => {
     scopePrefix: 'plv8ify',
     mode: 'inline',
     defaultVolatility: 'IMMUTABLE',
-    bundledJs: console.log('hello'),
+    bundledJs: `console.log('hello')`,
     pgFunctionDelimiter: '$plv8ify$',
     fallbackReturnType: 'JSONB',
   })
@@ -31,7 +31,7 @@ tap.test('getSQLFunction with delimiter', async (t) => {
     scopePrefix: 'plv8ify',
     mode: 'inline',
     defaultVolatility: 'IMMUTABLE',
-    bundledJs: console.log('hello'),
+    bundledJs: `console.log('hello')`,
     pgFunctionDelimiter: '$function$',
     fallbackReturnType: 'JSONB',
   })

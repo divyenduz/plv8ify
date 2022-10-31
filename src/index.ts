@@ -89,26 +89,21 @@ async function main() {
     plv8ify.write(startProcFileName, clientInitSQL)
   }
 
+  const fns = plv8ify.getFunctions().filter((fn) => fn.isExported)
   // Emit SQL files for each exported function
-  const fns = plv8ify.getFunctions()
+  const sqlFiles = plv8ify.getPLV8SQLFunctions({
+    fns,
+    scopePrefix,
+    mode,
+    defaultVolatility,
+    bundledJs,
+    pgFunctionDelimiter,
+    fallbackReturnType,
+    outputFolder: outputFolderPath,
+  })
 
-  fns.forEach((fn) => {
-    if (!fn.isExported) {
-      return
-    }
-
-    const plv8SqlFunction = plv8ify.getPLV8SQLFunction({
-      fn,
-      scopePrefix,
-      mode,
-      defaultVolatility,
-      bundledJs,
-      pgFunctionDelimiter,
-      fallbackReturnType,
-    })
-
-    const filename = plv8ify.getFileName(outputFolderPath, fn, scopePrefix)
-    plv8ify.write(filename, plv8SqlFunction)
+  sqlFiles.forEach((sqlFile) => {
+    plv8ify.write(sqlFile.filename, sqlFile.sql)
   })
 }
 

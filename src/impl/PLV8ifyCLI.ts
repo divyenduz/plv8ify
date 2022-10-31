@@ -4,6 +4,16 @@ import 'reflect-metadata'
 import TYPES from 'src/interfaces/types'
 import { match } from 'ts-pattern'
 
+interface GetPLV8SQLFunctionArgs {
+  fn: TSFunction
+  scopePrefix: string
+  pgFunctionDelimiter: string
+  mode: Mode
+  bundledJs: string
+  fallbackReturnType: string
+  defaultVolatility: Volatility
+}
+
 @injectable()
 export class PLV8ifyCLI implements PLV8ify {
   @inject(TYPES.Bundler) private _bundler: Bundler;
@@ -81,6 +91,33 @@ getScopedName(fn: TSFunction, scopePrefix: string) {
         return `${name}`
       })
       .join(',')
+  }
+
+  getPLV8SQLFunctions({
+    fns,
+    scopePrefix,
+    pgFunctionDelimiter,
+    mode,
+    bundledJs,
+    fallbackReturnType,
+    defaultVolatility,
+    outputFolder
+  }: GetPLV8SQLFunctionsArgs) {
+    const sqls = fns.map(fn => {
+      return {
+        filename: this.getFileName(outputFolder, fn, scopePrefix),
+        sql: this.getPLV8SQLFunction({
+          fn,
+    scopePrefix,
+    pgFunctionDelimiter,
+    mode,
+    bundledJs,
+    fallbackReturnType,
+    defaultVolatility
+        })
+      }
+    })
+    return sqls
   }
 
   getPLV8SQLFunction({

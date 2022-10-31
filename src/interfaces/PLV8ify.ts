@@ -1,13 +1,14 @@
 type Volatility = 'VOLATILE' | 'STABLE' | 'IMMUTABLE'
 
-interface GetPLV8SQLFunctionArgs {
-  fn: TSFunction
+interface GetPLV8SQLFunctionsArgs {
+  fns: TSFunction[]
   scopePrefix: string
   pgFunctionDelimiter: string
   mode: Mode
   bundledJs: string
   fallbackReturnType: string
   defaultVolatility: Volatility
+  outputFolder: string // TODO: fixme, does this belong here?
 }
 
 interface PLV8ify {
@@ -28,12 +29,15 @@ interface PLV8ify {
 
   getFunctions: () => TSFunction[]
 
-  getPLV8SQLFunction({
-    fn,
+  getPLV8SQLFunctions({
+    fns,
     scopePrefix,
     pgFunctionDelimiter,
     fallbackReturnType,
     mode,
     bundledJs,
-  }: GetPLV8SQLFunctionArgs)
+  }: GetPLV8SQLFunctionsArgs): {
+    filename: string
+    sql: string
+  }[]
 }
