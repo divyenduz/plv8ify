@@ -6,7 +6,7 @@
  */
 'use strict'
 exports[`src/fns/plv8/startProc/client.test.ts TAP getClientInitFileName > must match snapshot 1`] = `
-plv8ify-dist/start.plv8.sql
+plv8ify-dist/plv8ify_start.plv8.sql
 `
 
 exports[`src/fns/plv8/startProc/client.test.ts TAP getClientInitSQL > must match snapshot 1`] = `
