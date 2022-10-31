@@ -1,7 +1,4 @@
-type Mode = 'inline' | 'start_proc'
-
 interface BundleArgs {
-  mode: Mode
   inputFile: string
   scopePrefix: string
 }

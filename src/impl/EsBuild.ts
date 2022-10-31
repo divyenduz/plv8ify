@@ -3,15 +3,13 @@ import "reflect-metadata";
 
 import { build } from 'esbuild'
 import nodeExternals from 'webpack-node-externals'
-import { match } from "ts-pattern";
 
 class BundlerError extends Error {}
 
-// TODO: this is exported only for tests, is that needed?
+// TODO: fixme, this is exported only for tests, is that needed?
 @injectable()
 export class EsBuild implements Bundler {
   async bundle({
-    mode,
     inputFile,
     scopePrefix
   }: BundleArgs) {
@@ -31,13 +29,7 @@ export class EsBuild implements Bundler {
   }
 
   const esbuildFile = esbuildResult.outputFiles.find((_) => true)
-  const bundlesJs = match(mode)
-    .with('inline', () => esbuildFile.text)
-    .with('start_proc', () =>
-      // Remove var from var plv8ify to make it attach to the global scope in start_proc mode
-      esbuildFile.text.replace(`var ${scopePrefix} =`, `this.${scopePrefix} =`)
-    )
-    .exhaustive()
+  const bundlesJs = esbuildFile.text
   return bundlesJs
   }
 }

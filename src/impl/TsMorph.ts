@@ -2,7 +2,7 @@ import { injectable } from 'inversify'
 import 'reflect-metadata'
 import { FunctionDeclaration, Project, SourceFile } from 'ts-morph'
 
-// TODO: this is exported only for tests, is that needed?
+// TODO: fixme, this is exported only for tests, is that needed?
 @injectable()
 export class TsMorph implements TSCompiler {
   private sourceFile: SourceFile

@@ -14,6 +14,8 @@ interface GetPLV8SQLFunctionArgs {
   defaultVolatility: Volatility
 }
 
+// TODO: fixme, this is exported only for tests, is that needed?
+
 @injectable()
 export class PLV8ifyCLI implements PLV8ify {
   @inject(TYPES.Bundler) private _bundler: Bundler;
@@ -29,8 +31,19 @@ export class PLV8ifyCLI implements PLV8ify {
     this._tsCompiler.createSourceFile(inputFilePath)
   }
 
-  build(options: BundleArgs) {
-    return this._bundler.bundle(options)
+  async build({ mode, inputFile, scopePrefix }: BuildArgs) {
+    const bundledJs = await this._bundler.bundle({
+      inputFile,
+      scopePrefix,
+    })
+    const modeAdjustedBundledJs = match(mode)
+      .with('inline', () => bundledJs)
+      .with('start_proc', () =>
+        // Remove var from var plv8ify to make it attach to the global scope in start_proc mode
+        bundledJs.replace(`var ${scopePrefix} =`, `this.${scopePrefix} =`)
+      )
+      .exhaustive()
+    return modeAdjustedBundledJs
   }
 
   private writeFile(filePath: string, content: string) {
@@ -44,10 +57,10 @@ export class PLV8ifyCLI implements PLV8ify {
     this.writeFile(path, string)
   }
 
-getScopedName(fn: TSFunction, scopePrefix: string) {
-  const scopedName = scopePrefix + '_' + fn.name
-  return scopedName
-}
+  getScopedName(fn: TSFunction, scopePrefix: string) {
+    const scopedName = scopePrefix + '_' + fn.name
+    return scopedName
+  }
 
   getFileName(outputFolder: string, fn: TSFunction, scopePrefix: string) {
     const scopedName = this.getScopedName(fn, scopePrefix)
@@ -55,10 +68,10 @@ getScopedName(fn: TSFunction, scopePrefix: string) {
   }
 
   getFunctions() {
-    return this._tsCompiler.getFunctions().map(fn => {
+    return this._tsCompiler.getFunctions().map((fn) => {
       return {
         ...fn,
-        returnType: this._typeMap[fn.returnType]
+        returnType: this._typeMap[fn.returnType],
       }
     })
   }
@@ -79,7 +92,6 @@ getScopedName(fn: TSFunction, scopePrefix: string) {
     parameters: TSFunctionParameter[],
     fallbackReturnType: string
   ) {
-    
     return parameters
       .map((p) => {
         const { name, type } = p
@@ -106,20 +118,20 @@ getScopedName(fn: TSFunction, scopePrefix: string) {
     bundledJs,
     fallbackReturnType,
     defaultVolatility,
-    outputFolder
+    outputFolder,
   }: GetPLV8SQLFunctionsArgs) {
-    const sqls = fns.map(fn => {
+    const sqls = fns.map((fn) => {
       return {
         filename: this.getFileName(outputFolder, fn, scopePrefix),
         sql: this.getPLV8SQLFunction({
           fn,
-    scopePrefix,
-    pgFunctionDelimiter,
-    mode,
-    bundledJs,
-    fallbackReturnType,
-    defaultVolatility
-        })
+          scopePrefix,
+          pgFunctionDelimiter,
+          mode,
+          bundledJs,
+          fallbackReturnType,
+          defaultVolatility,
+        }),
       }
     })
     return sqls
@@ -132,7 +144,7 @@ getScopedName(fn: TSFunction, scopePrefix: string) {
     mode,
     bundledJs,
     fallbackReturnType,
-    defaultVolatility
+    defaultVolatility,
   }: GetPLV8SQLFunctionArgs) {
     const scopedName = scopePrefix + '_' + fn.name
     const sqlParametersString = this.getSQLParametersString(

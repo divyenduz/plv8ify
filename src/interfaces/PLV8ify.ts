@@ -1,4 +1,11 @@
 type Volatility = 'VOLATILE' | 'STABLE' | 'IMMUTABLE'
+type Mode = 'inline' | 'start_proc'
+
+interface BuildArgs {
+  mode: Mode
+  inputFile: string
+  scopePrefix: string
+}
 
 interface GetPLV8SQLFunctionsArgs {
   fns: TSFunction[]
@@ -13,7 +20,7 @@ interface GetPLV8SQLFunctionsArgs {
 
 interface PLV8ify {
   init(inputFilePath: string): void
-  build: (options: BundleArgs) => Promise<string>
+  build: (options: BuildArgs) => Promise<string>
   write: (path: string, string: string) => void
 
   getScopedName(fn: TSFunction, scopePrefix: string): string
