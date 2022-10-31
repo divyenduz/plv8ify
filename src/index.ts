@@ -57,7 +57,7 @@ async function main() {
   plv8ify.init(inputFilePath)
 
   const bundledJs = await plv8ify.build({
-    mode, // TODO: fixme, mode leaks plv8 stuff into the bundler, maybe that's wrong?
+    mode,
     inputFile: inputFilePath,
     scopePrefix: 'plv8ify',
   })

@@ -15,7 +15,7 @@ interface GetPLV8SQLFunctionsArgs {
   bundledJs: string
   fallbackReturnType: string
   defaultVolatility: Volatility
-  outputFolder: string // TODO: fixme, does this belong here?
+  outputFolder: string
 }
 
 interface PLV8ify {
