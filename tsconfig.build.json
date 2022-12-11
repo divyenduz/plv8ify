@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "exclude": [
+    "**/*.test.ts",
+    "**/*.fixture.ts",
+    "node_modules",
+    "examples/**/*",
+    "dist",
+    "src/fns/esbuild/test-fixtures/bad.fixture.ts"
+  ]
+}
