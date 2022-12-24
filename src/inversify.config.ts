@@ -1,9 +1,9 @@
 import { Container } from 'inversify'
-import { PLV8ifyCLI } from 'src/impl/PLV8ifyCLI'
-import TYPES from 'src/interfaces/types'
 
 import { EsBuild } from './impl/EsBuild'
+import { PLV8ifyCLI } from './impl/PLV8ifyCLI'
 import { TsMorph } from './impl/TsMorph'
+import TYPES from './interfaces/types'
 
 var container = new Container()
 container.bind<PLV8ify>(TYPES.PLV8ify).to(PLV8ifyCLI)
