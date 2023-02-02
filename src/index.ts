@@ -1,64 +1,20 @@
 #!/usr/bin/env node
-import fs from 'fs'
 import 'reflect-metadata'
 import { match } from 'ts-pattern'
 
+import { generateCommand } from './commands/generate'
+import { versionCommand } from './commands/version'
 import { ParseCLI } from './impl/ParseCLI'
-import TYPES from './interfaces/types'
-import container from './inversify.config'
 
 async function main() {
   const CLI = ParseCLI.getCommand()
 
-  if (CLI.command === 'version') {
-    const pkg = require('../package.json')
-    console.log(`Version: ${pkg.version}`)
-    process.exit(0)
-  }
-
-  const _ = match(CLI.command)
+  match(CLI.command)
+    .with('version', () => {
+      versionCommand()
+    })
     .with('generate', async () => {
-      const {
-        writeBundlerOutput,
-        inputFilePath,
-        outputFolderPath,
-        scopePrefix,
-        pgFunctionDelimiter,
-        fallbackReturnType,
-        mode,
-        defaultVolatility,
-      } = CLI.config
-
-      fs.mkdirSync(outputFolderPath, { recursive: true })
-
-      const plv8ify = container.get<PLV8ify>(TYPES.PLV8ify)
-      plv8ify.init(inputFilePath)
-
-      const bundledJs = await plv8ify.build({
-        mode,
-        inputFile: inputFilePath,
-        scopePrefix: 'plv8ify',
-      })
-
-      // Optionally, write ESBuild output file
-      if (writeBundlerOutput) {
-        plv8ify.write(`${outputFolderPath}/output.js`, bundledJs)
-      }
-
-      // Emit SQL files for each exported function in the input TS file
-      const sqlFiles = plv8ify.getPLV8SQLFunctions({
-        mode,
-        scopePrefix,
-        defaultVolatility,
-        bundledJs,
-        pgFunctionDelimiter,
-        fallbackReturnType,
-        outputFolder: outputFolderPath,
-      })
-
-      sqlFiles.forEach((sqlFile) => {
-        plv8ify.write(sqlFile.filename, sqlFile.sql)
-      })
+      await generateCommand(CLI)
     })
     .exhaustive()
 }
