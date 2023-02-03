@@ -14,7 +14,6 @@ export class Database {
 
   endConnection() {
     this.db.end()
-    delete this.db
   }
 
   async isDatabaseReachable() {

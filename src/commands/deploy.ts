@@ -102,4 +102,5 @@ export async function deployCommand(
   )
 
   database.endConnection()
+  process.exit(0) // This is a hotfix, database is leaking the connection
 }
