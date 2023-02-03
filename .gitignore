@@ -1,7 +1,10 @@
 node_modules
+yarn-error.log
 
 /plv8ify-dist/
 dist/
 
 .nyc_output
 examples/trackfootball
+
+.env

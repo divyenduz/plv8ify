@@ -2,9 +2,10 @@
 import 'reflect-metadata'
 import { match } from 'ts-pattern'
 
+import { deployCommand } from './commands/deploy'
 import { generateCommand } from './commands/generate'
 import { versionCommand } from './commands/version'
-import { ParseCLI } from './impl/ParseCLI'
+import { ParseCLI } from './helpers/ParseCLI'
 
 async function main() {
   const CLI = ParseCLI.getCommand()
@@ -15,6 +16,9 @@ async function main() {
     })
     .with('generate', async () => {
       await generateCommand(CLI)
+    })
+    .with('deploy', async () => {
+      await deployCommand(CLI)
     })
     .exhaustive()
 }

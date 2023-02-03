@@ -1,6 +1,6 @@
 import arg from 'arg'
 
-type Command = 'version' | 'generate'
+type Command = 'version' | 'generate' | 'deploy'
 
 export class ParseCLI {
   static getCommand() {
