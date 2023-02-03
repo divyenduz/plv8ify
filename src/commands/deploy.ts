@@ -76,6 +76,7 @@ export async function deployCommand(
             })
           })
         )
+        // TODO: add some batching here
         await Promise.allSettled(taskGroup)
         setTitle(
           `Deployed files from ${outputFolderPath} to the provided PostgreSQL database ✅`.trim()

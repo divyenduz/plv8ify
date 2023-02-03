@@ -20,7 +20,7 @@ export class ParseCLI {
 
     if (args._.length === 0) {
       throw new Error(
-        `Please specify a command. Available commands: generate, version`
+        `Please specify a command. Available commands: generate, version, deploy`
       )
     }
 
