@@ -3,6 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import { Database } from 'src/helpers/Database'
 import { ParseCLI } from 'src/helpers/ParseCLI'
+import task from 'tasuku'
 
 dotenv.config()
 
@@ -17,55 +18,72 @@ export async function deployCommand(
 ) {
   const outputFolderPath = CLI.config.outputFolderPath
 
-  if (!fs.statSync(outputFolderPath)) {
-    throw new Error(`${outputFolderPath} doesn't exist`)
-  }
+  await task(
+    `Check if the --output-folder (${outputFolderPath}) exists`,
+    async () => {
+      if (!fs.statSync(outputFolderPath)) {
+        throw new Error(`${outputFolderPath} doesn't exist`)
+      }
+    }
+  )
 
   // TODO: move process/env stuff to a separate file
   const databaseUrl = process.env.DATABASE_URL
-  if (!databaseUrl) {
-    throw new Error('DATABASE_URL not set in environment')
-  }
 
-  console.log(
-    `Deploying files from ${outputFolderPath} to the provided PostgreSQL database`
-  )
+  await task('Check if the DATABASE_URL env var is set', async () => {
+    if (!databaseUrl) {
+      throw new Error('DATABASE_URL not set in environment')
+    }
+  })
 
   const database = new Database(databaseUrl)
-  const isReachable = await database.isDatabaseReachable()
-  if (!isReachable) {
-    throw new Error(`${databaseUrl} not reachable`)
-  }
+  task('Check if the provided DATABASE_URL is reachable', async () => {
+    const isReachable = await database.isDatabaseReachable()
+    if (!isReachable) {
+      throw new Error(`${databaseUrl} not reachable`)
+    }
+  })
+
   const db = database.getConnection()
+  let deployCommands = fs
+    .readdirSync(outputFolderPath)
+    // Only extract .plv8.sql files, this will need to change if we ever make the extension configurable
+    .filter((file) => file.endsWith('.plv8.sql'))
+    .map((file) => {
+      const filePath = path.join(outputFolderPath, file)
+      return {
+        filePath,
+        sqlQueryPromise: db.file(filePath),
+      }
+    })
 
   try {
-    let deployCommands = fs
-      .readdirSync(outputFolderPath)
-      // Only extract .plv8.sql files, this will need to change if we ever make the extension configurable
-      .filter((file) => file.endsWith('.plv8.sql'))
-      .map((file) => {
-        const filePath = path.join(outputFolderPath, file)
-        return {
-          filePath,
-          sqlQueryPromise: db.file(filePath),
-        }
-      })
-
-    await Promise.allSettled(
-      deployCommands.map((deployCommand) => {
-        const name = getFunctionNameFromFilePath(deployCommand.filePath)
-        return deployCommand.sqlQueryPromise
-          .then(() => {
-            console.log(`Deployed ${name} ✅`)
+    await task(
+      `Deploying files from ${outputFolderPath} to the provided PostgreSQL database 🚧`.trim(),
+      async ({ setTitle }) => {
+        const taskGroup = await task.group((task) =>
+          deployCommands.map((deployCommand) => {
+            const name = getFunctionNameFromFilePath(deployCommand.filePath)
+            return task(`Deploying ${name}`, async ({ setTitle }) => {
+              return deployCommand.sqlQueryPromise
+                .then(() => {
+                  setTitle(`Deployed ${name} ✅`)
+                })
+                .catch((e) => {
+                  setTitle(`Failed to deploy ${name} ❌`)
+                  console.log(e)
+                })
+            })
           })
-          .catch((e) => {
-            console.log(`Failed to deploy ${name} ❌`)
-            console.log(e)
-          })
-      })
+        )
+        await Promise.allSettled(taskGroup)
+        setTitle(
+          `Deployed files from ${outputFolderPath} to the provided PostgreSQL database ✅`.trim()
+        )
+      }
     )
   } catch (e) {
-    console.error(`Failed to deploy, rolling back`)
+    console.error(`Failed to deploy`)
     console.error(`Failed with error ${e}`)
   } finally {
     db.end()
