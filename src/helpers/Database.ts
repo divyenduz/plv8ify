@@ -8,6 +8,9 @@ export class Database {
   }
 
   getConnection() {
+    if (this.db) {
+      return this.db
+    }
     this.db = postgres(this.databaseUrl)
     return this.db
   }
