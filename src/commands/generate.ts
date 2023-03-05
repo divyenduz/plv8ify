@@ -1,7 +1,7 @@
 import fs from 'fs'
-import { ParseCLI } from 'src/helpers/ParseCLI'
-import TYPES from 'src/interfaces/types'
 
+import { ParseCLI } from '../helpers/ParseCLI'
+import TYPES from '../interfaces/types'
 import container from '../inversify.config'
 
 export async function generateCommand(

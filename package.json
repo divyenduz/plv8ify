@@ -1,6 +1,6 @@
 {
   "name": "plv8ify",
-  "version": "0.0.39",
+  "version": "0.0.40",
   "main": "dist/index.js",
   "license": "MIT",
   "bin": {
@@ -33,6 +33,7 @@
     "date-fns": "2.28.0",
     "esbuild-register": "3.3.2",
     "esbuild-runner": "2.2.1",
+    "mathjs": "11.6.0",
     "object-hash": "3.0.0",
     "prettier": "2.5.1",
     "react": "17.0.2",
@@ -51,6 +52,7 @@
     "example:hello-start_proc": "yarn esr src/index.ts generate --input-file examples/hello-start_proc/input.ts --output-folder examples/hello-start_proc/plv8ify-dist --mode start_proc",
     "example:turf-js": "yarn esr src/index.ts generate --input-file examples/turf-js/input.ts --output-folder examples/turf-js/plv8ify-dist",
     "example:turf-js-distance": "yarn esr src/index.ts generate --input-file examples/turf-js-distance/input.ts --output-folder examples/turf-js-distance/plv8ify-dist",
+    "example:mathjs": "yarn esr src/index.ts generate --input-file examples/mathjs/input.ts --output-folder examples/mathjs/plv8ify-dist",
     "example:react-js": "yarn esr src/index.ts generate --input-file examples/react-js/input.tsx --output-folder examples/react-js/plv8ify-dist",
     "example:trackfootball": "yarn esr src/index.ts generate --input-file examples/trackfootball/input.tsx --output-folder examples/trackfootball/plv8ify-dist",
     "example:object-hash": "yarn esr src/index.ts generate --input-file examples/object-hash/input.ts --output-folder examples/object-hash/plv8ify-dist",
