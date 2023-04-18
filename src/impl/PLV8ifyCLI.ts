@@ -49,6 +49,10 @@ export class PLV8ifyCLI implements PLV8ify {
         // Remove var from var plv8ify to make it attach to the global scope in start_proc mode
         bundledJs.replace(`var ${scopePrefix} =`, `this.${scopePrefix} =`)
       )
+      .with('bundle', () =>
+        // Remove var from var plv8ify to make it attach to the global scope in start_proc mode
+        bundledJs.replace(`var ${scopePrefix} =`, `globalThis.${scopePrefix} =`)
+      )
       .exhaustive()
     return modeAdjustedBundledJs
   }
@@ -151,7 +155,7 @@ export class PLV8ifyCLI implements PLV8ify {
     })
 
     let startProcSQLs = []
-    if (mode === 'start_proc') {
+    if (mode === 'start_proc' || mode === 'bundle') {
       // -- PLV8 + Server
       const initFunctionName = 'init'
       const virtualInitFn = {
@@ -173,7 +177,9 @@ export class PLV8ifyCLI implements PLV8ify {
         filename: initFileName,
         sql: initFunction,
       })
+    }
 
+    if (mode === 'start_proc') {
       const startFunctionName = 'start'
       const virtualStartFn = {
         name: startFunctionName
@@ -216,6 +222,9 @@ export class PLV8ifyCLI implements PLV8ify {
       `CREATE OR REPLACE FUNCTION ${scopedName}(${sqlParametersString}) RETURNS ${returnType} AS ${pgFunctionDelimiter}`,
       match(mode)
         .with('inline', () => bundledJs)
+        .with('bundle', () => 
+          `if (globalThis.${scopePrefix} === undefined) plv8.execute('SELECT ${scopePrefix}_init();');`
+        )
         .otherwise(() => ''),
       `return ${scopePrefix}.${fn.name}(${jsParametersString})`,
       '',
