@@ -176,7 +176,7 @@ export class PLV8ifyCLI implements PLV8ify {
       const virtualStartFn = {
         name: startFunctionName
       } as TSFunction // TODO: fixme, risky because it doesn't have all the properties of a virtual function
-      const startProcSQLScript = this.getStartProcSQLScript()
+      const startProcSQLScript = this.getStartProcSQLScript({scopePrefix})
       const startProcFileName = this.getFileName(
         outputFolder,
         virtualStartFn,
@@ -215,7 +215,7 @@ export class PLV8ifyCLI implements PLV8ify {
       match(mode)
         .with('inline', () => bundledJs)
         .otherwise(() => ''),
-      `return plv8ify.${fn.name}(${jsParametersString})`,
+      `return ${scopePrefix}.${fn.name}(${jsParametersString})`,
       '',
       `${pgFunctionDelimiter} LANGUAGE plv8 ${volatility} STRICT;`,
     ].join('\n')
@@ -230,9 +230,9 @@ $$ LANGUAGE plv8 ${volatility} STRICT;
 `
   }
 
-  private getStartProcSQLScript = () =>
+  private getStartProcSQLScript = ({scopePrefix}) =>
   `
-SET plv8.start_proc = plv8ify_init;
+SET plv8.start_proc = ${scopePrefix}_init;
 SELECT plv8_reset();
 `
 }
