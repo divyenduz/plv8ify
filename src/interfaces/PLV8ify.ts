@@ -1,5 +1,5 @@
 type Volatility = 'VOLATILE' | 'STABLE' | 'IMMUTABLE'
-type Mode = 'inline' | 'start_proc'
+type Mode = 'inline' | 'start_proc' | 'bundle'
 
 interface BuildArgs {
   mode: Mode
