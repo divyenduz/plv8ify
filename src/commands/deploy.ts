@@ -1,9 +1,10 @@
 import dotenv from 'dotenv'
 import fs from 'fs'
 import path from 'path'
-import { Database } from 'src/helpers/Database'
-import { ParseCLI } from 'src/helpers/ParseCLI'
 import task from 'tasuku'
+
+import { Database } from '../helpers/Database'
+import { ParseCLI } from '../helpers/ParseCLI'
 
 dotenv.config()
 
