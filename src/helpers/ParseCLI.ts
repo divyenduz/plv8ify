@@ -1,6 +1,6 @@
 import arg from 'arg'
 
-type Command = 'version' | 'generate'
+type Command = 'version' | 'generate' | 'deploy'
 
 export class ParseCLI {
   static getCommand() {
@@ -19,9 +19,11 @@ export class ParseCLI {
     })
 
     if (args._.length === 0) {
-      throw new Error(
-        `Please specify a command. Available commands: generate, version`
-      )
+      ParseCLI.throwError(`
+Please specify a command. Available commands: generate, version, deploy
+`)
+      console.error()
+      process.exit(1)
     }
 
     const inputFilePath = args['--input-file'] || 'input.ts'
@@ -47,5 +49,12 @@ export class ParseCLI {
         defaultVolatility,
       },
     }
+  }
+
+  static throwError(message?: string) {
+    if (message) {
+      console.error(message)
+    }
+    process.exit(1)
   }
 }

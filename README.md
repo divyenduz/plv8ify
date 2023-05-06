@@ -30,7 +30,18 @@ export function point(lat, long) {
 
 See all examples in the [examples folder](/examples). Use `yarn examples` to apply any changes to all the examples.
 
-## CLI Arguments
+## CLI Usage
+
+### Version
+
+Print the version
+
+| Generate Command Flags | Type | Description | Default |
+| ---------------------- | ---- | ----------- | ------- |
+
+### Generate
+
+Generate PLV8 functions for an input typescript file
 
 | Generate Command Flags  | Type                                  | Description                                                                                                                                                                                                                                                                             | Default        |
 | ----------------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- |
@@ -43,6 +54,14 @@ See all examples in the [examples folder](/examples). Use `yarn examples` to app
 | --fallback-type         | String                                | Specify a fallback type when `plv8ify` fails to map a detected Typescript type to a Postges type                                                                                                                                                                                        | `JSONB`        |
 | --mode                  | 'inline', 'bundle' or 'start_proc'    | 'inline' will bundle the library in each function, both 'bundle' and 'start_proc' creates a `{prefix}_init` function that loads the library. 'bundle' adds a check to each function to call 'init' if required, whereas 'start_proc' is designed to be used with plv8.start_proc        | `inline`       |
 | --volatility            | 'IMMUTABLE' or 'STABLE' or 'VOLATILE' | Change the volatility of all the generated functions. To change volatility of a specific function use the comment format `//@plv8ify-volatility-STABLE` in the input typescript file (see `examples/turf-js/input.ts`). Note that for now only single-line comment syntax is supported. | `IMMUTABLE`    |
+
+### Deploy
+
+Deploy an output folder to a Postgres database
+
+| Generate Command Flags | Type   | Description              | Default        |
+| ---------------------- | ------ | ------------------------ | -------------- |
+| --output-folder        | String | Specify an output folder | `plv8ify-dist` |
 
 ## Caveats
 

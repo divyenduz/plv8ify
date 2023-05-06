@@ -1,6 +1,6 @@
 import fs from 'fs'
 
-import { ParseCLI } from '../impl/ParseCLI'
+import { ParseCLI } from '../helpers/ParseCLI'
 import TYPES from '../interfaces/types'
 import container from '../inversify.config'
 
