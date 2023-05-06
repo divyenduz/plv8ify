@@ -57,7 +57,7 @@ Generate PLV8 functions for an input typescript file
 
 ### Deploy
 
-Deploy an output folder to a Postgres database
+Deploy an output folder to a Postgres database (defined by env var `DATABASE_URL`)
 
 | Generate Command Flags | Type   | Description              | Default        |
 | ---------------------- | ------ | ------------------------ | -------------- |
