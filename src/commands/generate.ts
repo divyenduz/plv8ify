@@ -26,7 +26,7 @@ export async function generateCommand(
   const bundledJs = await plv8ify.build({
     mode,
     inputFile: inputFilePath,
-    scopePrefix: 'plv8ify',
+    scopePrefix,
   })
 
   // Optionally, write ESBuild output file

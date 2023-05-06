@@ -16,6 +16,7 @@ interface GetPLV8SQLFunctionArgs {
 
 interface GetInitSQLFunctionArgs {
   fn: TSFunction
+  scopePrefix: string
   bundledJs: string
   volatility: Volatility
 }
@@ -47,6 +48,10 @@ export class PLV8ifyCLI implements PLV8ify {
       .with('start_proc', () =>
         // Remove var from var plv8ify to make it attach to the global scope in start_proc mode
         bundledJs.replace(`var ${scopePrefix} =`, `this.${scopePrefix} =`)
+      )
+      .with('bundle', () =>
+        // Remove var from var plv8ify to make it attach to the global scope in start_proc mode
+        bundledJs.replace(`var ${scopePrefix} =`, `globalThis.${scopePrefix} =`)
       )
       .exhaustive()
     return modeAdjustedBundledJs
@@ -150,15 +155,16 @@ export class PLV8ifyCLI implements PLV8ify {
     })
 
     let startProcSQLs = []
-    if (mode === 'start_proc') {
+    if (mode === 'start_proc' || mode === 'bundle') {
       // -- PLV8 + Server
-      const initFunctionName = scopePrefix + '_init'
+      const initFunctionName = 'init'
       const virtualInitFn = {
         name: initFunctionName
       } as TSFunction // TODO: fixme, risky because it doesn't have all the properties of a virtual function
 
       const initFunction = this.getInitSQLFunction({
         fn: virtualInitFn,
+        scopePrefix,
         bundledJs,
         volatility: defaultVolatility,
       })
@@ -167,22 +173,24 @@ export class PLV8ifyCLI implements PLV8ify {
         virtualInitFn,
         scopePrefix
       )
-      startProcSQLs.concat({
+      startProcSQLs.push({
         filename: initFileName,
         sql: initFunction,
       })
+    }
 
-      const startFunctionName = scopePrefix + '_start'
+    if (mode === 'start_proc') {
+      const startFunctionName = 'start'
       const virtualStartFn = {
         name: startFunctionName
       } as TSFunction // TODO: fixme, risky because it doesn't have all the properties of a virtual function
-      const startProcSQLScript = this.getStartProcSQLScript()
+      const startProcSQLScript = this.getStartProcSQLScript({scopePrefix})
       const startProcFileName = this.getFileName(
         outputFolder,
         virtualStartFn,
         scopePrefix
       )
-      startProcSQLs.concat({
+      startProcSQLs.push({
         filename: startProcFileName,
         sql: startProcSQLScript,
       })
@@ -214,25 +222,29 @@ export class PLV8ifyCLI implements PLV8ify {
       `CREATE OR REPLACE FUNCTION ${scopedName}(${sqlParametersString}) RETURNS ${returnType} AS ${pgFunctionDelimiter}`,
       match(mode)
         .with('inline', () => bundledJs)
+        .with('bundle', () => 
+          `if (globalThis.${scopePrefix} === undefined) plv8.execute('SELECT ${scopePrefix}_init();');`
+        )
         .otherwise(() => ''),
-      `return plv8ify.${fn.name}(${jsParametersString})`,
+      `return ${scopePrefix}.${fn.name}(${jsParametersString})`,
       '',
       `${pgFunctionDelimiter} LANGUAGE plv8 ${volatility} STRICT;`,
     ].join('\n')
   }
 
   // TODO: fixme, can this be replaced with getPLV8SQLFunction
-  private getInitSQLFunction({ fn, bundledJs, volatility }: GetInitSQLFunctionArgs) {
-    return `DROP FUNCTION IF EXISTS ${fn.name}();
-CREATE OR REPLACE FUNCTION ${fn.name}() RETURNS VOID AS $$
+  private getInitSQLFunction({ fn, scopePrefix, bundledJs, volatility }: GetInitSQLFunctionArgs) {
+    const scopedName = scopePrefix + '_' + fn.name
+    return `DROP FUNCTION IF EXISTS ${scopedName}();
+CREATE OR REPLACE FUNCTION ${scopedName}() RETURNS VOID AS $$
 ${bundledJs}
 $$ LANGUAGE plv8 ${volatility} STRICT;
 `
   }
 
-  private getStartProcSQLScript = () =>
+  private getStartProcSQLScript = ({scopePrefix}) =>
   `
-SET plv8.start_proc = plv8ify_init;
+SET plv8.start_proc = ${scopePrefix}_init;
 SELECT plv8_reset();
 `
 }

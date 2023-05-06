@@ -1,6 +1,6 @@
 {
   "name": "plv8ify",
-  "version": "0.0.40",
+  "version": "0.0.43",
   "main": "dist/index.js",
   "license": "MIT",
   "bin": {
@@ -50,6 +50,7 @@
     "test:prod": "yarn build && yarn node dist/index.js generate --input-file examples/turf-js/input.ts --output-folder examples/turf-js/plv8ify-dist",
     "example:hello": "yarn esr src/index.ts generate --input-file examples/hello/input.ts --output-folder examples/hello/plv8ify-dist",
     "example:hello-start_proc": "yarn esr src/index.ts generate --input-file examples/hello-start_proc/input.ts --output-folder examples/hello-start_proc/plv8ify-dist --mode start_proc",
+    "example:hello-bundle": "yarn esr src/index.ts generate --input-file examples/hello-bundle/input.ts --output-folder examples/hello-bundle/plv8ify-dist --mode bundle --scope-prefix myScope",
     "example:turf-js": "yarn esr src/index.ts generate --input-file examples/turf-js/input.ts --output-folder examples/turf-js/plv8ify-dist",
     "example:turf-js-distance": "yarn esr src/index.ts generate --input-file examples/turf-js-distance/input.ts --output-folder examples/turf-js-distance/plv8ify-dist",
     "example:mathjs": "yarn esr src/index.ts generate --input-file examples/mathjs/input.ts --output-folder examples/mathjs/plv8ify-dist",
