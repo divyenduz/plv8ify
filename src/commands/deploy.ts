@@ -125,7 +125,7 @@ export async function deployCommand(
           try {
             const extensionName = CLI.config.pgTLEExtensionName
             const extensionVersion = CLI.config.pgTLEExtensionVersion
-            const extensionDescription = CLI.config.pgTLEExtensionDescrption
+            const extensionDescription = CLI.config.pgTLEExtensionDescription
             await db.begin(async (db) => {
               await db`CREATE EXTENSION IF NOT EXISTS pg_tle`
               await db`DROP EXTENSION IF EXISTS ${db(extensionName)}`

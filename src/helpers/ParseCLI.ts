@@ -63,7 +63,7 @@ Please specify a command. Available commands: generate, version, deploy
         deployMode,
         pgTLEExtensionName,
         pgTLEExtensionVersion,
-        pgTLEExtensionDescrption: pgTLEExtensionDescription,
+        pgTLEExtensionDescription,
       },
     }
   }
