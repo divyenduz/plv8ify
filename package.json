@@ -15,7 +15,7 @@
     "postgres": "3.3.3",
     "reflect-metadata": "0.1.13",
     "tasuku": "2.0.1",
-    "ts-morph": "13.0.3",
+    "ts-morph": "18.0.0",
     "ts-pattern": "3.3.5",
     "webpack-node-externals": "3.0.0"
   },
@@ -57,6 +57,7 @@
     "example:react-js": "yarn esr src/index.ts generate --input-file examples/react-js/input.tsx --output-folder examples/react-js/plv8ify-dist",
     "example:trackfootball": "yarn esr src/index.ts generate --input-file examples/trackfootball/input.tsx --output-folder examples/trackfootball/plv8ify-dist",
     "example:object-hash": "yarn esr src/index.ts generate --input-file examples/object-hash/input.ts --output-folder examples/object-hash/plv8ify-dist",
+    "example:turf-js-full": "yarn esr src/index.ts generate --input-file node_modules/@turf/turf/index.d.ts --output-folder examples/turf-js-full/plv8ify-dist",
     "examples": "yarn example:hello; yarn example:hello-start_proc; yarn example:turf-js; yarn example:react-js; yarn example:object-hash; yarn example:turf-js-distance"
   }
 }
