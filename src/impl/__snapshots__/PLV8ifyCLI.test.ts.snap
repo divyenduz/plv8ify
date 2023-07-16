@@ -1,0 +1,19 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`PLV8ifyCLI > getSQLFunction with delimiter 1`] = `
+"DROP FUNCTION IF EXISTS plv8ify_test();
+CREATE OR REPLACE FUNCTION plv8ify_test() RETURNS JSONB AS $function$
+console.log('hello')
+return plv8ify.test()
+
+$function$ LANGUAGE plv8 IMMUTABLE STRICT;"
+`;
+
+exports[`PLV8ifyCLI > getSQLFunction with parameters 1`] = `
+"DROP FUNCTION IF EXISTS plv8ify_test();
+CREATE OR REPLACE FUNCTION plv8ify_test() RETURNS JSONB AS $plv8ify$
+console.log('hello')
+return plv8ify.test()
+
+$plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;"
+`;

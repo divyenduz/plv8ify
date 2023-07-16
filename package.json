@@ -28,7 +28,6 @@
     "@turf/turf": "6.5.0",
     "@types/dotenv": "8.2.0",
     "@types/node": "20.4.2",
-    "@types/tap": "15.0.8",
     "@types/webpack-node-externals": "^3.0.0",
     "date-fns": "2.30.0",
     "esbuild-register": "3.4.2",
@@ -38,14 +37,13 @@
     "prettier": "3.0.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "tap": "16.3.7",
-    "ts-node": "10.9.1",
-    "typescript": "5.1.6"
+    "typescript": "5.1.6",
+    "vitest": "^0.33.0"
   },
   "scripts": {
     "build": "rm -rf dist; tsc --project tsconfig.build.json",
     "prepublish": "yarn build",
-    "test": "tap --node-arg=--require=esbuild-register --no-check-coverage",
+    "test": "yarn vitest",
     "dev": "yarn example:turf-js",
     "test:prod": "yarn build && yarn node dist/index.js generate --input-file examples/turf-js/input.ts --output-folder examples/turf-js/plv8ify-dist",
     "example:hello": "yarn esr src/index.ts generate --input-file examples/hello/input.ts --output-folder examples/hello/plv8ify-dist",
@@ -55,7 +53,6 @@
     "example:turf-js-distance": "yarn esr src/index.ts generate --input-file examples/turf-js-distance/input.ts --output-folder examples/turf-js-distance/plv8ify-dist",
     "example:mathjs": "yarn esr src/index.ts generate --input-file examples/mathjs/input.ts --output-folder examples/mathjs/plv8ify-dist",
     "example:react-js": "yarn esr src/index.ts generate --input-file examples/react-js/input.tsx --output-folder examples/react-js/plv8ify-dist",
-    "example:trackfootball": "yarn esr src/index.ts generate --input-file examples/trackfootball/input.tsx --output-folder examples/trackfootball/plv8ify-dist",
     "example:object-hash": "yarn esr src/index.ts generate --input-file examples/object-hash/input.ts --output-folder examples/object-hash/plv8ify-dist",
     "examples": "yarn example:hello; yarn example:hello-start_proc; yarn example:turf-js; yarn example:react-js; yarn example:object-hash; yarn example:turf-js-distance"
   }
