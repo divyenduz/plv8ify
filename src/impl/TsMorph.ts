@@ -1,16 +1,14 @@
-import { injectable } from 'inversify'
+import assert from 'node:assert/strict'
+import { TSCompiler } from 'src/interfaces/TSCompiler'
 import { FunctionDeclaration, Project, SourceFile } from 'ts-morph'
 
-// TODO: fixme, this is exported only for tests, is that needed?
-@injectable()
 export class TsMorph implements TSCompiler {
-  private sourceFile: SourceFile
+  private sourceFile?: SourceFile
 
   // TODO: figure out how to do constructors with literal variables in inversify
   // https://stackoverflow.com/questions/37439798/inversifyjs-injecting-literal-constructor-parameters
   createSourceFile(inputFilePath: string) {
     const project = new Project()
-    // TODO: needs access to the file system, can this be pure?
     this.sourceFile = project.addSourceFileAtPath(inputFilePath)
   }
 
@@ -34,10 +32,13 @@ export class TsMorph implements TSCompiler {
   }
 
   getFunctions() {
-    const fns = this.sourceFile.getFunctions()
+    const fns = this.sourceFile?.getFunctions() || []
     return fns.map((fn) => {
+      const fnName = fn.getName()
+      assert(fnName !== undefined, 'Failed to find function name')
+
       return {
-        name: fn.getName(),
+        name: fnName,
         isExported: fn.isExported(),
         parameters: this.getFunctionParameters(fn),
         comments: this.getFunctionComments(fn),

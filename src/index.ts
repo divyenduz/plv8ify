@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import 'reflect-metadata'
+import { Effect } from 'effect'
 import { match } from 'ts-pattern'
 
 import { deployCommand } from './commands/deploy'
@@ -24,3 +24,7 @@ async function main() {
 }
 
 main()
+
+const program = Effect.sync(() => {})
+
+Effect.runSync(program)

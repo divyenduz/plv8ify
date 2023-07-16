@@ -6,8 +6,9 @@
     "declaration": true,
     "esModuleInterop": true,
     "baseUrl": ".",
+    "strict": true,
     "lib": ["esnext", "dom"],
-    "types": ["reflect-metadata", "node"],
+    "types": ["node"],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
   },

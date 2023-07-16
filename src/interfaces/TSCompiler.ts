@@ -1,9 +1,9 @@
-interface TSFunctionParameter {
+export interface TSFunctionParameter {
   name: string
   type: string
 }
 
-interface TSFunction {
+export interface TSFunction {
   name: string
   isExported: boolean
   parameters: TSFunctionParameter[]
@@ -11,8 +11,8 @@ interface TSFunction {
   returnType: string
 }
 
-interface TSCompiler {
-  createSourceFile(inputFilePath: string)
+export interface TSCompiler {
+  createSourceFile(inputFilePath: string): void
 
   getFunctions: () => TSFunction[]
 }

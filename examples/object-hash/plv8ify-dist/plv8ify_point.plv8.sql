@@ -1,5 +1,6 @@
 DROP FUNCTION IF EXISTS plv8ify_point(lat float8,long float8);
 CREATE OR REPLACE FUNCTION plv8ify_point(lat float8,long float8) RETURNS JSONB AS $plv8ify$
+"use strict";
 var plv8ify = (() => {
   var __create = Object.create;
   var __defProp = Object.defineProperty;
@@ -7,13 +8,12 @@ var plv8ify = (() => {
   var __getOwnPropNames = Object.getOwnPropertyNames;
   var __getProtoOf = Object.getPrototypeOf;
   var __hasOwnProp = Object.prototype.hasOwnProperty;
-  var __markAsModule = (target) => __defProp(target, "__esModule", { value: true });
   var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require : typeof Proxy !== "undefined" ? new Proxy(x, {
     get: (a, b) => (typeof require !== "undefined" ? require : a)[b]
   }) : x)(function(x) {
     if (typeof require !== "undefined")
       return require.apply(this, arguments);
-    throw new Error('Dynamic require of "' + x + '" is not supported');
+    throw Error('Dynamic require of "' + x + '" is not supported');
   });
   var __commonJS = (cb, mod) => function __require2() {
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
@@ -22,35 +22,36 @@ var plv8ify = (() => {
     for (var name in all)
       __defProp(target, name, { get: all[name], enumerable: true });
   };
-  var __reExport = (target, module, copyDefault, desc) => {
-    if (module && typeof module === "object" || typeof module === "function") {
-      for (let key of __getOwnPropNames(module))
-        if (!__hasOwnProp.call(target, key) && (copyDefault || key !== "default"))
-          __defProp(target, key, { get: () => module[key], enumerable: !(desc = __getOwnPropDesc(module, key)) || desc.enumerable });
+  var __copyProps = (to, from, except, desc) => {
+    if (from && typeof from === "object" || typeof from === "function") {
+      for (let key of __getOwnPropNames(from))
+        if (!__hasOwnProp.call(to, key) && key !== except)
+          __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
     }
-    return target;
+    return to;
   };
-  var __toESM = (module, isNodeMode) => {
-    return __reExport(__markAsModule(__defProp(module != null ? __create(__getProtoOf(module)) : {}, "default", !isNodeMode && module && module.__esModule ? { get: () => module.default, enumerable: true } : { value: module, enumerable: true })), module);
-  };
-  var __toCommonJS = /* @__PURE__ */ ((cache) => {
-    return (module, temp) => {
-      return cache && cache.get(module) || (temp = __reExport(__markAsModule({}), module, 1), cache && cache.set(module, temp), temp);
-    };
-  })(typeof WeakMap !== "undefined" ? /* @__PURE__ */ new WeakMap() : 0);
+  var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+    // If the importer is in node compatibility mode or this is not an ESM
+    // file that has been converted to a CommonJS file using a Babel-
+    // compatible transform (i.e. "__esModule" has not been set), then set
+    // "default" to the CommonJS "module.exports" for node compatibility.
+    isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+    mod
+  ));
+  var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
   // node_modules/object-hash/dist/object_hash.js
   var require_object_hash = __commonJS({
     "node_modules/object-hash/dist/object_hash.js"(exports, module) {
       !function(e) {
         var t;
-        typeof exports == "object" ? module.exports = e() : typeof define == "function" && define.amd ? define(e) : (typeof window != "undefined" ? t = window : typeof global != "undefined" ? t = global : typeof self != "undefined" && (t = self), t.objectHash = e());
+        "object" == typeof exports ? module.exports = e() : "function" == typeof define && define.amd ? define(e) : ("undefined" != typeof window ? t = window : "undefined" != typeof global ? t = global : "undefined" != typeof self && (t = self), t.objectHash = e());
       }(function() {
         return function r(o, i, u) {
           function s(n, e2) {
             if (!i[n]) {
               if (!o[n]) {
-                var t = typeof __require == "function" && __require;
+                var t = "function" == typeof __require && __require;
                 if (!e2 && t)
                   return t(n, true);
                 if (a)
@@ -65,7 +66,7 @@ var plv8ify = (() => {
             }
             return i[n].exports;
           }
-          for (var a = typeof __require == "function" && __require, e = 0; e < u.length; e++)
+          for (var a = "function" == typeof __require && __require, e = 0; e < u.length; e++)
             s(u[e]);
           return s;
         }({ 1: [function(w, b, m) {
@@ -75,7 +76,7 @@ var plv8ify = (() => {
             function t(e2, t2) {
               t2 = u(e2, t2);
               var n2;
-              return (n2 = t2.algorithm !== "passthrough" ? r.createHash(t2.algorithm) : new l()).write === void 0 && (n2.write = n2.update, n2.end = n2.update), f(t2, n2).dispatch(e2), n2.update || n2.end(""), n2.digest ? n2.digest(t2.encoding === "buffer" ? void 0 : t2.encoding) : (e2 = n2.read(), t2.encoding !== "buffer" ? e2.toString(t2.encoding) : e2);
+              return void 0 === (n2 = "passthrough" !== t2.algorithm ? r.createHash(t2.algorithm) : new l()).write && (n2.write = n2.update, n2.end = n2.update), f(t2, n2).dispatch(e2), n2.update || n2.end(""), n2.digest ? n2.digest("buffer" === t2.encoding ? void 0 : t2.encoding) : (e2 = n2.read(), "buffer" !== t2.encoding ? e2.toString(t2.encoding) : e2);
             }
             (m = b.exports = t).sha1 = function(e2) {
               return t(e2);
@@ -89,19 +90,19 @@ var plv8ify = (() => {
             var o = r.getHashes ? r.getHashes().slice() : ["sha1", "md5"], i = (o.push("passthrough"), ["buffer", "hex", "binary", "base64"]);
             function u(e2, t2) {
               var n2 = {};
-              if (n2.algorithm = (t2 = t2 || {}).algorithm || "sha1", n2.encoding = t2.encoding || "hex", n2.excludeValues = !!t2.excludeValues, n2.algorithm = n2.algorithm.toLowerCase(), n2.encoding = n2.encoding.toLowerCase(), n2.ignoreUnknown = t2.ignoreUnknown === true, n2.respectType = t2.respectType !== false, n2.respectFunctionNames = t2.respectFunctionNames !== false, n2.respectFunctionProperties = t2.respectFunctionProperties !== false, n2.unorderedArrays = t2.unorderedArrays === true, n2.unorderedSets = t2.unorderedSets !== false, n2.unorderedObjects = t2.unorderedObjects !== false, n2.replacer = t2.replacer || void 0, n2.excludeKeys = t2.excludeKeys || void 0, e2 === void 0)
+              if (n2.algorithm = (t2 = t2 || {}).algorithm || "sha1", n2.encoding = t2.encoding || "hex", n2.excludeValues = !!t2.excludeValues, n2.algorithm = n2.algorithm.toLowerCase(), n2.encoding = n2.encoding.toLowerCase(), n2.ignoreUnknown = true === t2.ignoreUnknown, n2.respectType = false !== t2.respectType, n2.respectFunctionNames = false !== t2.respectFunctionNames, n2.respectFunctionProperties = false !== t2.respectFunctionProperties, n2.unorderedArrays = true === t2.unorderedArrays, n2.unorderedSets = false !== t2.unorderedSets, n2.unorderedObjects = false !== t2.unorderedObjects, n2.replacer = t2.replacer || void 0, n2.excludeKeys = t2.excludeKeys || void 0, void 0 === e2)
                 throw new Error("Object argument required.");
               for (var r2 = 0; r2 < o.length; ++r2)
                 o[r2].toLowerCase() === n2.algorithm.toLowerCase() && (n2.algorithm = o[r2]);
-              if (o.indexOf(n2.algorithm) === -1)
+              if (-1 === o.indexOf(n2.algorithm))
                 throw new Error('Algorithm "' + n2.algorithm + '"  not supported. supported values: ' + o.join(", "));
-              if (i.indexOf(n2.encoding) === -1 && n2.algorithm !== "passthrough")
+              if (-1 === i.indexOf(n2.encoding) && "passthrough" !== n2.algorithm)
                 throw new Error('Encoding "' + n2.encoding + '"  not supported. supported values: ' + i.join(", "));
               return n2;
             }
             function a(e2) {
-              if (typeof e2 == "function")
-                return /^function\s+\w*\s*\(\s*\)\s*{\s+\[native code\]\s+}$/i.exec(Function.prototype.toString.call(e2)) != null;
+              if ("function" == typeof e2)
+                return null != /^function\s+\w*\s*\(\s*\)\s*{\s+\[native code\]\s+}$/i.exec(Function.prototype.toString.call(e2));
             }
             function f(o2, t2, i2) {
               i2 = i2 || [];
@@ -109,16 +110,16 @@ var plv8ify = (() => {
                 return t2.update ? t2.update(e2, "utf8") : t2.write(e2, "utf8");
               }
               return { dispatch: function(e2) {
-                return this["_" + ((e2 = o2.replacer ? o2.replacer(e2) : e2) === null ? "null" : typeof e2)](e2);
+                return this["_" + (null === (e2 = o2.replacer ? o2.replacer(e2) : e2) ? "null" : typeof e2)](e2);
               }, _object: function(t3) {
                 var n2, e2 = Object.prototype.toString.call(t3), r2 = /\[object (.*)\]/i.exec(e2);
                 r2 = (r2 = r2 ? r2[1] : "unknown:[" + e2 + "]").toLowerCase();
                 if (0 <= (e2 = i2.indexOf(t3)))
                   return this.dispatch("[CIRCULAR:" + e2 + "]");
-                if (i2.push(t3), s !== void 0 && s.isBuffer && s.isBuffer(t3))
+                if (i2.push(t3), void 0 !== s && s.isBuffer && s.isBuffer(t3))
                   return u2("buffer:"), u2(t3);
-                if (r2 === "object" || r2 === "function" || r2 === "asyncfunction")
-                  return e2 = Object.keys(t3), o2.unorderedObjects && (e2 = e2.sort()), o2.respectType === false || a(t3) || e2.splice(0, 0, "prototype", "__proto__", "constructor"), o2.excludeKeys && (e2 = e2.filter(function(e3) {
+                if ("object" === r2 || "function" === r2 || "asyncfunction" === r2)
+                  return e2 = Object.keys(t3), o2.unorderedObjects && (e2 = e2.sort()), false === o2.respectType || a(t3) || e2.splice(0, 0, "prototype", "__proto__", "constructor"), o2.excludeKeys && (e2 = e2.filter(function(e3) {
                     return !o2.excludeKeys(e3);
                   })), u2("object:" + e2.length + ":"), n2 = this, e2.forEach(function(e3) {
                     n2.dispatch(e3), u2(":"), o2.excludeValues || n2.dispatch(t3[e3]), u2(",");
@@ -130,7 +131,7 @@ var plv8ify = (() => {
                 }
                 this["_" + r2](t3);
               }, _array: function(e2, t3) {
-                t3 = t3 !== void 0 ? t3 : o2.unorderedArrays !== false;
+                t3 = void 0 !== t3 ? t3 : false !== o2.unorderedArrays;
                 var n2 = this;
                 if (u2("array:" + e2.length + ":"), !t3 || e2.length <= 1)
                   return e2.forEach(function(e3) {
@@ -152,7 +153,7 @@ var plv8ify = (() => {
               }, _string: function(e2) {
                 u2("string:" + e2.length + ":"), u2(e2.toString());
               }, _function: function(e2) {
-                u2("fn:"), a(e2) ? this.dispatch("[native]") : this.dispatch(e2.toString()), o2.respectFunctionNames !== false && this.dispatch("function-name:" + String(e2.name)), o2.respectFunctionProperties && this._object(e2);
+                u2("fn:"), a(e2) ? this.dispatch("[native]") : this.dispatch(e2.toString()), false !== o2.respectFunctionNames && this.dispatch("function-name:" + String(e2.name)), o2.respectFunctionProperties && this._object(e2);
               }, _number: function(e2) {
                 return u2("number:" + e2.toString());
               }, _xml: function(e2) {
@@ -188,11 +189,11 @@ var plv8ify = (() => {
               }, _map: function(e2) {
                 u2("map:");
                 e2 = Array.from(e2);
-                return this._array(e2, o2.unorderedSets !== false);
+                return this._array(e2, false !== o2.unorderedSets);
               }, _set: function(e2) {
                 u2("set:");
                 e2 = Array.from(e2);
-                return this._array(e2, o2.unorderedSets !== false);
+                return this._array(e2, false !== o2.unorderedSets);
               }, _file: function(e2) {
                 return u2("file:"), this.dispatch([e2.name, e2.size, e2.type, e2.lastModfied]);
               }, _blob: function() {
@@ -249,14 +250,14 @@ var plv8ify = (() => {
               } };
             }
             m.writeToStream = function(e2, t2, n2) {
-              return n2 === void 0 && (n2 = t2, t2 = {}), f(t2 = u(e2, t2), n2).dispatch(e2);
+              return void 0 === n2 && (n2 = t2, t2 = {}), f(t2 = u(e2, t2), n2).dispatch(e2);
             };
-          }.call(this, w("lYpoI2"), typeof self != "undefined" ? self : typeof window != "undefined" ? window : {}, w("buffer").Buffer, arguments[3], arguments[4], arguments[5], arguments[6], "/fake_9a5aa49d.js", "/");
+          }.call(this, w("lYpoI2"), "undefined" != typeof self ? self : "undefined" != typeof window ? window : {}, w("buffer").Buffer, arguments[3], arguments[4], arguments[5], arguments[6], "/fake_9a5aa49d.js", "/");
         }, { buffer: 3, crypto: 5, lYpoI2: 11 }], 2: [function(e, t, f) {
           !function(e2, t2, n, r, o, i, u, s, a) {
             !function(e3) {
               "use strict";
-              var a2 = typeof Uint8Array != "undefined" ? Uint8Array : Array, t3 = "+".charCodeAt(0), n2 = "/".charCodeAt(0), r2 = "0".charCodeAt(0), o2 = "a".charCodeAt(0), i2 = "A".charCodeAt(0), u2 = "-".charCodeAt(0), s2 = "_".charCodeAt(0);
+              var a2 = "undefined" != typeof Uint8Array ? Uint8Array : Array, t3 = "+".charCodeAt(0), n2 = "/".charCodeAt(0), r2 = "0".charCodeAt(0), o2 = "a".charCodeAt(0), i2 = "A".charCodeAt(0), u2 = "-".charCodeAt(0), s2 = "_".charCodeAt(0);
               function f2(e4) {
                 e4 = e4.charCodeAt(0);
                 return e4 === t3 || e4 === u2 ? 62 : e4 === n2 || e4 === s2 ? 63 : e4 < r2 ? -1 : e4 < r2 + 10 ? e4 - r2 + 26 + 26 : e4 < i2 + 26 ? e4 - i2 : e4 < o2 + 26 ? e4 - o2 + 26 : void 0;
@@ -265,13 +266,13 @@ var plv8ify = (() => {
                 var t4, n3;
                 if (0 < e4.length % 4)
                   throw new Error("Invalid string. Length must be a multiple of 4");
-                var r3 = e4.length, r3 = e4.charAt(r3 - 2) === "=" ? 2 : e4.charAt(r3 - 1) === "=" ? 1 : 0, o3 = new a2(3 * e4.length / 4 - r3), i3 = 0 < r3 ? e4.length - 4 : e4.length, u3 = 0;
+                var r3 = e4.length, r3 = "=" === e4.charAt(r3 - 2) ? 2 : "=" === e4.charAt(r3 - 1) ? 1 : 0, o3 = new a2(3 * e4.length / 4 - r3), i3 = 0 < r3 ? e4.length - 4 : e4.length, u3 = 0;
                 function s3(e5) {
                   o3[u3++] = e5;
                 }
                 for (t4 = 0; t4 < i3; t4 += 4, 0)
                   s3((16711680 & (n3 = f2(e4.charAt(t4)) << 18 | f2(e4.charAt(t4 + 1)) << 12 | f2(e4.charAt(t4 + 2)) << 6 | f2(e4.charAt(t4 + 3)))) >> 16), s3((65280 & n3) >> 8), s3(255 & n3);
-                return r3 == 2 ? s3(255 & (n3 = f2(e4.charAt(t4)) << 2 | f2(e4.charAt(t4 + 1)) >> 4)) : r3 == 1 && (s3((n3 = f2(e4.charAt(t4)) << 10 | f2(e4.charAt(t4 + 1)) << 4 | f2(e4.charAt(t4 + 2)) >> 2) >> 8 & 255), s3(255 & n3)), o3;
+                return 2 == r3 ? s3(255 & (n3 = f2(e4.charAt(t4)) << 2 | f2(e4.charAt(t4 + 1)) >> 4)) : 1 == r3 && (s3((n3 = f2(e4.charAt(t4)) << 10 | f2(e4.charAt(t4 + 1)) << 4 | f2(e4.charAt(t4 + 2)) >> 2) >> 8 & 255), s3(255 & n3)), o3;
               }, e3.fromByteArray = function(e4) {
                 var t4, n3, r3, o3, i3 = e4.length % 3, u3 = "";
                 function s3(e5) {
@@ -288,8 +289,8 @@ var plv8ify = (() => {
                 }
                 return u3;
               };
-            }(f === void 0 ? this.base64js = {} : f);
-          }.call(this, e("lYpoI2"), typeof self != "undefined" ? self : typeof window != "undefined" ? window : {}, e("buffer").Buffer, arguments[3], arguments[4], arguments[5], arguments[6], "/node_modules/gulp-browserify/node_modules/base64-js/lib/b64.js", "/node_modules/gulp-browserify/node_modules/base64-js/lib");
+            }(void 0 === f ? this.base64js = {} : f);
+          }.call(this, e("lYpoI2"), "undefined" != typeof self ? self : "undefined" != typeof window ? window : {}, e("buffer").Buffer, arguments[3], arguments[4], arguments[5], arguments[6], "/node_modules/gulp-browserify/node_modules/base64-js/lib/b64.js", "/node_modules/gulp-browserify/node_modules/base64-js/lib");
         }, { buffer: 3, lYpoI2: 11 }], 3: [function(O, e, H) {
           !function(e2, n, f, r, h, p, g, y, w) {
             var a = O("base64-js"), i = O("ieee754");
@@ -297,26 +298,26 @@ var plv8ify = (() => {
               if (!(this instanceof f))
                 return new f(e3, t2, n2);
               var r2, o2, i2, u2, s2 = typeof e3;
-              if (t2 === "base64" && s2 == "string")
+              if ("base64" === t2 && "string" == s2)
                 for (e3 = (u2 = e3).trim ? u2.trim() : u2.replace(/^\s+|\s+$/g, ""); e3.length % 4 != 0; )
                   e3 += "=";
-              if (s2 == "number")
+              if ("number" == s2)
                 r2 = j(e3);
-              else if (s2 == "string")
+              else if ("string" == s2)
                 r2 = f.byteLength(e3, t2);
               else {
-                if (s2 != "object")
+                if ("object" != s2)
                   throw new Error("First argument needs to be a number, array or string.");
                 r2 = j(e3.length);
               }
-              if (f._useTypedArrays ? o2 = f._augment(new Uint8Array(r2)) : ((o2 = this).length = r2, o2._isBuffer = true), f._useTypedArrays && typeof e3.byteLength == "number")
+              if (f._useTypedArrays ? o2 = f._augment(new Uint8Array(r2)) : ((o2 = this).length = r2, o2._isBuffer = true), f._useTypedArrays && "number" == typeof e3.byteLength)
                 o2._set(e3);
-              else if (C(u2 = e3) || f.isBuffer(u2) || u2 && typeof u2 == "object" && typeof u2.length == "number")
+              else if (C(u2 = e3) || f.isBuffer(u2) || u2 && "object" == typeof u2 && "number" == typeof u2.length)
                 for (i2 = 0; i2 < r2; i2++)
                   f.isBuffer(e3) ? o2[i2] = e3.readUInt8(i2) : o2[i2] = e3[i2];
-              else if (s2 == "string")
+              else if ("string" == s2)
                 o2.write(e3, 0, t2);
-              else if (s2 == "number" && !f._useTypedArrays && !n2)
+              else if ("number" == s2 && !f._useTypedArrays && !n2)
                 for (i2 = 0; i2 < r2; i2++)
                   o2[i2] = 0;
               return o2;
@@ -343,63 +344,63 @@ var plv8ify = (() => {
               return r2;
             }
             function o(e3, t2, n2, r2) {
-              r2 || (d(typeof n2 == "boolean", "missing or invalid endian"), d(t2 != null, "missing offset"), d(t2 + 1 < e3.length, "Trying to read beyond buffer length"));
+              r2 || (d("boolean" == typeof n2, "missing or invalid endian"), d(null != t2, "missing offset"), d(t2 + 1 < e3.length, "Trying to read beyond buffer length"));
               var o2, r2 = e3.length;
               if (!(r2 <= t2))
                 return n2 ? (o2 = e3[t2], t2 + 1 < r2 && (o2 |= e3[t2 + 1] << 8)) : (o2 = e3[t2] << 8, t2 + 1 < r2 && (o2 |= e3[t2 + 1])), o2;
             }
             function u(e3, t2, n2, r2) {
-              r2 || (d(typeof n2 == "boolean", "missing or invalid endian"), d(t2 != null, "missing offset"), d(t2 + 3 < e3.length, "Trying to read beyond buffer length"));
+              r2 || (d("boolean" == typeof n2, "missing or invalid endian"), d(null != t2, "missing offset"), d(t2 + 3 < e3.length, "Trying to read beyond buffer length"));
               var o2, r2 = e3.length;
               if (!(r2 <= t2))
                 return n2 ? (t2 + 2 < r2 && (o2 = e3[t2 + 2] << 16), t2 + 1 < r2 && (o2 |= e3[t2 + 1] << 8), o2 |= e3[t2], t2 + 3 < r2 && (o2 += e3[t2 + 3] << 24 >>> 0)) : (t2 + 1 < r2 && (o2 = e3[t2 + 1] << 16), t2 + 2 < r2 && (o2 |= e3[t2 + 2] << 8), t2 + 3 < r2 && (o2 |= e3[t2 + 3]), o2 += e3[t2] << 24 >>> 0), o2;
             }
             function _(e3, t2, n2, r2) {
-              if (r2 || (d(typeof n2 == "boolean", "missing or invalid endian"), d(t2 != null, "missing offset"), d(t2 + 1 < e3.length, "Trying to read beyond buffer length")), !(e3.length <= t2))
+              if (r2 || (d("boolean" == typeof n2, "missing or invalid endian"), d(null != t2, "missing offset"), d(t2 + 1 < e3.length, "Trying to read beyond buffer length")), !(e3.length <= t2))
                 return r2 = o(e3, t2, n2, true), 32768 & r2 ? -1 * (65535 - r2 + 1) : r2;
             }
             function E(e3, t2, n2, r2) {
-              if (r2 || (d(typeof n2 == "boolean", "missing or invalid endian"), d(t2 != null, "missing offset"), d(t2 + 3 < e3.length, "Trying to read beyond buffer length")), !(e3.length <= t2))
+              if (r2 || (d("boolean" == typeof n2, "missing or invalid endian"), d(null != t2, "missing offset"), d(t2 + 3 < e3.length, "Trying to read beyond buffer length")), !(e3.length <= t2))
                 return r2 = u(e3, t2, n2, true), 2147483648 & r2 ? -1 * (4294967295 - r2 + 1) : r2;
             }
             function I(e3, t2, n2, r2) {
-              return r2 || (d(typeof n2 == "boolean", "missing or invalid endian"), d(t2 + 3 < e3.length, "Trying to read beyond buffer length")), i.read(e3, t2, n2, 23, 4);
+              return r2 || (d("boolean" == typeof n2, "missing or invalid endian"), d(t2 + 3 < e3.length, "Trying to read beyond buffer length")), i.read(e3, t2, n2, 23, 4);
             }
             function A(e3, t2, n2, r2) {
-              return r2 || (d(typeof n2 == "boolean", "missing or invalid endian"), d(t2 + 7 < e3.length, "Trying to read beyond buffer length")), i.read(e3, t2, n2, 52, 8);
+              return r2 || (d("boolean" == typeof n2, "missing or invalid endian"), d(t2 + 7 < e3.length, "Trying to read beyond buffer length")), i.read(e3, t2, n2, 52, 8);
             }
             function s(e3, t2, n2, r2, o2) {
-              o2 || (d(t2 != null, "missing value"), d(typeof r2 == "boolean", "missing or invalid endian"), d(n2 != null, "missing offset"), d(n2 + 1 < e3.length, "trying to write beyond buffer length"), Y(t2, 65535));
+              o2 || (d(null != t2, "missing value"), d("boolean" == typeof r2, "missing or invalid endian"), d(null != n2, "missing offset"), d(n2 + 1 < e3.length, "trying to write beyond buffer length"), Y(t2, 65535));
               o2 = e3.length;
               if (!(o2 <= n2))
                 for (var i2 = 0, u2 = Math.min(o2 - n2, 2); i2 < u2; i2++)
                   e3[n2 + i2] = (t2 & 255 << 8 * (r2 ? i2 : 1 - i2)) >>> 8 * (r2 ? i2 : 1 - i2);
             }
             function l(e3, t2, n2, r2, o2) {
-              o2 || (d(t2 != null, "missing value"), d(typeof r2 == "boolean", "missing or invalid endian"), d(n2 != null, "missing offset"), d(n2 + 3 < e3.length, "trying to write beyond buffer length"), Y(t2, 4294967295));
+              o2 || (d(null != t2, "missing value"), d("boolean" == typeof r2, "missing or invalid endian"), d(null != n2, "missing offset"), d(n2 + 3 < e3.length, "trying to write beyond buffer length"), Y(t2, 4294967295));
               o2 = e3.length;
               if (!(o2 <= n2))
                 for (var i2 = 0, u2 = Math.min(o2 - n2, 4); i2 < u2; i2++)
                   e3[n2 + i2] = t2 >>> 8 * (r2 ? i2 : 3 - i2) & 255;
             }
             function B(e3, t2, n2, r2, o2) {
-              o2 || (d(t2 != null, "missing value"), d(typeof r2 == "boolean", "missing or invalid endian"), d(n2 != null, "missing offset"), d(n2 + 1 < e3.length, "Trying to write beyond buffer length"), F(t2, 32767, -32768)), e3.length <= n2 || s(e3, 0 <= t2 ? t2 : 65535 + t2 + 1, n2, r2, o2);
+              o2 || (d(null != t2, "missing value"), d("boolean" == typeof r2, "missing or invalid endian"), d(null != n2, "missing offset"), d(n2 + 1 < e3.length, "Trying to write beyond buffer length"), F(t2, 32767, -32768)), e3.length <= n2 || s(e3, 0 <= t2 ? t2 : 65535 + t2 + 1, n2, r2, o2);
             }
             function L(e3, t2, n2, r2, o2) {
-              o2 || (d(t2 != null, "missing value"), d(typeof r2 == "boolean", "missing or invalid endian"), d(n2 != null, "missing offset"), d(n2 + 3 < e3.length, "Trying to write beyond buffer length"), F(t2, 2147483647, -2147483648)), e3.length <= n2 || l(e3, 0 <= t2 ? t2 : 4294967295 + t2 + 1, n2, r2, o2);
+              o2 || (d(null != t2, "missing value"), d("boolean" == typeof r2, "missing or invalid endian"), d(null != n2, "missing offset"), d(n2 + 3 < e3.length, "Trying to write beyond buffer length"), F(t2, 2147483647, -2147483648)), e3.length <= n2 || l(e3, 0 <= t2 ? t2 : 4294967295 + t2 + 1, n2, r2, o2);
             }
             function U(e3, t2, n2, r2, o2) {
-              o2 || (d(t2 != null, "missing value"), d(typeof r2 == "boolean", "missing or invalid endian"), d(n2 != null, "missing offset"), d(n2 + 3 < e3.length, "Trying to write beyond buffer length"), D(t2, 34028234663852886e22, -34028234663852886e22)), e3.length <= n2 || i.write(e3, t2, n2, r2, 23, 4);
+              o2 || (d(null != t2, "missing value"), d("boolean" == typeof r2, "missing or invalid endian"), d(null != n2, "missing offset"), d(n2 + 3 < e3.length, "Trying to write beyond buffer length"), D(t2, 34028234663852886e22, -34028234663852886e22)), e3.length <= n2 || i.write(e3, t2, n2, r2, 23, 4);
             }
             function x(e3, t2, n2, r2, o2) {
-              o2 || (d(t2 != null, "missing value"), d(typeof r2 == "boolean", "missing or invalid endian"), d(n2 != null, "missing offset"), d(n2 + 7 < e3.length, "Trying to write beyond buffer length"), D(t2, 17976931348623157e292, -17976931348623157e292)), e3.length <= n2 || i.write(e3, t2, n2, r2, 52, 8);
+              o2 || (d(null != t2, "missing value"), d("boolean" == typeof r2, "missing or invalid endian"), d(null != n2, "missing offset"), d(n2 + 7 < e3.length, "Trying to write beyond buffer length"), D(t2, 17976931348623157e292, -17976931348623157e292)), e3.length <= n2 || i.write(e3, t2, n2, r2, 52, 8);
             }
             H.Buffer = f, H.SlowBuffer = f, H.INSPECT_MAX_BYTES = 50, f.poolSize = 8192, f._useTypedArrays = function() {
               try {
                 var e3 = new ArrayBuffer(0), t2 = new Uint8Array(e3);
                 return t2.foo = function() {
                   return 42;
-                }, t2.foo() === 42 && typeof t2.subarray == "function";
+                }, 42 === t2.foo() && "function" == typeof t2.subarray;
               } catch (e4) {
                 return false;
               }
@@ -421,7 +422,7 @@ var plv8ify = (() => {
                   return false;
               }
             }, f.isBuffer = function(e3) {
-              return !(e3 == null || !e3._isBuffer);
+              return !(null == e3 || !e3._isBuffer);
             }, f.byteLength = function(e3, t2) {
               var n2;
               switch (e3 += "", t2 || "utf8") {
@@ -451,11 +452,11 @@ var plv8ify = (() => {
               }
               return n2;
             }, f.concat = function(e3, t2) {
-              if (d(C(e3), "Usage: Buffer.concat(list, [totalLength])\nlist should be an Array."), e3.length === 0)
+              if (d(C(e3), "Usage: Buffer.concat(list, [totalLength])\nlist should be an Array."), 0 === e3.length)
                 return new f(0);
-              if (e3.length === 1)
+              if (1 === e3.length)
                 return e3[0];
-              if (typeof t2 != "number")
+              if ("number" != typeof t2)
                 for (o2 = t2 = 0; o2 < e3.length; o2++)
                   t2 += e3[o2].length;
               for (var n2 = new f(t2), r2 = 0, o2 = 0; o2 < e3.length; o2++) {
@@ -502,7 +503,7 @@ var plv8ify = (() => {
               return o2;
             }, f.prototype.toString = function(e3, t2, n2) {
               var r2, o2, i2, u2, s2 = this;
-              if (e3 = String(e3 || "utf8").toLowerCase(), t2 = Number(t2) || 0, (n2 = n2 !== void 0 ? Number(n2) : s2.length) === t2)
+              if (e3 = String(e3 || "utf8").toLowerCase(), t2 = Number(t2) || 0, (n2 = void 0 !== n2 ? Number(n2) : s2.length) === t2)
                 return "";
               switch (e3) {
                 case "hex":
@@ -530,7 +531,7 @@ var plv8ify = (() => {
                   r2 = v(s2, t2, n2);
                   break;
                 case "base64":
-                  o2 = s2, u2 = n2, r2 = (i2 = t2) === 0 && u2 === o2.length ? a.fromByteArray(o2) : a.fromByteArray(o2.slice(i2, u2));
+                  o2 = s2, u2 = n2, r2 = 0 === (i2 = t2) && u2 === o2.length ? a.fromByteArray(o2) : a.fromByteArray(o2.slice(i2, u2));
                   break;
                 case "ucs2":
                 case "ucs-2":
@@ -549,7 +550,7 @@ var plv8ify = (() => {
             }, f.prototype.toJSON = function() {
               return { type: "Buffer", data: Array.prototype.slice.call(this._arr || this, 0) };
             }, f.prototype.copy = function(e3, t2, n2, r2) {
-              if (t2 = t2 || 0, (r2 = r2 || r2 === 0 ? r2 : this.length) !== (n2 = n2 || 0) && e3.length !== 0 && this.length !== 0) {
+              if (t2 = t2 || 0, (r2 = r2 || 0 === r2 ? r2 : this.length) !== (n2 = n2 || 0) && 0 !== e3.length && 0 !== this.length) {
                 d(n2 <= r2, "sourceEnd < sourceStart"), d(0 <= t2 && t2 < e3.length, "targetStart out of bounds"), d(0 <= n2 && n2 < this.length, "sourceStart out of bounds"), d(0 <= r2 && r2 <= this.length, "sourceEnd out of bounds"), r2 > this.length && (r2 = this.length);
                 var o2 = (r2 = e3.length - t2 < r2 - n2 ? e3.length - t2 + n2 : r2) - n2;
                 if (o2 < 100 || !f._useTypedArrays)
@@ -570,7 +571,7 @@ var plv8ify = (() => {
             }, f.prototype.set = function(e3, t2) {
               return console.log(".set() is deprecated. Access using array indexes instead."), this.writeUInt8(e3, t2);
             }, f.prototype.readUInt8 = function(e3, t2) {
-              if (t2 || (d(e3 != null, "missing offset"), d(e3 < this.length, "Trying to read beyond buffer length")), !(e3 >= this.length))
+              if (t2 || (d(null != e3, "missing offset"), d(e3 < this.length, "Trying to read beyond buffer length")), !(e3 >= this.length))
                 return this[e3];
             }, f.prototype.readUInt16LE = function(e3, t2) {
               return o(this, e3, true, t2);
@@ -581,7 +582,7 @@ var plv8ify = (() => {
             }, f.prototype.readUInt32BE = function(e3, t2) {
               return u(this, e3, false, t2);
             }, f.prototype.readInt8 = function(e3, t2) {
-              if (t2 || (d(e3 != null, "missing offset"), d(e3 < this.length, "Trying to read beyond buffer length")), !(e3 >= this.length))
+              if (t2 || (d(null != e3, "missing offset"), d(e3 < this.length, "Trying to read beyond buffer length")), !(e3 >= this.length))
                 return 128 & this[e3] ? -1 * (255 - this[e3] + 1) : this[e3];
             }, f.prototype.readInt16LE = function(e3, t2) {
               return _(this, e3, true, t2);
@@ -600,7 +601,7 @@ var plv8ify = (() => {
             }, f.prototype.readDoubleBE = function(e3, t2) {
               return A(this, e3, false, t2);
             }, f.prototype.writeUInt8 = function(e3, t2, n2) {
-              n2 || (d(e3 != null, "missing value"), d(t2 != null, "missing offset"), d(t2 < this.length, "trying to write beyond buffer length"), Y(e3, 255)), t2 >= this.length || (this[t2] = e3);
+              n2 || (d(null != e3, "missing value"), d(null != t2, "missing offset"), d(t2 < this.length, "trying to write beyond buffer length"), Y(e3, 255)), t2 >= this.length || (this[t2] = e3);
             }, f.prototype.writeUInt16LE = function(e3, t2, n2) {
               s(this, e3, t2, true, n2);
             }, f.prototype.writeUInt16BE = function(e3, t2, n2) {
@@ -610,7 +611,7 @@ var plv8ify = (() => {
             }, f.prototype.writeUInt32BE = function(e3, t2, n2) {
               l(this, e3, t2, false, n2);
             }, f.prototype.writeInt8 = function(e3, t2, n2) {
-              n2 || (d(e3 != null, "missing value"), d(t2 != null, "missing offset"), d(t2 < this.length, "Trying to write beyond buffer length"), F(e3, 127, -128)), t2 >= this.length || (0 <= e3 ? this.writeUInt8(e3, t2, n2) : this.writeUInt8(255 + e3 + 1, t2, n2));
+              n2 || (d(null != e3, "missing value"), d(null != t2, "missing offset"), d(t2 < this.length, "Trying to write beyond buffer length"), F(e3, 127, -128)), t2 >= this.length || (0 <= e3 ? this.writeUInt8(e3, t2, n2) : this.writeUInt8(255 + e3 + 1, t2, n2));
             }, f.prototype.writeInt16LE = function(e3, t2, n2) {
               B(this, e3, t2, true, n2);
             }, f.prototype.writeInt16BE = function(e3, t2, n2) {
@@ -628,7 +629,7 @@ var plv8ify = (() => {
             }, f.prototype.writeDoubleBE = function(e3, t2, n2) {
               x(this, e3, t2, false, n2);
             }, f.prototype.fill = function(e3, t2, n2) {
-              if (t2 = t2 || 0, n2 = n2 || this.length, d(typeof (e3 = typeof (e3 = e3 || 0) == "string" ? e3.charCodeAt(0) : e3) == "number" && !isNaN(e3), "value is not a number"), d(t2 <= n2, "end < start"), n2 !== t2 && this.length !== 0) {
+              if (t2 = t2 || 0, n2 = n2 || this.length, d("number" == typeof (e3 = "string" == typeof (e3 = e3 || 0) ? e3.charCodeAt(0) : e3) && !isNaN(e3), "value is not a number"), d(t2 <= n2, "end < start"), n2 !== t2 && 0 !== this.length) {
                 d(0 <= t2 && t2 < this.length, "start out of bounds"), d(0 <= n2 && n2 <= this.length, "end out of bounds");
                 for (var r2 = t2; r2 < n2; r2++)
                   this[r2] = e3;
@@ -641,7 +642,7 @@ var plv8ify = (() => {
                 }
               return "<Buffer " + e3.join(" ") + ">";
             }, f.prototype.toArrayBuffer = function() {
-              if (typeof Uint8Array == "undefined")
+              if ("undefined" == typeof Uint8Array)
                 throw new Error("Buffer.toArrayBuffer not supported in this browser");
               if (f._useTypedArrays)
                 return new f(this).buffer;
@@ -651,14 +652,14 @@ var plv8ify = (() => {
             };
             var t = f.prototype;
             function S(e3, t2, n2) {
-              return typeof e3 != "number" ? n2 : t2 <= (e3 = ~~e3) ? t2 : 0 <= e3 || 0 <= (e3 += t2) ? e3 : 0;
+              return "number" != typeof e3 ? n2 : t2 <= (e3 = ~~e3) ? t2 : 0 <= e3 || 0 <= (e3 += t2) ? e3 : 0;
             }
             function j(e3) {
               return (e3 = ~~Math.ceil(+e3)) < 0 ? 0 : e3;
             }
             function C(e3) {
               return (Array.isArray || function(e4) {
-                return Object.prototype.toString.call(e4) === "[object Array]";
+                return "[object Array]" === Object.prototype.toString.call(e4);
               })(e3);
             }
             function k(e3) {
@@ -691,13 +692,13 @@ var plv8ify = (() => {
               }
             }
             function Y(e3, t2) {
-              d(typeof e3 == "number", "cannot write a non-number as a number"), d(0 <= e3, "specified a negative value for writing an unsigned value"), d(e3 <= t2, "value is larger than maximum value for type"), d(Math.floor(e3) === e3, "value has a fractional component");
+              d("number" == typeof e3, "cannot write a non-number as a number"), d(0 <= e3, "specified a negative value for writing an unsigned value"), d(e3 <= t2, "value is larger than maximum value for type"), d(Math.floor(e3) === e3, "value has a fractional component");
             }
             function F(e3, t2, n2) {
-              d(typeof e3 == "number", "cannot write a non-number as a number"), d(e3 <= t2, "value larger than maximum allowed value"), d(n2 <= e3, "value smaller than minimum allowed value"), d(Math.floor(e3) === e3, "value has a fractional component");
+              d("number" == typeof e3, "cannot write a non-number as a number"), d(e3 <= t2, "value larger than maximum allowed value"), d(n2 <= e3, "value smaller than minimum allowed value"), d(Math.floor(e3) === e3, "value has a fractional component");
             }
             function D(e3, t2, n2) {
-              d(typeof e3 == "number", "cannot write a non-number as a number"), d(e3 <= t2, "value larger than maximum allowed value"), d(n2 <= e3, "value smaller than minimum allowed value");
+              d("number" == typeof e3, "cannot write a non-number as a number"), d(e3 <= t2, "value larger than maximum allowed value"), d(n2 <= e3, "value smaller than minimum allowed value");
             }
             function d(e3, t2) {
               if (!e3)
@@ -706,7 +707,7 @@ var plv8ify = (() => {
             f._augment = function(e3) {
               return e3._isBuffer = true, e3._get = e3.get, e3._set = e3.set, e3.get = t.get, e3.set = t.set, e3.write = t.write, e3.toString = t.toString, e3.toLocaleString = t.toString, e3.toJSON = t.toJSON, e3.copy = t.copy, e3.slice = t.slice, e3.readUInt8 = t.readUInt8, e3.readUInt16LE = t.readUInt16LE, e3.readUInt16BE = t.readUInt16BE, e3.readUInt32LE = t.readUInt32LE, e3.readUInt32BE = t.readUInt32BE, e3.readInt8 = t.readInt8, e3.readInt16LE = t.readInt16LE, e3.readInt16BE = t.readInt16BE, e3.readInt32LE = t.readInt32LE, e3.readInt32BE = t.readInt32BE, e3.readFloatLE = t.readFloatLE, e3.readFloatBE = t.readFloatBE, e3.readDoubleLE = t.readDoubleLE, e3.readDoubleBE = t.readDoubleBE, e3.writeUInt8 = t.writeUInt8, e3.writeUInt16LE = t.writeUInt16LE, e3.writeUInt16BE = t.writeUInt16BE, e3.writeUInt32LE = t.writeUInt32LE, e3.writeUInt32BE = t.writeUInt32BE, e3.writeInt8 = t.writeInt8, e3.writeInt16LE = t.writeInt16LE, e3.writeInt16BE = t.writeInt16BE, e3.writeInt32LE = t.writeInt32LE, e3.writeInt32BE = t.writeInt32BE, e3.writeFloatLE = t.writeFloatLE, e3.writeFloatBE = t.writeFloatBE, e3.writeDoubleLE = t.writeDoubleLE, e3.writeDoubleBE = t.writeDoubleBE, e3.fill = t.fill, e3.inspect = t.inspect, e3.toArrayBuffer = t.toArrayBuffer, e3;
             };
-          }.call(this, O("lYpoI2"), typeof self != "undefined" ? self : typeof window != "undefined" ? window : {}, O("buffer").Buffer, arguments[3], arguments[4], arguments[5], arguments[6], "/node_modules/gulp-browserify/node_modules/buffer/index.js", "/node_modules/gulp-browserify/node_modules/buffer");
+          }.call(this, O("lYpoI2"), "undefined" != typeof self ? self : "undefined" != typeof window ? window : {}, O("buffer").Buffer, arguments[3], arguments[4], arguments[5], arguments[6], "/node_modules/gulp-browserify/node_modules/buffer/index.js", "/node_modules/gulp-browserify/node_modules/buffer");
         }, { "base64-js": 2, buffer: 3, ieee754: 10, lYpoI2: 11 }], 4: [function(c, d, e) {
           !function(e2, t, a, n, r, o, i, u, s) {
             var a = c("buffer").Buffer, f = 4, l = new a(f);
@@ -721,7 +722,7 @@ var plv8ify = (() => {
                 u2.call(i2, o2[s2], 4 * s2, true);
               return i2;
             } };
-          }.call(this, c("lYpoI2"), typeof self != "undefined" ? self : typeof window != "undefined" ? window : {}, c("buffer").Buffer, arguments[3], arguments[4], arguments[5], arguments[6], "/node_modules/gulp-browserify/node_modules/crypto-browserify/helpers.js", "/node_modules/gulp-browserify/node_modules/crypto-browserify");
+          }.call(this, c("lYpoI2"), "undefined" != typeof self ? self : "undefined" != typeof window ? window : {}, c("buffer").Buffer, arguments[3], arguments[4], arguments[5], arguments[6], "/node_modules/gulp-browserify/node_modules/crypto-browserify/helpers.js", "/node_modules/gulp-browserify/node_modules/crypto-browserify");
         }, { buffer: 3, lYpoI2: 11 }], 5: [function(v, e, _) {
           !function(l, c, u, d, h, p, g, y, w) {
             var u = v("buffer").Buffer, e2 = v("./sha"), t = v("./sha256"), n = v("./rng"), b = { sha1: e2, sha256: t, md5: v("./md5") }, s = 64, a = new u(s);
@@ -761,7 +762,7 @@ var plv8ify = (() => {
             };
             for (o in f)
               m(f[o], o);
-          }.call(this, v("lYpoI2"), typeof self != "undefined" ? self : typeof window != "undefined" ? window : {}, v("buffer").Buffer, arguments[3], arguments[4], arguments[5], arguments[6], "/node_modules/gulp-browserify/node_modules/crypto-browserify/index.js", "/node_modules/gulp-browserify/node_modules/crypto-browserify");
+          }.call(this, v("lYpoI2"), "undefined" != typeof self ? self : "undefined" != typeof window ? window : {}, v("buffer").Buffer, arguments[3], arguments[4], arguments[5], arguments[6], "/node_modules/gulp-browserify/node_modules/crypto-browserify/index.js", "/node_modules/gulp-browserify/node_modules/crypto-browserify");
         }, { "./md5": 6, "./rng": 7, "./sha": 8, "./sha256": 9, buffer: 3, lYpoI2: 11 }], 6: [function(w, b, e) {
           !function(e2, r, o, i, u, a, f, l, y) {
             var t = w("./helpers");
@@ -795,16 +796,16 @@ var plv8ify = (() => {
             b.exports = function(e3) {
               return t.hash(e3, n, 16);
             };
-          }.call(this, w("lYpoI2"), typeof self != "undefined" ? self : typeof window != "undefined" ? window : {}, w("buffer").Buffer, arguments[3], arguments[4], arguments[5], arguments[6], "/node_modules/gulp-browserify/node_modules/crypto-browserify/md5.js", "/node_modules/gulp-browserify/node_modules/crypto-browserify");
+          }.call(this, w("lYpoI2"), "undefined" != typeof self ? self : "undefined" != typeof window ? window : {}, w("buffer").Buffer, arguments[3], arguments[4], arguments[5], arguments[6], "/node_modules/gulp-browserify/node_modules/crypto-browserify/md5.js", "/node_modules/gulp-browserify/node_modules/crypto-browserify");
         }, { "./helpers": 4, buffer: 3, lYpoI2: 11 }], 7: [function(e, l, t) {
           !function(e2, t2, n, r, o, i, u, s, f) {
             var a;
             l.exports = a || function(e3) {
               for (var t3, n2 = new Array(e3), r2 = 0; r2 < e3; r2++)
-                (3 & r2) == 0 && (t3 = 4294967296 * Math.random()), n2[r2] = t3 >>> ((3 & r2) << 3) & 255;
+                0 == (3 & r2) && (t3 = 4294967296 * Math.random()), n2[r2] = t3 >>> ((3 & r2) << 3) & 255;
               return n2;
             };
-          }.call(this, e("lYpoI2"), typeof self != "undefined" ? self : typeof window != "undefined" ? window : {}, e("buffer").Buffer, arguments[3], arguments[4], arguments[5], arguments[6], "/node_modules/gulp-browserify/node_modules/crypto-browserify/rng.js", "/node_modules/gulp-browserify/node_modules/crypto-browserify");
+          }.call(this, e("lYpoI2"), "undefined" != typeof self ? self : "undefined" != typeof window ? window : {}, e("buffer").Buffer, arguments[3], arguments[4], arguments[5], arguments[6], "/node_modules/gulp-browserify/node_modules/crypto-browserify/rng.js", "/node_modules/gulp-browserify/node_modules/crypto-browserify");
         }, { buffer: 3, lYpoI2: 11 }], 8: [function(c, d, e) {
           !function(e2, t, n, r, o, s, a, f, l) {
             var i = c("./helpers");
@@ -829,7 +830,7 @@ var plv8ify = (() => {
             d.exports = function(e3) {
               return i.hash(e3, u, 20, true);
             };
-          }.call(this, c("lYpoI2"), typeof self != "undefined" ? self : typeof window != "undefined" ? window : {}, c("buffer").Buffer, arguments[3], arguments[4], arguments[5], arguments[6], "/node_modules/gulp-browserify/node_modules/crypto-browserify/sha.js", "/node_modules/gulp-browserify/node_modules/crypto-browserify");
+          }.call(this, c("lYpoI2"), "undefined" != typeof self ? self : "undefined" != typeof window ? window : {}, c("buffer").Buffer, arguments[3], arguments[4], arguments[5], arguments[6], "/node_modules/gulp-browserify/node_modules/crypto-browserify/sha.js", "/node_modules/gulp-browserify/node_modules/crypto-browserify");
         }, { "./helpers": 4, buffer: 3, lYpoI2: 11 }], 9: [function(c, d, e) {
           !function(e2, t, n, r, u, s, a, f, l) {
             function b(e3, t2) {
@@ -854,7 +855,7 @@ var plv8ify = (() => {
             d.exports = function(e3) {
               return i.hash(e3, o, 32, true);
             };
-          }.call(this, c("lYpoI2"), typeof self != "undefined" ? self : typeof window != "undefined" ? window : {}, c("buffer").Buffer, arguments[3], arguments[4], arguments[5], arguments[6], "/node_modules/gulp-browserify/node_modules/crypto-browserify/sha256.js", "/node_modules/gulp-browserify/node_modules/crypto-browserify");
+          }.call(this, c("lYpoI2"), "undefined" != typeof self ? self : "undefined" != typeof window ? window : {}, c("buffer").Buffer, arguments[3], arguments[4], arguments[5], arguments[6], "/node_modules/gulp-browserify/node_modules/crypto-browserify/sha256.js", "/node_modules/gulp-browserify/node_modules/crypto-browserify");
         }, { "./helpers": 4, buffer: 3, lYpoI2: 11 }], 10: [function(e, t, f) {
           !function(e2, t2, n, r, o, i, u, s, a) {
             f.read = function(e3, t3, n2, r2, o2) {
@@ -863,7 +864,7 @@ var plv8ify = (() => {
                 ;
               for (u2 = i2 & (1 << -s2) - 1, i2 >>= -s2, s2 += r2; 0 < s2; u2 = 256 * u2 + e3[t3 + a2], a2 += f2, s2 -= 8)
                 ;
-              if (i2 === 0)
+              if (0 === i2)
                 i2 = 1 - d;
               else {
                 if (i2 === c)
@@ -872,24 +873,24 @@ var plv8ify = (() => {
               }
               return (o2 ? -1 : 1) * u2 * Math.pow(2, i2 - r2);
             }, f.write = function(e3, t3, l, n2, r2, c) {
-              var o2, i2, u2 = 8 * c - r2 - 1, s2 = (1 << u2) - 1, a2 = s2 >> 1, d = r2 === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0, f2 = n2 ? 0 : c - 1, h = n2 ? 1 : -1, c = t3 < 0 || t3 === 0 && 1 / t3 < 0 ? 1 : 0;
+              var o2, i2, u2 = 8 * c - r2 - 1, s2 = (1 << u2) - 1, a2 = s2 >> 1, d = 23 === r2 ? Math.pow(2, -24) - Math.pow(2, -77) : 0, f2 = n2 ? 0 : c - 1, h = n2 ? 1 : -1, c = t3 < 0 || 0 === t3 && 1 / t3 < 0 ? 1 : 0;
               for (t3 = Math.abs(t3), isNaN(t3) || t3 === 1 / 0 ? (i2 = isNaN(t3) ? 1 : 0, o2 = s2) : (o2 = Math.floor(Math.log(t3) / Math.LN2), t3 * (n2 = Math.pow(2, -o2)) < 1 && (o2--, n2 *= 2), 2 <= (t3 += 1 <= o2 + a2 ? d / n2 : d * Math.pow(2, 1 - a2)) * n2 && (o2++, n2 /= 2), s2 <= o2 + a2 ? (i2 = 0, o2 = s2) : 1 <= o2 + a2 ? (i2 = (t3 * n2 - 1) * Math.pow(2, r2), o2 += a2) : (i2 = t3 * Math.pow(2, a2 - 1) * Math.pow(2, r2), o2 = 0)); 8 <= r2; e3[l + f2] = 255 & i2, f2 += h, i2 /= 256, r2 -= 8)
                 ;
               for (o2 = o2 << r2 | i2, u2 += r2; 0 < u2; e3[l + f2] = 255 & o2, f2 += h, o2 /= 256, u2 -= 8)
                 ;
               e3[l + f2 - h] |= 128 * c;
             };
-          }.call(this, e("lYpoI2"), typeof self != "undefined" ? self : typeof window != "undefined" ? window : {}, e("buffer").Buffer, arguments[3], arguments[4], arguments[5], arguments[6], "/node_modules/gulp-browserify/node_modules/ieee754/index.js", "/node_modules/gulp-browserify/node_modules/ieee754");
+          }.call(this, e("lYpoI2"), "undefined" != typeof self ? self : "undefined" != typeof window ? window : {}, e("buffer").Buffer, arguments[3], arguments[4], arguments[5], arguments[6], "/node_modules/gulp-browserify/node_modules/ieee754/index.js", "/node_modules/gulp-browserify/node_modules/ieee754");
         }, { buffer: 3, lYpoI2: 11 }], 11: [function(e, h, t) {
           !function(e2, t2, n, r, o, f, l, c, d) {
             var i, u, s;
             function a() {
             }
-            (e2 = h.exports = {}).nextTick = (u = typeof window != "undefined" && window.setImmediate, s = typeof window != "undefined" && window.postMessage && window.addEventListener, u ? function(e3) {
+            (e2 = h.exports = {}).nextTick = (u = "undefined" != typeof window && window.setImmediate, s = "undefined" != typeof window && window.postMessage && window.addEventListener, u ? function(e3) {
               return window.setImmediate(e3);
             } : s ? (i = [], window.addEventListener("message", function(e3) {
               var t3 = e3.source;
-              t3 !== window && t3 !== null || e3.data !== "process-tick" || (e3.stopPropagation(), 0 < i.length && i.shift()());
+              t3 !== window && null !== t3 || "process-tick" !== e3.data || (e3.stopPropagation(), 0 < i.length && i.shift()());
             }, true), function(e3) {
               i.push(e3), window.postMessage("process-tick", "*");
             }) : function(e3) {
@@ -901,7 +902,7 @@ var plv8ify = (() => {
             }, e2.chdir = function(e3) {
               throw new Error("process.chdir is not supported");
             };
-          }.call(this, e("lYpoI2"), typeof self != "undefined" ? self : typeof window != "undefined" ? window : {}, e("buffer").Buffer, arguments[3], arguments[4], arguments[5], arguments[6], "/node_modules/gulp-browserify/node_modules/process/browser.js", "/node_modules/gulp-browserify/node_modules/process");
+          }.call(this, e("lYpoI2"), "undefined" != typeof self ? self : "undefined" != typeof window ? window : {}, e("buffer").Buffer, arguments[3], arguments[4], arguments[5], arguments[6], "/node_modules/gulp-browserify/node_modules/process/browser.js", "/node_modules/gulp-browserify/node_modules/process");
         }, { buffer: 3, lYpoI2: 11 }] }, {}, [1])(1);
       });
     }

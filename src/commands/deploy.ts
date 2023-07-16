@@ -1,5 +1,6 @@
 import dotenv from 'dotenv'
 import fs from 'fs'
+import assert from 'node:assert/strict'
 import path from 'path'
 import task from 'tasuku'
 
@@ -34,6 +35,7 @@ export async function deployCommand(
 
   // TODO: move process/env stuff to a separate file
   const databaseUrl = process.env.DATABASE_URL
+  assert(databaseUrl !== undefined, 'DATABASE_URL not set in environment')
 
   const databaseUrlIsSetTask = await task(
     'Check if the DATABASE_URL env var is set',
@@ -89,8 +91,12 @@ export async function deployCommand(
                 await deployCommand.sqlQueryPromise
                 _setTitle(`Deployed ${name}`)
               } catch (e) {
-                _setError(`Failed to deploy ${name} (because of ${e.message})`)
-                setWarning(`Failed to some functions (see below))`)
+                if (e instanceof Error) {
+                  _setError(
+                    `Failed to deploy ${name} (because of ${e.message})`
+                  )
+                  setWarning(`Failed to some functions (see below))`)
+                }
               }
             }
           )

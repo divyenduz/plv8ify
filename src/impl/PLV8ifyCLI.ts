@@ -1,7 +1,10 @@
 import fs from 'fs'
-import { inject, injectable } from 'inversify'
-import 'reflect-metadata'
-import TYPES from '../interfaces/types'
+import assert from 'node:assert/strict'
+import {
+  TSCompiler,
+  TSFunction,
+  TSFunctionParameter,
+} from 'src/interfaces/TSCompiler'
 import { match } from 'ts-pattern'
 
 interface GetPLV8SQLFunctionArgs {
@@ -21,28 +24,25 @@ interface GetInitSQLFunctionArgs {
   volatility: Volatility
 }
 
-// TODO: fixme, this is exported only for tests, is that needed?
-
-@injectable()
 export class PLV8ifyCLI implements PLV8ify {
-  @inject(TYPES.Bundler) private _bundler: Bundler;
-  @inject(TYPES.TSCompiler) private _tsCompiler: TSCompiler;
+  constructor(private bundler: Bundler, private tsCompiler: TSCompiler) {}
 
-  private _typeMap = {
+  private _typeMap: Record<string, string> = {
     number: 'float8',
     string: 'text',
     boolean: 'boolean',
   }
 
   init(inputFilePath: string) {
-    this._tsCompiler.createSourceFile(inputFilePath)
+    this.tsCompiler.createSourceFile(inputFilePath)
   }
 
   async build({ mode, inputFile, scopePrefix }: BuildArgs) {
-    const bundledJs = await this._bundler.bundle({
+    const bundledJs = await this.bundler.bundle({
       inputFile,
       globalName: scopePrefix,
     })
+    assert(bundledJs !== undefined, 'Failed to bundle JS')
     const modeAdjustedBundledJs = match(mode)
       .with('inline', () => bundledJs)
       .with('start_proc', () =>
@@ -83,7 +83,8 @@ export class PLV8ifyCLI implements PLV8ify {
   }
 
   private getFunctions() {
-    return this._tsCompiler.getFunctions().map((fn) => {
+    const fns = this.tsCompiler.getFunctions() || []
+    return fns.map((fn) => {
       return {
         ...fn,
         returnType: this._typeMap[fn.returnType],
@@ -159,7 +160,7 @@ export class PLV8ifyCLI implements PLV8ify {
       // -- PLV8 + Server
       const initFunctionName = 'init'
       const virtualInitFn = {
-        name: initFunctionName
+        name: initFunctionName,
       } as TSFunction // TODO: fixme, risky because it doesn't have all the properties of a virtual function
 
       const initFunction = this.getInitSQLFunction({
@@ -182,9 +183,9 @@ export class PLV8ifyCLI implements PLV8ify {
     if (mode === 'start_proc') {
       const startFunctionName = 'start'
       const virtualStartFn = {
-        name: startFunctionName
+        name: startFunctionName,
       } as TSFunction // TODO: fixme, risky because it doesn't have all the properties of a virtual function
-      const startProcSQLScript = this.getStartProcSQLScript({scopePrefix})
+      const startProcSQLScript = this.getStartProcSQLScript({ scopePrefix })
       const startProcFileName = this.getFileName(
         outputFolder,
         virtualStartFn,
@@ -222,8 +223,10 @@ export class PLV8ifyCLI implements PLV8ify {
       `CREATE OR REPLACE FUNCTION ${scopedName}(${sqlParametersString}) RETURNS ${returnType} AS ${pgFunctionDelimiter}`,
       match(mode)
         .with('inline', () => bundledJs)
-        .with('bundle', () => 
-          `if (globalThis.${scopePrefix} === undefined) plv8.execute('SELECT ${scopePrefix}_init();');`
+        .with(
+          'bundle',
+          () =>
+            `if (globalThis.${scopePrefix} === undefined) plv8.execute('SELECT ${scopePrefix}_init();');`
         )
         .otherwise(() => ''),
       `return ${scopePrefix}.${fn.name}(${jsParametersString})`,
@@ -233,7 +236,12 @@ export class PLV8ifyCLI implements PLV8ify {
   }
 
   // TODO: fixme, can this be replaced with getPLV8SQLFunction
-  private getInitSQLFunction({ fn, scopePrefix, bundledJs, volatility }: GetInitSQLFunctionArgs) {
+  private getInitSQLFunction({
+    fn,
+    scopePrefix,
+    bundledJs,
+    volatility,
+  }: GetInitSQLFunctionArgs) {
     const scopedName = scopePrefix + '_' + fn.name
     return `DROP FUNCTION IF EXISTS ${scopedName}();
 CREATE OR REPLACE FUNCTION ${scopedName}() RETURNS VOID AS $$
@@ -242,8 +250,8 @@ $$ LANGUAGE plv8 ${volatility} STRICT;
 `
   }
 
-  private getStartProcSQLScript = ({scopePrefix}) =>
-  `
+  private getStartProcSQLScript = ({ scopePrefix }: { scopePrefix: string }) =>
+    `
 SET plv8.start_proc = ${scopePrefix}_init;
 SELECT plv8_reset();
 `

@@ -1,9 +1,10 @@
+import assert from 'node:assert/strict'
 import postgres from 'postgres'
 
 export class Database {
   private databaseUrl: string
-  private db: ReturnType<typeof postgres>
-  constructor(databaseUrl) {
+  private db?: ReturnType<typeof postgres>
+  constructor(databaseUrl: string) {
     this.databaseUrl = databaseUrl
   }
 
@@ -16,7 +17,7 @@ export class Database {
   }
 
   endConnection() {
-    this.db.end()
+    this.db?.end()
   }
 
   async isDatabaseReachable() {
@@ -24,6 +25,7 @@ export class Database {
       this.getConnection()
     }
     try {
+      assert(this.db !== undefined, 'Failed to connect to database')
       await this.db`SELECT 1`
       return true
     } catch (e) {
