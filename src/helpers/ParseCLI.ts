@@ -1,6 +1,8 @@
 import arg from 'arg'
+import { Mode, Volatility } from 'src/interfaces/PLV8ify'
 
 type Command = 'version' | 'generate' | 'deploy'
+export type BundlerType = 'esbuild' | 'bun'
 
 export class ParseCLI {
   static getCommand() {
@@ -9,6 +11,7 @@ export class ParseCLI {
     const args = arg({
       '--input-file': String,
       '--output-folder': String,
+      '--bundler': String, // 'esbuild' or 'bun'
       '--write-bundler-output': Boolean,
       '--scope-prefix': String,
       '--pg-function-delimiter': String,
@@ -26,8 +29,10 @@ Please specify a command. Available commands: generate, version, deploy
       process.exit(1)
     }
 
+    const debug = args['--debug'] || false
     const inputFilePath = args['--input-file'] || 'input.ts'
     const outputFolderPath = args['--output-folder'] || 'plv8ify-dist'
+    const bundler = args['--bundler'] || 'esbuild'
     const writeBundlerOutput = args['--write-bundler-output'] || false
     const scopePrefix = args['--scope-prefix'] || 'plv8ify'
     const pgFunctionDelimiter = args['--pg-function-delimiter'] || '$plv8ify$'
@@ -39,6 +44,8 @@ Please specify a command. Available commands: generate, version, deploy
     return {
       command: args._[0] as Command,
       config: {
+        debug,
+        bundler: bundler as BundlerType,
         writeBundlerOutput,
         inputFilePath,
         outputFolderPath,

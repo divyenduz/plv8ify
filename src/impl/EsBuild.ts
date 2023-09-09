@@ -5,15 +5,14 @@ import nodeExternals from 'webpack-node-externals'
 class BundlerError extends Error {}
 
 export class EsBuild implements Bundler {
-  async bundle({ inputFile, globalName }: BundleArgs) {
+  async bundle({ inputFile }: BundleArgs) {
     const esbuildResult = await build({
       entryPoints: [inputFile],
-      globalName,
-      platform: 'browser',
       external: [nodeExternals()],
+      format: 'esm',
+      platform: 'browser',
       bundle: true,
       write: false,
-      target: 'es2015',
     }).catch(() => new BundlerError('esbuild failed'))
 
     if (esbuildResult instanceof Error) {

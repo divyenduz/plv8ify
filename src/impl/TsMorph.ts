@@ -6,7 +6,6 @@ export class TsMorph implements TSCompiler {
 
   createSourceFile(inputFilePath: string) {
     const project = new Project()
-    // TODO: needs access to the file system, can this be pure?
     this.sourceFile = project.addSourceFileAtPath(inputFilePath)
   }
 

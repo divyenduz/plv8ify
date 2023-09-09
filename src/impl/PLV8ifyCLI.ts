@@ -1,12 +1,22 @@
 import fs, { Mode } from 'fs'
+import { BundlerType } from 'src/helpers/ParseCLI'
+import { Bundler } from 'src/interfaces/Bundler'
+import {
+  BuildArgs,
+  GetPLV8SQLFunctionsArgs,
+  PLV8ify,
+  Volatility,
+} from 'src/interfaces/PLV8ify'
+import {
+  TSCompiler,
+  TSFunction,
+  TSFunctionParameter,
+} from 'src/interfaces/TSCompiler'
 import { match } from 'ts-pattern'
+
+import { BunBuild } from './BunBuild'
 import { EsBuild } from './EsBuild'
 import { TsMorph } from './TsMorph'
-import { Bundler } from 'src/interfaces/Bundler'
-import { BuildArgs, GetPLV8SQLFunctionsArgs, PLV8ify, Volatility } from 'src/interfaces/PLV8ify'
-import { TSCompiler, TSFunction, TSFunctionParameter } from 'src/interfaces/TSCompiler'
-import { BunBuild } from './BunBuild'
-import { BundlerType } from 'src/helpers/ParseCLI'
 
 interface GetPLV8SQLFunctionArgs {
   fn: TSFunction
@@ -26,8 +36,8 @@ interface GetInitSQLFunctionArgs {
 }
 
 export class PLV8ifyCLI implements PLV8ify {
-  private _bundler: Bundler;
-  private _tsCompiler: TSCompiler;
+  private _bundler: Bundler
+  private _tsCompiler: TSCompiler
 
   private _typeMap = {
     number: 'float8',
@@ -35,15 +45,28 @@ export class PLV8ifyCLI implements PLV8ify {
     boolean: 'boolean',
   }
 
+  constructor(bundler: BundlerType = 'esbuild') {
+    this._bundler = match(bundler)
+      .with('esbuild', () => new EsBuild())
+      .with('bun', () => new BunBuild())
+      .exhaustive()
+
+    this._tsCompiler = new TsMorph()
+  }
+
   init(inputFilePath: string) {
     this._tsCompiler.createSourceFile(inputFilePath)
   }
 
+  private removeExportBlock(bundledJs: string) {
+    return bundledJs.replace(/export\s*{[^}]*};/gs, '')
+  }
+
   async build({ mode, inputFile, scopePrefix }: BuildArgs) {
-    const bundledJs = await this._bundler.bundle({
+    const bundledJsR = await this._bundler.bundle({
       inputFile,
-      globalName: scopePrefix,
     })
+    const bundledJs = this.removeExportBlock(bundledJsR)
     const modeAdjustedBundledJs = match(mode)
       .with('inline', () => bundledJs)
       .with('start_proc', () =>
@@ -160,7 +183,7 @@ export class PLV8ifyCLI implements PLV8ify {
       // -- PLV8 + Server
       const initFunctionName = 'init'
       const virtualInitFn = {
-        name: initFunctionName
+        name: initFunctionName,
       } as TSFunction // TODO: fixme, risky because it doesn't have all the properties of a virtual function
 
       const initFunction = this.getInitSQLFunction({
@@ -183,9 +206,9 @@ export class PLV8ifyCLI implements PLV8ify {
     if (mode === 'start_proc') {
       const startFunctionName = 'start'
       const virtualStartFn = {
-        name: startFunctionName
+        name: startFunctionName,
       } as TSFunction // TODO: fixme, risky because it doesn't have all the properties of a virtual function
-      const startProcSQLScript = this.getStartProcSQLScript({scopePrefix})
+      const startProcSQLScript = this.getStartProcSQLScript({ scopePrefix })
       const startProcFileName = this.getFileName(
         outputFolder,
         virtualStartFn,
@@ -223,18 +246,25 @@ export class PLV8ifyCLI implements PLV8ify {
       `CREATE OR REPLACE FUNCTION ${scopedName}(${sqlParametersString}) RETURNS ${returnType} AS ${pgFunctionDelimiter}`,
       match(mode)
         .with('inline', () => bundledJs)
-        .with('bundle', () => 
-          `if (globalThis.${scopePrefix} === undefined) plv8.execute('SELECT ${scopePrefix}_init();');`
+        .with(
+          'bundle',
+          () =>
+            `if (globalThis.${scopePrefix} === undefined) plv8.execute('SELECT ${scopePrefix}_init();');`
         )
         .otherwise(() => ''),
-      `return ${scopePrefix}.${fn.name}(${jsParametersString})`,
+      `return ${fn.name}(${jsParametersString})`,
       '',
       `${pgFunctionDelimiter} LANGUAGE plv8 ${volatility} STRICT;`,
     ].join('\n')
   }
 
   // TODO: fixme, can this be replaced with getPLV8SQLFunction
-  private getInitSQLFunction({ fn, scopePrefix, bundledJs, volatility }: GetInitSQLFunctionArgs) {
+  private getInitSQLFunction({
+    fn,
+    scopePrefix,
+    bundledJs,
+    volatility,
+  }: GetInitSQLFunctionArgs) {
     const scopedName = scopePrefix + '_' + fn.name
     return `DROP FUNCTION IF EXISTS ${scopedName}();
 CREATE OR REPLACE FUNCTION ${scopedName}() RETURNS VOID AS $$
@@ -243,8 +273,8 @@ $$ LANGUAGE plv8 ${volatility} STRICT;
 `
   }
 
-  private getStartProcSQLScript = ({scopePrefix}) =>
-  `
+  private getStartProcSQLScript = ({ scopePrefix }) =>
+    `
 SET plv8.start_proc = ${scopePrefix}_init;
 SELECT plv8_reset();
 `
