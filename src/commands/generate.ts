@@ -7,6 +7,7 @@ export async function generateCommand(
   CLI: ReturnType<typeof ParseCLI.getCommand>
 ) {
   const {
+    bundler,
     writeBundlerOutput,
     inputFilePath,
     outputFolderPath,
