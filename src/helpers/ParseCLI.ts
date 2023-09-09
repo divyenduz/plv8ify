@@ -29,6 +29,7 @@ Please specify a command. Available commands: generate, version, deploy
       process.exit(1)
     }
 
+    const debug = args['--debug'] || false
     const inputFilePath = args['--input-file'] || 'input.ts'
     const outputFolderPath = args['--output-folder'] || 'plv8ify-dist'
     const bundler = args['--bundler'] || 'esbuild'
@@ -43,6 +44,7 @@ Please specify a command. Available commands: generate, version, deploy
     return {
       command: args._[0] as Command,
       config: {
+        debug,
         bundler: bundler as BundlerType,
         writeBundlerOutput,
         inputFilePath,
