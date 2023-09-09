@@ -3,8 +3,8 @@ import fs from 'fs'
 import path from 'path'
 import task from 'tasuku'
 
-import { Database } from '../helpers/Database'
-import { ParseCLI } from '../helpers/ParseCLI'
+import { Database } from '../helpers/Database.js'
+import { ParseCLI } from '../helpers/ParseCLI.js'
 
 dotenv.config()
 

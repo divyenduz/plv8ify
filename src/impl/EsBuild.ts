@@ -1,5 +1,5 @@
 import { build } from 'esbuild'
-import { BundleArgs, Bundler } from 'src/interfaces/Bundler'
+import { BundleArgs, Bundler } from 'src/interfaces/Bundler.js'
 import nodeExternals from 'webpack-node-externals'
 
 class BundlerError extends Error {}

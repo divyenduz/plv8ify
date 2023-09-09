@@ -43,16 +43,16 @@ jobs:
       - name: Run Tests
         run: bun test
 
-      # - name: Release Patch
-      #   if: endsWith(github.ref, '/main')
-      #   run: |
-      #     git config --global user.email "mail@divyendusingh.com"
-      #     git config --global user.name "Divyendu Singh"
-      #     echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
-      #     bun run build
-      #     npm version patch
-      #     npm publish
-      #     git push origin main
+      - name: Release Patch
+        if: endsWith(github.ref, '/main')
+        run: |
+          git config --global user.email "mail@divyendusingh.com"
+          git config --global user.name "Divyendu Singh"
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
+          bun run build
+          npm version patch
+          npm publish
+          git push origin main
 
       # Note: not 1.0.0 yet, semantic-release only supports versions >1.0.0
       # - name: Release

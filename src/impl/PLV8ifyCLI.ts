@@ -1,22 +1,22 @@
 import fs, { Mode } from 'fs'
-import { BundlerType } from 'src/helpers/ParseCLI'
-import { Bundler } from 'src/interfaces/Bundler'
+import { BundlerType } from 'src/helpers/ParseCLI.js'
+import { Bundler } from 'src/interfaces/Bundler.js'
 import {
   BuildArgs,
   GetPLV8SQLFunctionsArgs,
   PLV8ify,
   Volatility,
-} from 'src/interfaces/PLV8ify'
+} from 'src/interfaces/PLV8ify.js'
 import {
   TSCompiler,
   TSFunction,
   TSFunctionParameter,
-} from 'src/interfaces/TSCompiler'
+} from 'src/interfaces/TSCompiler.js'
 import { match } from 'ts-pattern'
 
-import { BunBuild } from './BunBuild'
-import { EsBuild } from './EsBuild'
-import { TsMorph } from './TsMorph'
+import { BunBuild } from './BunBuild.js'
+import { EsBuild } from './EsBuild.js'
+import { TsMorph } from './TsMorph.js'
 
 interface GetPLV8SQLFunctionArgs {
   fn: TSFunction

@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 import { match } from 'ts-pattern'
 
-import { deployCommand } from './commands/deploy'
-import { generateCommand } from './commands/generate'
-import { versionCommand } from './commands/version'
-import { ParseCLI } from './helpers/ParseCLI'
+import { deployCommand } from './commands/deploy.js'
+import { generateCommand } from './commands/generate.js'
+import { versionCommand } from './commands/version.js'
+import { ParseCLI } from './helpers/ParseCLI.js'
 
 type Runtime = 'node' | 'bun'
 
