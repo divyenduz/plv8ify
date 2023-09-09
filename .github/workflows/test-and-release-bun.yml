@@ -1,0 +1,60 @@
+name: Run Tests and Release
+# This workflow is triggered on pushes to the repository.
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+
+env:
+  NO_COLOR: true
+  CI: 1
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+jobs:
+  build:
+    name: Test
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.9.1
+        with:
+          access_token: ${{ github.token }}
+      - uses: actions/checkout@v2
+      - uses: oven-sh/setup-bun@v1
+
+      - name: Turnstyle
+        uses: softprops/turnstyle@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Dependencies
+        run: echo "Installing dependencies" && bun install && echo "Done installing dependencies"
+
+      - name: Run Types Check
+        run: bunx tsc --noEmit
+
+      - name: Run Tests
+        run: bun test
+
+      # - name: Release Patch
+      #   if: endsWith(github.ref, '/main')
+      #   run: |
+      #     git config --global user.email "mail@divyendusingh.com"
+      #     git config --global user.name "Divyendu Singh"
+      #     echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
+      #     bun run build
+      #     npm version patch
+      #     npm publish
+      #     git push origin main
+
+      # Note: not 1.0.0 yet, semantic-release only supports versions >1.0.0
+      # - name: Release
+      #   if: endsWith(github.ref, '/main')
+      #   run: yarn semantic-release
