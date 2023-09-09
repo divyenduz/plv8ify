@@ -27,11 +27,7 @@ jobs:
         with:
           access_token: ${{ github.token }}
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '16'
-          cache: 'yarn'
-      # - uses: c-hive/gha-yarn-cache@v2
+      - uses: oven-sh/setup-bun@v1
 
       - name: Turnstyle
         uses: softprops/turnstyle@v1
@@ -39,24 +35,24 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install Dependencies
-        run: echo "Installing dependencies" && yarn install && echo "Done installing dependencies"
+        run: echo "Installing dependencies" && bun install && echo "Done installing dependencies"
 
       - name: Run Types Check
-        run: yarn tsc --noEmit
+        run: bun x tsc --noEmit
 
       - name: Run Tests
-        run: yarn test
+        run: bun test
 
-      - name: Release Patch
-        if: endsWith(github.ref, '/main')
-        run: |
-          git config --global user.email "mail@divyendusingh.com"
-          git config --global user.name "Divyendu Singh"
-          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
-          yarn build
-          npm version patch
-          npm publish
-          git push origin main
+      # - name: Release Patch
+      #   if: endsWith(github.ref, '/main')
+      #   run: |
+      #     git config --global user.email "mail@divyendusingh.com"
+      #     git config --global user.name "Divyendu Singh"
+      #     echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
+      #     bun run build
+      #     npm version patch
+      #     npm publish
+      #     git push origin main
 
       # Note: not 1.0.0 yet, semantic-release only supports versions >1.0.0
       # - name: Release

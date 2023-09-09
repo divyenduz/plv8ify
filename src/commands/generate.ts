@@ -1,13 +1,13 @@
 import fs from 'fs'
 
 import { ParseCLI } from '../helpers/ParseCLI'
-import TYPES from '../interfaces/types'
-import container from '../inversify.config'
+import { PLV8ifyCLI } from 'src/impl/PLV8ifyCLI'
 
 export async function generateCommand(
   CLI: ReturnType<typeof ParseCLI.getCommand>
 ) {
   const {
+    bundler,
     writeBundlerOutput,
     inputFilePath,
     outputFolderPath,
@@ -20,7 +20,7 @@ export async function generateCommand(
 
   fs.mkdirSync(outputFolderPath, { recursive: true })
 
-  const plv8ify = container.get<PLV8ify>(TYPES.PLV8ify)
+  const plv8ify = new PLV8ifyCLI(bundler)
   plv8ify.init(inputFilePath)
 
   const bundledJs = await plv8ify.build({

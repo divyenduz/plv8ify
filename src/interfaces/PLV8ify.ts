@@ -1,13 +1,13 @@
-type Volatility = 'VOLATILE' | 'STABLE' | 'IMMUTABLE'
-type Mode = 'inline' | 'start_proc' | 'bundle'
+export type Volatility = 'VOLATILE' | 'STABLE' | 'IMMUTABLE'
+export type Mode = 'inline' | 'start_proc' | 'bundle'
 
-interface BuildArgs {
+export interface BuildArgs {
   mode: Mode
   inputFile: string
   scopePrefix: string
 }
 
-interface GetPLV8SQLFunctionsArgs {
+export interface GetPLV8SQLFunctionsArgs {
   scopePrefix: string
   pgFunctionDelimiter: string
   mode: Mode
@@ -17,7 +17,7 @@ interface GetPLV8SQLFunctionsArgs {
   outputFolder: string
 }
 
-interface PLV8ify {
+export interface PLV8ify {
   init(inputFilePath: string): void
   build: (options: BuildArgs) => Promise<string>
   write: (path: string, string: string) => void

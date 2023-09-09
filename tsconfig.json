@@ -1,15 +1,30 @@
 {
   "compilerOptions": {
+    "types": ["bun-types"],
+
+    "lib": ["esnext"],
+    "module": "esnext",
+    "target": "esnext",
+
+    // if TS 5.x+
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "moduleDetection": "force",
+
+    "jsx": "react-jsx", // support JSX
+    "allowJs": true, // allow importing `.js` from `.ts`
+    "esModuleInterop": true, // allow default imports for CommonJS modules
+
+    // best practices
+    "strict": false,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+
     "rootDir": "src",
     "outDir": "dist",
-    "jsx": "react-jsx",
     "declaration": true,
-    "esModuleInterop": true,
     "baseUrl": ".",
-    "lib": ["esnext", "dom"],
-    "types": ["reflect-metadata", "node"],
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
   },
   "include": ["src/**/*"],
   "exclude": [

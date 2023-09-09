@@ -1,0 +1,52 @@
+// Bun Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`EsBuild tests getBundleJs - inline mode 1`] = `
+"// src/test-fixtures/input.fixture.ts
+function sayHello(toWhom) {
+  const greet = \`hello \` + toWhom;
+  return greet;
+}
+export {
+  sayHello
+};
+"
+`;
+
+exports[`EsBuild tests getBundleJs - newline template 1`] = `
+"// src/test-fixtures/newline-template.fixture.ts
+function sayHello() {
+  const greetTemplate = \`hello 
+ world\`;
+  return greetTemplate;
+}
+export {
+  sayHello
+};
+"
+`;
+
+exports[`EsBuild tests getBundleJs - newline string 1`] = `
+"// src/test-fixtures/newline-string.fixture.ts
+function sayHello() {
+  const greetString = "hello\nworld";
+  return greetString;
+}
+export {
+  sayHello
+};
+"
+`;
+
+exports[`EsBuild tests getBundleJs - newline string 2`] = `
+"// src/test-fixtures/newline-string.fixture.ts
+function sayHello() {
+  const greetString = "hello\nworld";
+  return greetString;
+}
+export {
+  sayHello
+};
+"
+`;
+
+exports[`EsBuild tests getBundleJs - bad syntax 1`] = `[BundlerError: esbuild failed]`;
