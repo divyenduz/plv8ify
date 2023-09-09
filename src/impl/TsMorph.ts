@@ -5,8 +5,6 @@ import { FunctionDeclaration, Project, SourceFile } from 'ts-morph'
 export class TsMorph implements TSCompiler {
   private sourceFile?: SourceFile
 
-  // TODO: figure out how to do constructors with literal variables in inversify
-  // https://stackoverflow.com/questions/37439798/inversifyjs-injecting-literal-constructor-parameters
   createSourceFile(inputFilePath: string) {
     const project = new Project()
     this.sourceFile = project.addSourceFileAtPath(inputFilePath)

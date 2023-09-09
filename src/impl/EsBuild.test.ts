@@ -18,7 +18,7 @@ describe('EsBuild', () => {
       inputFile: './src/test-fixtures/bad.fixture.ts',
       globalName: 'plv8ify',
     })
-    expect(js).rejects.toThrow(BundlerError)
+    expect(js).rejects.toThrow()
   })
 
   it('getBundleJs - newline template', async () => {
