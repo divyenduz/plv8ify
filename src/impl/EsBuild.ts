@@ -1,12 +1,9 @@
 import { build } from 'esbuild'
-import { injectable } from 'inversify'
+import { BundleArgs, Bundler } from 'src/interfaces/Bundler'
 import nodeExternals from 'webpack-node-externals'
-import "reflect-metadata"
 
 class BundlerError extends Error {}
 
-// TODO: fixme, this is exported only for tests, is that needed?
-@injectable()
 export class EsBuild implements Bundler {
   async bundle({ inputFile, globalName }: BundleArgs) {
     const esbuildResult = await build({

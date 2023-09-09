@@ -11,9 +11,7 @@
     "arg": "5.0.1",
     "dotenv": "16.0.3",
     "esbuild": "0.14.18",
-    "inversify": "6.0.1",
     "postgres": "3.3.3",
-    "reflect-metadata": "0.1.13",
     "tasuku": "2.0.1",
     "ts-morph": "13.0.3",
     "ts-pattern": "3.3.5",
@@ -40,7 +38,7 @@
     "react-dom": "17.0.2",
     "tap": "15.1.6",
     "ts-node": "10.4.0",
-    "typescript": "4.5.5"
+    "typescript": "5.2.2"
   },
   "scripts": {
     "build": "rm -rf dist; tsc --project tsconfig.build.json",

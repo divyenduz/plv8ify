@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import 'reflect-metadata'
 import { match } from 'ts-pattern'
 
 import { deployCommand } from './commands/deploy'

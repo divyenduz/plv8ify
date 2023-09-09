@@ -1,8 +1,12 @@
-import fs from 'fs'
-import { inject, injectable } from 'inversify'
-import 'reflect-metadata'
-import TYPES from '../interfaces/types'
+import fs, { Mode } from 'fs'
 import { match } from 'ts-pattern'
+import { EsBuild } from './EsBuild'
+import { TsMorph } from './TsMorph'
+import { Bundler } from 'src/interfaces/Bundler'
+import { BuildArgs, GetPLV8SQLFunctionsArgs, PLV8ify, Volatility } from 'src/interfaces/PLV8ify'
+import { TSCompiler, TSFunction, TSFunctionParameter } from 'src/interfaces/TSCompiler'
+import { BunBuild } from './BunBuild'
+import { BundlerType } from 'src/helpers/ParseCLI'
 
 interface GetPLV8SQLFunctionArgs {
   fn: TSFunction
@@ -21,12 +25,9 @@ interface GetInitSQLFunctionArgs {
   volatility: Volatility
 }
 
-// TODO: fixme, this is exported only for tests, is that needed?
-
-@injectable()
 export class PLV8ifyCLI implements PLV8ify {
-  @inject(TYPES.Bundler) private _bundler: Bundler;
-  @inject(TYPES.TSCompiler) private _tsCompiler: TSCompiler;
+  private _bundler: Bundler;
+  private _tsCompiler: TSCompiler;
 
   private _typeMap = {
     number: 'float8',

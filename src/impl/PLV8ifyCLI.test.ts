@@ -1,6 +1,7 @@
 import tap from 'tap'
 
 import { PLV8ifyCLI } from './PLV8ifyCLI'
+import { TSFunction } from 'src/interfaces/TSCompiler'
 
 tap.test('getSQLFunction with parameters', async (t) => {
   const plv8ify = new PLV8ifyCLI()
