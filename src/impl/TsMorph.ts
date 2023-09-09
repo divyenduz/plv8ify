@@ -1,4 +1,4 @@
-import { TSCompiler } from 'src/interfaces/TSCompiler'
+import { TSCompiler } from 'src/interfaces/TSCompiler.js'
 import { FunctionDeclaration, Project, SourceFile } from 'ts-morph'
 
 export class TsMorph implements TSCompiler {

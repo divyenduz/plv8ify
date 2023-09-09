@@ -1,5 +1,5 @@
 import arg from 'arg'
-import { Mode, Volatility } from 'src/interfaces/PLV8ify'
+import { Mode, Volatility } from 'src/interfaces/PLV8ify.js'
 
 type Command = 'version' | 'generate' | 'deploy'
 export type BundlerType = 'esbuild' | 'bun'

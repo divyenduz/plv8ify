@@ -1,7 +1,7 @@
 import fs from 'fs'
 
-import { ParseCLI } from '../helpers/ParseCLI'
-import { PLV8ifyCLI } from 'src/impl/PLV8ifyCLI'
+import { ParseCLI } from '../helpers/ParseCLI.js'
+import { PLV8ifyCLI } from '../impl/PLV8ifyCLI.js'
 
 export async function generateCommand(
   CLI: ReturnType<typeof ParseCLI.getCommand>
