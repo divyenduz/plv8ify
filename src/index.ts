@@ -20,11 +20,11 @@ function getRuntime(): Runtime {
 
 async function main() {
   const runtime = getRuntime()
-  if (process.env.DEBUG) {
+  const CLI = ParseCLI.getCommand()
+
+  if (CLI.config.debug) {
     console.log(`DEBUG: Running in ${runtime} runtime`)
   }
-
-  const CLI = ParseCLI.getCommand()
 
   if (CLI.config.bundler === 'bun' && runtime === 'node') {
     throw new Error('Bun bundler is not supported in node runtime')
