@@ -4,6 +4,8 @@
     "noEmit": false,
     "allowImportingTsExtensions": false,
 
+    "resolveJsonModule": true, // Include package.json in the build (for version cmd)
+
     "moduleResolution": "NodeNext",
     "module": "NodeNext"
   },

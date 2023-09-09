@@ -2,12 +2,12 @@
   "name": "plv8ify",
   "version": "0.0.45",
   "type": "module",
-  "main": "dist/index.js",
+  "main": "dist/src/index.js",
   "license": "MIT",
   "bin": {
-    "plv8ify": "dist/index.js"
+    "plv8ify": "dist/src/index.js"
   },
-  "prepublish": "chmod +x dist/index.js",
+  "prepublish": "chmod +x dist/src/index.js",
   "dependencies": {
     "arg": "5.0.1",
     "dotenv": "16.0.3",
@@ -37,8 +37,9 @@
     "prepublish": "bun build",
     "test": "bun test",
     "dev": "bun example:turf-js",
-    "test:prod": "bun run build && bun run --bun dist/index.js generate --input-file examples/turf-js/input.ts --output-folder examples/turf-js/plv8ify-dist",
-    "test:prod-node": "bun run build && yarn node dist/index.js generate --input-file examples/turf-js/input.ts --output-folder examples/turf-js/plv8ify-dist",
+    "test:prod-version": "bun run build && bun run --bun dist/src/index.js version",
+    "test:prod": "bun run build && bun run --bun dist/src/index.js generate --input-file examples/turf-js/input.ts --output-folder examples/turf-js/plv8ify-dist",
+    "test:prod-node": "bun run build && yarn node dist/src/index.js generate --input-file examples/turf-js/input.ts --output-folder examples/turf-js/plv8ify-dist",
     "example:hello": "bun run --bun src/index.ts generate --input-file examples/hello/input.ts --output-folder examples/hello/plv8ify-dist",
     "example:hello-start_proc": "bun run --bun src/index.ts generate --input-file examples/hello-start_proc/input.ts --output-folder examples/hello-start_proc/plv8ify-dist --mode start_proc",
     "example:hello-bundle": "bun run --bun src/index.ts generate --input-file examples/hello-bundle/input.ts --output-folder examples/hello-bundle/plv8ify-dist --mode bundle --scope-prefix myScope",

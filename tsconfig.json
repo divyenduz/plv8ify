@@ -21,12 +21,11 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
 
-    "rootDir": "src",
     "outDir": "dist",
     "declaration": true,
-    "baseUrl": ".",
+    "baseUrl": "."
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "package.json"],
   "exclude": [
     "node_modules",
     "examples/**/*",
