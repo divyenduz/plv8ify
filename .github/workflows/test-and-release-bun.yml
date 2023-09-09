@@ -38,7 +38,7 @@ jobs:
         run: echo "Installing dependencies" && bun install && echo "Done installing dependencies"
 
       - name: Run Types Check
-        run: bunx tsc --noEmit
+        run: bun x tsc --noEmit
 
       - name: Run Tests
         run: bun test
