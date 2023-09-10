@@ -1,7 +1,6 @@
 node_modules
 examples
 src
-package.json
 tsconfig.json
 tsconfig.build.json
 README.md
