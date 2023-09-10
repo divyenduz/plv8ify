@@ -38,6 +38,7 @@
     "test": "bun test",
     "dev": "bun example:turf-js",
     "test:prod-version": "bun run build && bun run --bun dist/src/index.js version",
+    "test:prod-version-node": "bun run build && yarn node dist/src/index.js version",
     "test:prod": "bun run build && bun run --bun dist/src/index.js generate --input-file examples/turf-js/input.ts --output-folder examples/turf-js/plv8ify-dist",
     "test:prod-node": "bun run build && yarn node dist/src/index.js generate --input-file examples/turf-js/input.ts --output-folder examples/turf-js/plv8ify-dist",
     "example:hello": "bun run --bun src/index.ts generate --input-file examples/hello/input.ts --output-folder examples/hello/plv8ify-dist",
