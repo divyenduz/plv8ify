@@ -109,7 +109,7 @@ export class PLV8ifyCLI implements PLV8ify {
 
   private getFunctions() {
     return this._tsCompiler.getFunctions().map((fn) => {
-      if (fn.comments && fn.comments.toString().match(/plv8_trigger/)) {
+      if (this.getFunctionTrigger(fn)) {
         fn.returnType = 'trigger'
       }
       return {
@@ -131,6 +131,16 @@ export class PLV8ifyCLI implements PLV8ify {
       .map((comment) => comment.replace(volatilityStr, ''))[0] ||
       defaultVolatility) as Volatility
     return volatility
+  }
+
+  private getFunctionTrigger(fn: TSFunction) {
+    const triggerStr = '//@plv8ify-trigger'
+    const comments = fn.comments
+    const trigger = comments.filter((comment) => comment.includes(triggerStr))
+      .length
+      ? true
+      : false
+    return trigger
   }
 
   // Input: parsed parameters, output of FunctionDeclaratioin.getParameters()
@@ -237,7 +247,7 @@ export class PLV8ifyCLI implements PLV8ify {
     defaultVolatility,
   }: GetPLV8SQLFunctionArgs) {
     const scopedName = scopePrefix + '_' + fn.name
-    if (fn.comments && fn.comments.toString().match(/@plv8ify-trigger/)) {
+    if (this.getFunctionTrigger(fn)) {
       fn.returnType = 'TRIGGER'
     }
     console.log(fn)
