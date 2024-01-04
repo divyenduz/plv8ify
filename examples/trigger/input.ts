@@ -1,4 +1,4 @@
-type testRow = {
+type Row = {
   // Either JS or plv8 types can be used here
   id: number
   event_name: string
@@ -6,7 +6,7 @@ type testRow = {
 }
 
 //@plv8ify-trigger
-export function test(NEW: testRow, OLD: testRow): testRow {
+export function test(NEW: Row, OLD: Row): Row {
   plv8.elog(NOTICE, 'NEW = ', JSON.stringify(NEW))
   plv8.elog(NOTICE, 'OLD = ', JSON.stringify(OLD))
   plv8.elog(NOTICE, 'TG_OP = ', TG_OP)
@@ -19,4 +19,5 @@ export function test(NEW: testRow, OLD: testRow): testRow {
     NEW.id = 102
     return NEW
   }
+  return NEW
 }

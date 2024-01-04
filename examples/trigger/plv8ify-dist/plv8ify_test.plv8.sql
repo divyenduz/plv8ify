@@ -14,6 +14,7 @@ function test(NEW, OLD) {
     NEW.id = 102;
     return NEW;
   }
+  return NEW;
 }
 
 

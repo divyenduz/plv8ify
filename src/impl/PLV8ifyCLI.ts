@@ -250,7 +250,6 @@ export class PLV8ifyCLI implements PLV8ify {
     if (this.getFunctionTrigger(fn)) {
       fn.returnType = 'TRIGGER'
     }
-    console.log(fn)
 
     const sqlParametersString =
       fn.returnType && fn.returnType.toUpperCase() === 'TRIGGER'
