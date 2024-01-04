@@ -43,6 +43,7 @@ export class PLV8ifyCLI implements PLV8ify {
     number: 'float8',
     string: 'text',
     boolean: 'boolean',
+    trigger: 'TRIGGER',
   }
 
   constructor(bundler: BundlerType = 'esbuild') {
@@ -108,6 +109,9 @@ export class PLV8ifyCLI implements PLV8ify {
 
   private getFunctions() {
     return this._tsCompiler.getFunctions().map((fn) => {
+      if (this.getFunctionTrigger(fn)) {
+        fn.returnType = 'trigger'
+      }
       return {
         ...fn,
         returnType: this._typeMap[fn.returnType],
@@ -127,6 +131,16 @@ export class PLV8ifyCLI implements PLV8ify {
       .map((comment) => comment.replace(volatilityStr, ''))[0] ||
       defaultVolatility) as Volatility
     return volatility
+  }
+
+  private getFunctionTrigger(fn: TSFunction) {
+    const triggerStr = '//@plv8ify-trigger'
+    const comments = fn.comments
+    const trigger = comments.filter((comment) => comment.includes(triggerStr))
+      .length
+      ? true
+      : false
+    return trigger
   }
 
   // Input: parsed parameters, output of FunctionDeclaratioin.getParameters()
@@ -233,10 +247,14 @@ export class PLV8ifyCLI implements PLV8ify {
     defaultVolatility,
   }: GetPLV8SQLFunctionArgs) {
     const scopedName = scopePrefix + '_' + fn.name
-    const sqlParametersString = this.getSQLParametersString(
-      fn.parameters,
-      fallbackReturnType
-    )
+    if (this.getFunctionTrigger(fn)) {
+      fn.returnType = 'TRIGGER'
+    }
+
+    const sqlParametersString =
+      fn.returnType && fn.returnType.toUpperCase() === 'TRIGGER'
+        ? ''
+        : this.getSQLParametersString(fn.parameters, fallbackReturnType)
     const jsParametersString = this.getJSParametersString(fn.parameters)
     const volatility = this.getFunctionVolatility(fn, defaultVolatility)
     const returnType = fn.returnType || fallbackReturnType

@@ -40,4 +40,36 @@ describe('PLV8ifyCLI tests', () => {
 
     expect(sql).toMatchSnapshot()
   })
+
+  it('getSQLFunction with parameters-trigger', async () => {
+    const plv8ify = new PLV8ifyCLI()
+    const sql = plv8ify.getPLV8SQLFunction({
+      fn: {
+        name: 'test',
+        parameters: [
+          { name: 'NEW', type: 'testRow' },
+          { name: 'OLD', type: 'testRow' },
+        ],
+        comments: ['//@plv8ify-trigger'],
+      } as TSFunction,
+      scopePrefix: 'plv8ify',
+      mode: 'inline',
+      defaultVolatility: 'IMMUTABLE',
+      bundledJs: `
+function test(NEW, OLD) {
+  if (TG_OP === "UPDATE") {
+    NEW.event_name = NEW.event_name ?? OLD.event_name;
+    return NEW;
+  }
+  if (TG_OP === "INSERT") {
+    NEW.id = 102;
+    return NEW;
+  }
+}      
+      `,
+      pgFunctionDelimiter: '$plv8ify$',
+      fallbackReturnType: 'JSONB',
+    })
+    expect(sql).toMatchSnapshot()
+  })
 })

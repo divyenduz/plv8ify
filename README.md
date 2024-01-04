@@ -30,6 +30,36 @@ export function point(lat, long) {
 
 See all examples in the [examples folder](/examples). Use `yarn examples` to apply any changes to all the examples.
 
+## Trigger functions
+
+To write a trigger function, decorate the function with the `//@plv8ify-trigger` comment, and have the function return a `testRow` type where `testRow` defines the type of the row for the trigger. You can also add a NEW parameter for insert and update triggers, and OLD for update and delete triggers.
+(Tip: you can add @types/pg and @types/plv8-internals to get all standard postgres types/defines and plv8 specific functions recognized by the type checker)
+
+```
+type Row = {
+  // Either JS or plv8 types can be used here
+  id: number
+  event_name: string
+  event_date_time: Date
+}
+
+//@plv8ify-trigger
+export function test(NEW: Row, OLD: Row): Row {
+  plv8.elog(NOTICE, 'NEW = ', JSON.stringify(NEW));
+  plv8.elog(NOTICE, 'OLD = ', JSON.stringify(OLD));
+  plv8.elog(NOTICE, 'TG_OP = ', TG_OP);
+  plv8.elog(NOTICE, 'TG_ARGV = ', TG_ARGV);
+  if (TG_OP === 'UPDATE') {
+    NEW.event_name = NEW.event_name ?? OLD.event_name
+    return NEW
+  }
+  if (TG_OP === 'INSERT') {
+    NEW.id = 102
+    return NEW
+  }
+}
+```
+
 ## CLI Usage
 
 ### Version

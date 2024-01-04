@@ -17,3 +17,24 @@ return test()
 
 $function$ LANGUAGE plv8 IMMUTABLE STRICT;"
 `;
+
+
+exports[`PLV8ifyCLI tests getSQLFunction with parameters-trigger 1`] = `
+"DROP FUNCTION IF EXISTS plv8ify_test();
+CREATE OR REPLACE FUNCTION plv8ify_test() RETURNS TRIGGER AS $plv8ify$
+
+function test(NEW, OLD) {
+  if (TG_OP === "UPDATE") {
+    NEW.event_name = NEW.event_name ?? OLD.event_name;
+    return NEW;
+  }
+  if (TG_OP === "INSERT") {
+    NEW.id = 102;
+    return NEW;
+  }
+}      
+      
+return test(NEW,OLD)
+
+$plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;"
+`;
