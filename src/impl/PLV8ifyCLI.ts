@@ -1,4 +1,5 @@
-import fs, { Mode } from 'fs'
+import { Layer } from 'effect'
+import { Mode } from 'fs'
 import { BundlerType } from 'src/helpers/ParseCLI.js'
 import { Bundler } from 'src/interfaces/Bundler.js'
 import {
@@ -35,7 +36,7 @@ interface GetInitSQLFunctionArgs {
   volatility: Volatility
 }
 
-export class PLV8ifyCLI implements PLV8ify {
+export class PLV8ifyCLIImpl implements PLV8ify {
   private _bundler: Bundler
   private _tsCompiler: TSCompiler
 
@@ -80,17 +81,6 @@ export class PLV8ifyCLI implements PLV8ify {
       )
       .exhaustive()
     return modeAdjustedBundledJs
-  }
-
-  private writeFile(filePath: string, content: string) {
-    try {
-      fs.unlinkSync(filePath)
-    } catch (e) {}
-    fs.writeFileSync(filePath, content)
-  }
-
-  write(path: string, string: string) {
-    this.writeFile(path, string)
   }
 
   private getScopedName(fn: TSFunction, scopePrefix: string) {
@@ -297,3 +287,21 @@ SET plv8.start_proc = ${scopePrefix}_init;
 SELECT plv8_reset();
 `
 }
+
+// TODO: this should be lazily evaluated
+const plv8ify = new PLV8ifyCLIImpl()
+
+export const PLV8ifyCLILive = Layer.succeed(
+  PLV8ify,
+  PLV8ify.of({
+    init: (inputFilePath: string) => {
+      return plv8ify.init(inputFilePath)
+    },
+    build: (args) => {
+      return plv8ify.build(args)
+    },
+    getPLV8SQLFunctions: (args) => {
+      return plv8ify.getPLV8SQLFunctions(args)
+    },
+  })
+)

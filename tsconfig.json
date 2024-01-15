@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "types": ["bun-types"],
+    "types": ["@types/bun"],
 
     "lib": ["esnext"],
     "module": "esnext",

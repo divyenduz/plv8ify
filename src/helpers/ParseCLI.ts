@@ -1,8 +1,6 @@
 import arg from 'arg'
+import { Context, Layer } from 'effect'
 import { Mode, Volatility } from 'src/interfaces/PLV8ify.js'
-
-type Command = 'version' | 'generate' | 'deploy'
-export type BundlerType = 'esbuild' | 'bun'
 
 export class ParseCLI {
   static getCommand() {
@@ -22,11 +20,9 @@ export class ParseCLI {
     })
 
     if (args._.length === 0) {
-      ParseCLI.throwError(`
+      throw new Error(`
 Please specify a command. Available commands: generate, version, deploy
 `)
-      console.error()
-      process.exit(1)
     }
 
     const debug = args['--debug'] || false
@@ -57,11 +53,20 @@ Please specify a command. Available commands: generate, version, deploy
       },
     }
   }
-
-  static throwError(message?: string) {
-    if (message) {
-      console.error(message)
-    }
-    process.exit(1)
-  }
 }
+
+type Command = 'version' | 'generate' | 'deploy'
+export type BundlerType = 'esbuild' | 'bun'
+
+export interface Config {
+  getCommand: () => ReturnType<typeof ParseCLI.getCommand>
+}
+
+export const Config = Context.Tag<Config>()
+
+export const ConfigLive = Layer.succeed(
+  Config,
+  Config.of({
+    getCommand: ParseCLI.getCommand,
+  })
+)

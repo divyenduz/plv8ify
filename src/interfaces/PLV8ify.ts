@@ -1,3 +1,5 @@
+import { Context } from 'effect'
+
 export type Volatility = 'VOLATILE' | 'STABLE' | 'IMMUTABLE'
 export type Mode = 'inline' | 'start_proc' | 'bundle'
 
@@ -20,7 +22,6 @@ export interface GetPLV8SQLFunctionsArgs {
 export interface PLV8ify {
   init(inputFilePath: string): void
   build: (options: BuildArgs) => Promise<string>
-  write: (path: string, string: string) => void
 
   getPLV8SQLFunctions({
     mode,
@@ -33,3 +34,5 @@ export interface PLV8ify {
     sql: string
   }[]
 }
+
+export const PLV8ify = Context.Tag<PLV8ify>()
