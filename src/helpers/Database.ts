@@ -1,4 +1,6 @@
+import { Layer } from 'effect'
 import postgres from 'postgres'
+import { DatabaseLayer } from 'src/interfaces/Database'
 
 export class Database {
   private databaseUrl: string
@@ -31,3 +33,11 @@ export class Database {
     }
   }
 }
+
+export const DatabaseLive = Layer.succeed(
+  DatabaseLayer,
+  DatabaseLayer.of({
+    databaseUrl: process.env.DATABASE_URL,
+    database: new Database(process.env.DATABASE_URL),
+  })
+)
