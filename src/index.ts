@@ -7,7 +7,7 @@ import { deployCommand } from './commands/deploy.js'
 import { generateCommand } from './commands/generate.js'
 import { versionCommand } from './commands/version.js'
 import { DatabaseLive } from './helpers/Database.js'
-import { Config, ConfigLive, ParseCLI } from './helpers/ParseCLI.js'
+import { ConfigLive, ParseCLI } from './helpers/ParseCLI.js'
 import { getRuntime, writeFile } from './helpers/Utils.js'
 import { PLV8ifyCLILive } from './impl/PLV8ifyCLI.js'
 
@@ -56,7 +56,7 @@ async function main() {
       )
     })
     .with('deploy', async () => {
-      const program = deployCommand()
+      const program = Effect.scoped(deployCommand())
       const runnable = Effect.provide(
         program,
         Layer.merge(ConfigLive, DatabaseLive)

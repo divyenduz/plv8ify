@@ -1,4 +1,4 @@
-import { Layer } from 'effect'
+import { Effect, Layer } from 'effect'
 import postgres from 'postgres'
 import { DatabaseLayer } from 'src/interfaces/Database'
 
@@ -7,6 +7,10 @@ export class Database {
   private db: ReturnType<typeof postgres>
   constructor(databaseUrl) {
     this.databaseUrl = databaseUrl
+  }
+
+  getDatabaseUrl() {
+    return this.databaseUrl
   }
 
   getConnection() {
@@ -34,10 +38,16 @@ export class Database {
   }
 }
 
+const acquireDatabase = Effect.sync(
+  () => new Database(process.env.DATABASE_URL)
+)
+const releaseDatabase = (database: Database) =>
+  Effect.sync(() => database.endConnection())
+
 export const DatabaseLive = Layer.succeed(
   DatabaseLayer,
   DatabaseLayer.of({
     databaseUrl: process.env.DATABASE_URL,
-    database: new Database(process.env.DATABASE_URL),
+    database: Effect.acquireRelease(acquireDatabase, releaseDatabase),
   })
 )

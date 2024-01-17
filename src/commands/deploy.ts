@@ -83,12 +83,15 @@ function checkDatabaseUrlIsSetTaskEffectFn() {
 function checkDatabaseIsReachableTaskEffectFn() {
   return DatabaseLayer.pipe(
     Effect.flatMap((databaseLayer) => {
+      return databaseLayer.database
+    }),
+    Effect.flatMap((database) => {
       const isDatabaseReachableTask = tasukuTask(
         'Check if the provided DATABASE_URL is reachable',
         async ({ setError }) => {
-          const isReachable = await databaseLayer.database.isDatabaseReachable()
+          const isReachable = await database.isDatabaseReachable()
           if (!isReachable) {
-            const errorMessage = `Provided DATABASE_URL: ${databaseLayer.databaseUrl} is not reachable`
+            const errorMessage = `Provided DATABASE_URL: ${database.getDatabaseUrl()} is not reachable`
             setError(errorMessage)
           }
         }
@@ -124,9 +127,12 @@ function deployCommandsTaskEffectFn() {
 
   const deployCommandsEffect = DatabaseLayer.pipe(
     Effect.flatMap((databaseLayer) => {
+      return databaseLayer.database
+    }),
+    Effect.flatMap((database) => {
       return filePathsEffect.pipe(
         Effect.flatMap((filePaths) => {
-          const db = databaseLayer.database.getConnection()
+          const db = database.getConnection()
           const deployCommands = filePaths.map((filePath) => {
             const name = getFunctionNameFromFilePath(filePath)
             const deployCommandTasukuTaskEffect = tasukuTask(
@@ -135,7 +141,6 @@ function deployCommandsTaskEffectFn() {
                 try {
                   const r = await db.file(filePath)
                   setTitle(`Deployed ${name}`)
-                  console.log(r)
                 } catch (e) {
                   if (e instanceof Error) {
                     setError(
@@ -167,16 +172,10 @@ export function deployCommand() {
 
   const deployCommandsTaskEffect = deployCommandsTaskEffectFn()
 
-  // TODO: somehow terminate database connection
   return Effect.all([
     checkOutputFolderTaskEffect,
     checkDatabaseUrlIsSetTaskEffect,
     checkDatabaseIsReachableTaskEffect,
     deployCommandsTaskEffect,
-    DatabaseLayer.pipe(
-      Effect.tap((databaseLayer) => {
-        databaseLayer.database.endConnection()
-      })
-    ),
   ])
 }
