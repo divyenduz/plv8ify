@@ -55,7 +55,9 @@ async function main() {
       )
     })
     .with('deploy', async () => {
-      await deployCommand(CLI)
+      const program = deployCommand()
+      const runnable = Effect.provide(program, ConfigLive)
+      Effect.runPromise(runnable)
     })
     .exhaustive()
 }
