@@ -132,21 +132,18 @@ function deployCommandsTaskEffectFn() {
             const deployCommandTasukuTaskEffect = tasukuTask(
               `Deploying ${name}`,
               async ({ setTitle, setError }) => {
-                Effect.tryPromise({
-                  try: () => {
-                    const r = db.file(filePath)
-                    setTitle(`Deployed ${name}`)
-                    return r
-                  },
-                  catch: (e) => {
-                    if (e instanceof Error) {
-                      setError(
-                        `Failed to deploy ${name} (because of ${e.message})`
-                      )
-                      return new DatabaseQueryFailedError(`${e}`)
-                    }
-                  },
-                })
+                try {
+                  const r = await db.file(filePath)
+                  setTitle(`Deployed ${name}`)
+                  console.log(r)
+                } catch (e) {
+                  if (e instanceof Error) {
+                    setError(
+                      `Failed to deploy ${name} (because of ${e.message})`
+                    )
+                    throw new DatabaseQueryFailedError(`${e}`)
+                  }
+                }
               }
             )
 
