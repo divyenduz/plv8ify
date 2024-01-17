@@ -72,4 +72,26 @@ function test(NEW, OLD) {
     })
     expect(sql).toMatchSnapshot()
   })
+
+  it('getSQLFunction with custom-schema', async () => {
+    const plv8ify = new PLV8ifyCLI()
+    const sql = plv8ify.getPLV8SQLFunction({
+      fn: {
+        name: 'test',
+        parameters: [],
+        comments: ['//@plv8ify-schema-name testschema'],
+      } as TSFunction,
+      scopePrefix: 'plv8ify',
+      mode: 'inline',
+      defaultVolatility: 'IMMUTABLE',
+      bundledJs: `
+function test() {
+  return "hello";
+}      
+      `,
+      pgFunctionDelimiter: '$plv8ify$',
+      fallbackReturnType: 'JSONB',
+    })
+    expect(sql).toMatchSnapshot()
+  })
 })

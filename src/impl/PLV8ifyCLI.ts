@@ -143,6 +143,15 @@ export class PLV8ifyCLI implements PLV8ify {
     return trigger
   }
 
+  private getFunctionCustomSchema(fn: TSFunction) {
+    const schemaStr = '//@plv8ify-schema-name '
+    const comments = fn.comments
+    const schema = comments
+      .filter((comment) => comment.includes(schemaStr))
+      .map((comment) => comment.replace(schemaStr, ''))[0]
+    return schema
+  }
+
   // Input: parsed parameters, output of FunctionDeclaratioin.getParameters()
   // Output: SQL string of bind params
   private getSQLParametersString(
@@ -246,7 +255,9 @@ export class PLV8ifyCLI implements PLV8ify {
     fallbackReturnType,
     defaultVolatility,
   }: GetPLV8SQLFunctionArgs) {
-    const scopedName = scopePrefix + '_' + fn.name
+    const customSchema = this.getFunctionCustomSchema(fn)
+    const scopedName =
+      (customSchema ? customSchema + '.' : '') + scopePrefix + '_' + fn.name
     if (this.getFunctionTrigger(fn)) {
       fn.returnType = 'TRIGGER'
     }
