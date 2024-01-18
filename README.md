@@ -30,6 +30,33 @@ export function point(lat, long) {
 
 See all examples in the [examples folder](/examples). Use `yarn examples` to apply any changes to all the examples.
 
+## Deploy on custom schema
+
+To generate a function to be deployed on a schema different than the default one (usually: public) decorate the function with a `//@plv8ify-schema-name <schemaname>` comment
+
+```
+//@plv8ify-schema-name testschema
+export function hello() {
+  return 'world'
+}
+```
+
+will generate
+
+```
+DROP FUNCTION IF EXISTS testschema.plv8ify_hello();
+CREATE OR REPLACE FUNCTION testschema.plv8ify_hello() RETURNS text AS $plv8ify$
+// input.ts
+function hello() {
+  return "world";
+}
+
+
+return hello()
+
+$plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;
+```
+
 ## Trigger functions
 
 To write a trigger function, decorate the function with the `//@plv8ify-trigger` comment, and have the function return a `testRow` type where `testRow` defines the type of the row for the trigger. You can also add a NEW parameter for insert and update triggers, and OLD for update and delete triggers.
