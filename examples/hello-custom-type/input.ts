@@ -1,4 +1,4 @@
-interface test_type {
+export interface test_type {
   name: string
   age: number
 }

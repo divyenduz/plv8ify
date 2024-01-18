@@ -106,6 +106,8 @@ export class PLV8ifyCLI implements PLV8ify {
       customTypeMap = fs.readFileSync(typesFilePath, 'utf8')
       eval(customTypeMap)
       return typeMap
+    } else {
+      console.log(`Not found types file: ${typesFilePath}`)
     }
     return {}
   }
@@ -123,6 +125,11 @@ export class PLV8ifyCLI implements PLV8ify {
     const scopedName = this.getScopedName(fn, scopePrefix)
     return `${outputFolder}/${scopedName}.plv8.sql`
   }
+  private getTypeFromMap(type: string) {
+    const typeLocal = type.split('.').pop()
+    //console.log(`Original type: ${type}, Converted type: ${typeLocal} `)
+    return this._typeMap[typeLocal ?? type]
+  }
 
   private getFunctions() {
     return this._tsCompiler.getFunctions().map((fn) => {
@@ -131,7 +138,7 @@ export class PLV8ifyCLI implements PLV8ify {
       }
       return {
         ...fn,
-        returnType: this._typeMap[fn.returnType],
+        returnType: this.getTypeFromMap(fn.returnType),
       }
     })
   }
@@ -178,7 +185,7 @@ export class PLV8ifyCLI implements PLV8ify {
     return parameters
       .map((p) => {
         const { name, type } = p
-        const mappedType = this._typeMap[type] || fallbackReturnType
+        const mappedType = this.getTypeFromMap(type) || fallbackReturnType
         return `${name} ${mappedType}`
       })
       .join(',')
