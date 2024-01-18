@@ -60,6 +60,82 @@ export function test(NEW: Row, OLD: Row): Row {
 }
 ```
 
+## Custom Postgres Types
+
+By default plv8ify converts typescript types to postgres types using the following map:
+
+```
+  private _typeMap = {
+    number: 'float8',
+    string: 'text',
+    boolean: 'boolean',
+  }
+```
+
+and defaults all other types to either JSONB or the type passed in using the **--fallback-type option**
+It is possible to define additional type mapping by using a custom file (by default **types.ts**) with the following format:
+
+```
+typeMap = {
+  test_type: 'test_type',
+  'test_type[]': 'test_type[]',
+}
+```
+
+The custom types will be merged with the default ones at runtime and will allow using either internal postgres type or custom defined types
+
+Example:
+types.ts
+
+```
+typeMap = {
+  test_type: 'test_type',
+  'test_type[]': 'test_type[]',
+}
+```
+
+input.ts
+
+```
+interface test_type {
+  name: string
+  age: number
+}
+
+export function hello(test: test_type[]) {
+  return {
+    name: `Hello ${test[0].name}`,
+    age: test[0].age,
+  }
+}
+
+```
+
+cli command line:
+
+```
+plv8ify generate input.ts --types-config-file types.ts
+```
+
+will generate this function:
+
+```
+DROP FUNCTION IF EXISTS plv8ify_hello(test test_type[]);
+CREATE OR REPLACE FUNCTION plv8ify_hello(test test_type[]) RETURNS JSONB AS $plv8ify$
+// input.ts
+function hello(test) {
+  return {
+    name: `Hello ${test[0].name}`,
+    age: test[0].age
+  };
+}
+
+
+return hello(test)
+
+$plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;
+```
+
 ## CLI Usage
 
 ### Version

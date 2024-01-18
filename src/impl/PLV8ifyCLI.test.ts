@@ -72,4 +72,31 @@ function test(NEW, OLD) {
     })
     expect(sql).toMatchSnapshot()
   })
+
+  it('getSQLFunction with custom type', async () => {
+    const plv8ify = new PLV8ifyCLI()
+    plv8ify.init('', './src/test-fixtures/types-custom.fixture.js')
+
+    const sql = plv8ify.getPLV8SQLFunction({
+      fn: {
+        name: 'test',
+        parameters: [{ name: 'test', type: 'test_type[]' }],
+        comments: [],
+      } as TSFunction,
+      scopePrefix: 'plv8ify',
+      mode: 'inline',
+      defaultVolatility: 'IMMUTABLE',
+      bundledJs: `
+      export function hello(test: test_type[]) {
+        return {
+          name: "Hello" + test[0].name,
+          age: test[0].age,
+        }
+      }      
+      `,
+      pgFunctionDelimiter: '$plv8ify$',
+      fallbackReturnType: 'JSONB',
+    })
+    expect(sql).toMatchSnapshot()
+  })
 })

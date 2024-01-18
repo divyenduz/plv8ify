@@ -23,7 +23,8 @@
 
     "outDir": "dist",
     "declaration": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "sourceMap": true
   },
   "include": ["src/**/*", "package.json"],
   "exclude": [

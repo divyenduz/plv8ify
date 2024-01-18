@@ -1,4 +1,5 @@
 import fs, { Mode } from 'fs'
+import path from 'path'
 import { BundlerType } from 'src/helpers/ParseCLI.js'
 import { Bundler } from 'src/interfaces/Bundler.js'
 import {
@@ -55,8 +56,14 @@ export class PLV8ifyCLI implements PLV8ify {
     this._tsCompiler = new TsMorph()
   }
 
-  init(inputFilePath: string) {
-    this._tsCompiler.createSourceFile(inputFilePath)
+  init(inputFilePath: string, typesFilePath?: string) {
+    if (fs.existsSync(inputFilePath)) {
+      this._tsCompiler.createSourceFile(inputFilePath)
+    }
+    this._typeMap = {
+      ...this._typeMap,
+      ...this.getCustomTypeMap(typesFilePath),
+    }
   }
 
   private removeExportBlock(bundledJs: string) {
@@ -91,6 +98,17 @@ export class PLV8ifyCLI implements PLV8ify {
 
   write(path: string, string: string) {
     this.writeFile(path, string)
+  }
+
+  private getCustomTypeMap(typesFilePath: string) {
+    let customTypeMap = null
+    let typeMap = {}
+    if (fs.existsSync(typesFilePath)) {
+      customTypeMap = fs.readFileSync(typesFilePath, 'utf8')
+      eval(customTypeMap)
+      return typeMap
+    }
+    return {}
   }
 
   private getScopedName(fn: TSFunction, scopePrefix: string) {

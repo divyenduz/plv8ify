@@ -16,12 +16,13 @@ export async function generateCommand(
     fallbackReturnType,
     mode,
     defaultVolatility,
+    typesFilePath,
   } = CLI.config
 
   fs.mkdirSync(outputFolderPath, { recursive: true })
 
   const plv8ify = new PLV8ifyCLI(bundler)
-  plv8ify.init(inputFilePath)
+  plv8ify.init(inputFilePath, typesFilePath)
 
   const bundledJs = await plv8ify.build({
     mode,
