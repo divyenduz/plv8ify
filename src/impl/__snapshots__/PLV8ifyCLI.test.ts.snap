@@ -56,3 +56,16 @@ return test(test)
 
 $plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;"
 `;
+
+exports[`PLV8ifyCLI tests getSQLFunction with custom-schema 1`] = `
+"DROP FUNCTION IF EXISTS plv8ify_test();
+CREATE OR REPLACE FUNCTION plv8ify_test() RETURNS JSONB AS $plv8ify$
+
+function test() {
+  return "hello";
+}      
+      
+return test()
+
+$plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;"
+`;
