@@ -1,22 +1,15 @@
 #!/usr/bin/env node
+import { Effect, Layer } from 'effect'
+import fs from 'fs'
 import { match } from 'ts-pattern'
 
 import { deployCommand } from './commands/deploy.js'
 import { generateCommand } from './commands/generate.js'
 import { versionCommand } from './commands/version.js'
-import { ParseCLI } from './helpers/ParseCLI.js'
-
-type Runtime = 'node' | 'bun'
-
-function getRuntime(): Runtime {
-  if (typeof Bun !== 'undefined') {
-    return 'bun'
-  }
-  if (typeof process !== 'undefined') {
-    return 'node'
-  }
-  throw new Error('Unknown runtime')
-}
+import { DatabaseLive } from './helpers/Database.js'
+import { ConfigLive, ParseCLI } from './helpers/ParseCLI.js'
+import { getRuntime, writeFile } from './helpers/Utils.js'
+import { PLV8ifyCLILive } from './impl/PLV8ifyCLI.js'
 
 async function main() {
   const runtime = getRuntime()
@@ -32,13 +25,43 @@ async function main() {
 
   match(CLI.command)
     .with('version', () => {
-      versionCommand()
+      const program = versionCommand()
+      Effect.runSync(program)
     })
     .with('generate', async () => {
-      await generateCommand(CLI)
+      const program = await generateCommand()
+      const runnable = await Effect.provide(
+        program,
+        Layer.merge(ConfigLive, PLV8ifyCLILive)
+      )
+      runnable.pipe(
+        Effect.tap(
+          ({ outputFolderPath, writeBundlerOutput, sqlFiles, bundledJs }) => {
+            fs.mkdirSync(outputFolderPath, { recursive: true })
+
+            if (writeBundlerOutput) {
+              writeFile(`${outputFolderPath}/output.js`, bundledJs)
+            }
+            sqlFiles.forEach((sqlFile) => {
+              writeFile(sqlFile.filename, sqlFile.sql)
+            })
+            process.exit(0)
+          }
+        ),
+        Effect.catchAll((e) => {
+          console.error(e)
+          process.exit(1)
+        }),
+        Effect.runPromise
+      )
     })
     .with('deploy', async () => {
-      await deployCommand(CLI)
+      const program = Effect.scoped(deployCommand())
+      const runnable = Effect.provide(
+        program,
+        Layer.merge(ConfigLive, DatabaseLive)
+      )
+      Effect.runPromise(runnable)
     })
     .exhaustive()
 }

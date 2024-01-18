@@ -11,6 +11,7 @@
   "dependencies": {
     "arg": "5.0.1",
     "dotenv": "16.0.3",
+    "effect": "2.0.3",
     "esbuild": "0.14.18",
     "postgres": "3.3.3",
     "tasuku": "2.0.1",
@@ -22,9 +23,9 @@
     "@trivago/prettier-plugin-sort-imports": "3.2.0",
     "@turf/distance": "6.5.0",
     "@turf/helpers": "6.5.0",
+    "@types/bun": "1.0.1",
     "@types/dotenv": "8.2.0",
     "@types/node": "18.11.7",
-    "bun-types": "1.0.1",
     "mathjs": "11.6.0",
     "object-hash": "3.0.0",
     "prettier": "2.5.1",

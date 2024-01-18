@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'bun:test'
 import { TSFunction } from 'src/interfaces/TSCompiler'
 
-import { PLV8ifyCLI } from './PLV8ifyCLI'
+import { PLV8ifyCLIImpl } from './PLV8ifyCLI'
 
 describe('PLV8ifyCLI tests', () => {
   it('getSQLFunction with parameters', async () => {
-    const plv8ify = new PLV8ifyCLI()
+    const plv8ify = new PLV8ifyCLIImpl()
     const sql = plv8ify.getPLV8SQLFunction({
       fn: {
         name: 'test',
@@ -23,7 +23,7 @@ describe('PLV8ifyCLI tests', () => {
   })
 
   it('getSQLFunction with delimiter', async () => {
-    const plv8ify = new PLV8ifyCLI()
+    const plv8ify = new PLV8ifyCLIImpl()
     const sql = plv8ify.getPLV8SQLFunction({
       fn: {
         name: 'test',
@@ -42,7 +42,7 @@ describe('PLV8ifyCLI tests', () => {
   })
 
   it('getSQLFunction with parameters-trigger', async () => {
-    const plv8ify = new PLV8ifyCLI()
+    const plv8ify = new PLV8ifyCLIImpl()
     const sql = plv8ify.getPLV8SQLFunction({
       fn: {
         name: 'test',
