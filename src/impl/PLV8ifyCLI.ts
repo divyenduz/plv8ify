@@ -55,8 +55,14 @@ export class PLV8ifyCLI implements PLV8ify {
     this._tsCompiler = new TsMorph()
   }
 
-  init(inputFilePath: string) {
-    this._tsCompiler.createSourceFile(inputFilePath)
+  init(inputFilePath: string, typesFilePath?: string) {
+    if (fs.existsSync(inputFilePath)) {
+      this._tsCompiler.createSourceFile(inputFilePath)
+    }
+    this._typeMap = {
+      ...this._typeMap,
+      ...this.getCustomTypeMap(typesFilePath),
+    }
   }
 
   private removeExportBlock(bundledJs: string) {
@@ -93,6 +99,19 @@ export class PLV8ifyCLI implements PLV8ify {
     this.writeFile(path, string)
   }
 
+  private getCustomTypeMap(typesFilePath: string) {
+    let customTypeMap = null
+    let typeMap = {}
+    if (fs.existsSync(typesFilePath)) {
+      customTypeMap = fs.readFileSync(typesFilePath, 'utf8')
+      eval(customTypeMap)
+      return typeMap
+    } else {
+      console.log(`Not found types file: ${typesFilePath}`)
+    }
+    return {}
+  }
+
   private getScopedName(fn: TSFunction, scopePrefix: string) {
     const scopedName = scopePrefix + '_' + fn.name
     return scopedName
@@ -106,6 +125,10 @@ export class PLV8ifyCLI implements PLV8ify {
     const scopedName = this.getScopedName(fn, scopePrefix)
     return `${outputFolder}/${scopedName}.plv8.sql`
   }
+  private getTypeFromMap(type: string) {
+    const typeLocal = type.split('.').pop()
+    return this._typeMap[typeLocal ?? type]
+  }
 
   private getFunctions() {
     return this._tsCompiler.getFunctions().map((fn) => {
@@ -114,7 +137,7 @@ export class PLV8ifyCLI implements PLV8ify {
       }
       return {
         ...fn,
-        returnType: this._typeMap[fn.returnType],
+        returnType: this.getTypeFromMap(fn.returnType),
       }
     })
   }
@@ -161,7 +184,7 @@ export class PLV8ifyCLI implements PLV8ify {
     return parameters
       .map((p) => {
         const { name, type } = p
-        const mappedType = this._typeMap[type] || fallbackReturnType
+        const mappedType = this.getTypeFromMap(type) || fallbackReturnType
         return `${name} ${mappedType}`
       })
       .join(',')

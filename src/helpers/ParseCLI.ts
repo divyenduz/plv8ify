@@ -11,6 +11,7 @@ export class ParseCLI {
     const args = arg({
       '--input-file': String,
       '--output-folder': String,
+      '--types-config-file': String,
       '--bundler': String, // 'esbuild' or 'bun'
       '--write-bundler-output': Boolean,
       '--scope-prefix': String,
@@ -40,6 +41,7 @@ Please specify a command. Available commands: generate, version, deploy
     const mode = (args['--mode'] || 'inline') as Mode
     const defaultVolatility = (args['--volatility'] ||
       'IMMUTABLE') as Volatility
+    const typesFilePath = args['--types-config-file'] || 'types.ts'
 
     return {
       command: args._[0] as Command,
@@ -54,6 +56,7 @@ Please specify a command. Available commands: generate, version, deploy
         fallbackReturnType,
         mode,
         defaultVolatility,
+        typesFilePath,
       },
     }
   }

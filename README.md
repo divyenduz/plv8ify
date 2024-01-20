@@ -87,6 +87,82 @@ export function test(NEW: Row, OLD: Row): Row {
 }
 ```
 
+## Custom Postgres Types
+
+By default plv8ify converts typescript types to postgres types using the following map:
+
+```
+  private _typeMap = {
+    number: 'float8',
+    string: 'text',
+    boolean: 'boolean',
+  }
+```
+
+and defaults all other types to either JSONB or the type passed in using the **--fallback-type option**
+It is possible to define additional type mapping by using a custom file (by default **types.ts**) with the following format:
+
+```
+typeMap = {
+  test_type: 'test_type',
+  'test_type[]': 'test_type[]',
+}
+```
+
+The custom types will be merged with the default ones at runtime and will allow using either internal postgres type or custom defined types
+
+Example:
+types.ts
+
+```
+typeMap = {
+  test_type: 'test_type',
+  'test_type[]': 'test_type[]',
+}
+```
+
+input.ts
+
+```
+interface test_type {
+  name: string
+  age: number
+}
+
+export function hello(test: test_type[]) {
+  return {
+    name: `Hello ${test[0].name}`,
+    age: test[0].age,
+  }
+}
+
+```
+
+cli command line:
+
+```
+plv8ify generate input.ts --types-config-file types.ts
+```
+
+will generate this function:
+
+```
+DROP FUNCTION IF EXISTS plv8ify_hello(test test_type[]);
+CREATE OR REPLACE FUNCTION plv8ify_hello(test test_type[]) RETURNS JSONB AS $plv8ify$
+// input.ts
+function hello(test) {
+  return {
+    name: `Hello ${test[0].name}`,
+    age: test[0].age
+  };
+}
+
+
+return hello(test)
+
+$plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;
+```
+
 ## CLI Usage
 
 ### Version
@@ -112,6 +188,7 @@ Generate PLV8 functions for an input typescript file
 | --fallback-type         | String                                | Specify a fallback type when `plv8ify` fails to map a detected Typescript type to a Postges type                                                                                                                                                                                        | `JSONB`        |
 | --mode                  | 'inline', 'bundle' or 'start_proc'    | 'inline' will bundle the library in each function, both 'bundle' and 'start_proc' creates a `{prefix}_init` function that loads the library. 'bundle' adds a check to each function to call 'init' if required, whereas 'start_proc' is designed to be used with plv8.start_proc        | `inline`       |
 | --volatility            | 'IMMUTABLE' or 'STABLE' or 'VOLATILE' | Change the volatility of all the generated functions. To change volatility of a specific function use the comment format `//@plv8ify-volatility-STABLE` in the input typescript file (see `examples/turf-js/input.ts`). Note that for now only single-line comment syntax is supported. | `IMMUTABLE`    |
+| --types-config-file     | String                                | Specify a custom types config file                                                                                                                                                                                                                                                      | types.ts       |
 
 ### Deploy
 
