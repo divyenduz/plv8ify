@@ -127,7 +127,6 @@ export class PLV8ifyCLI implements PLV8ify {
   }
   private getTypeFromMap(type: string) {
     const typeLocal = type.split('.').pop()
-    //console.log(`Original type: ${type}, Converted type: ${typeLocal} `)
     return this._typeMap[typeLocal ?? type]
   }
 
