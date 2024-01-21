@@ -56,7 +56,8 @@ async function main() {
       )
     })
     .with('deploy', async () => {
-      const program = Effect.scoped(deployCommand())
+      const deployCommandTask = deployCommand()
+      const program = Effect.scoped(deployCommandTask)
       const runnable = Effect.provide(
         program,
         Layer.merge(ConfigLive, DatabaseLive)

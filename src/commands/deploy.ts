@@ -2,16 +2,13 @@ import dotenv from 'dotenv'
 import { Effect } from 'effect'
 import fs from 'fs'
 import path from 'path'
+import { Database } from 'src/helpers/Database.js'
 import { DatabaseLayer } from 'src/interfaces/Database.js'
-import task, { TaskFunction } from 'tasuku'
+import { tasukuTask } from 'src/lib/tasukuEffect.js'
 
 import { Config } from '../helpers/ParseCLI.js'
 
 dotenv.config()
-
-class DatabaseQueryFailedError extends Error {
-  readonly _tag = 'DatabaseQueryFailedError'
-}
 
 // File name/function name are configurable but with the same variable, so they will always match (so far)
 function getFunctionNameFromFilePath(filePath: string) {
@@ -19,21 +16,12 @@ function getFunctionNameFromFilePath(filePath: string) {
   return fileName
 }
 
-function tasukuTask(title: string, taskFunction: TaskFunction<void>) {
-  return Effect.tryPromise({
-    try: () => task(title, taskFunction),
-    catch: (e) => {
-      return new Error(`${e}`)
-    },
-  })
-}
-
 function checkOutputFolderTaskEffectFn() {
   return Config.pipe(
-    Effect.flatMap((config) => {
+    Effect.map((config) => {
       const commandConfig = config.getCommand()
       const { outputFolderPath } = commandConfig.config
-      return Effect.succeed(outputFolderPath)
+      return outputFolderPath
     }),
     Effect.flatMap((outputFolderPath) => {
       const outputFolderExistsTask = tasukuTask(
@@ -47,15 +35,23 @@ function checkOutputFolderTaskEffectFn() {
       )
       return outputFolderExistsTask
     }),
-    Effect.flatMap((outputFolderExistsTask) => {
-      if (outputFolderExistsTask.state === 'error') {
-        throw new Error('Output folder does not exist')
+    Effect.mapError((e) => {
+      class OutputFolderDoesNotExistError extends Error {
+        readonly _tag = 'OutputFolderDoesNotExistError'
       }
-      return Effect.succeed(outputFolderExistsTask)
+      return new OutputFolderDoesNotExistError(`${e}`)
     })
   )
 }
 
+class DatabaseUrlNotSetError extends Error {
+  readonly _tag = 'DatabaseUrlNotSetError'
+  readonly message = `DATABASE_URL not set in environment`
+
+  public static getMessage() {
+    return new DatabaseUrlNotSetError().message
+  }
+}
 function checkDatabaseUrlIsSetTaskEffectFn() {
   return DatabaseLayer.pipe(
     Effect.flatMap((databaseLayer) => {
@@ -63,23 +59,25 @@ function checkDatabaseUrlIsSetTaskEffectFn() {
         'Check if the DATABASE_URL env var is set',
         async ({ setError }) => {
           if (!databaseLayer.databaseUrl) {
-            const errorMessage = `DATABASE_URL not set in environment`
-            setError(errorMessage)
+            setError(DatabaseUrlNotSetError.getMessage())
           }
         }
       )
-      return databaseUrlIsSetTask.pipe(
-        Effect.flatMap((databaseUrlIsSetTask) => {
-          if (databaseUrlIsSetTask.state === 'error') {
-            throw new Error('DATABASE_URL not set in environment')
-          }
-          return Effect.succeed(databaseUrlIsSetTask)
-        })
-      )
+      return databaseUrlIsSetTask
+    }),
+    Effect.mapError((e) => {
+      return new DatabaseUrlNotSetError()
     })
   )
 }
 
+class DatabaseNotReachableError extends Error {
+  readonly _tag = 'DatabaseNotReachableError'
+  readonly message = `Provided DATABASE_URL (${process.env.DATABASE_URL}) is not reachable`
+  public static getMessage() {
+    return new DatabaseNotReachableError().message
+  }
+}
 function checkDatabaseIsReachableTaskEffectFn() {
   return DatabaseLayer.pipe(
     Effect.flatMap((databaseLayer) => {
@@ -91,28 +89,34 @@ function checkDatabaseIsReachableTaskEffectFn() {
         async ({ setError }) => {
           const isReachable = await database.isDatabaseReachable()
           if (!isReachable) {
-            const errorMessage = `Provided DATABASE_URL: ${database.getDatabaseUrl()} is not reachable`
+            const errorMessage = DatabaseNotReachableError.getMessage()
             setError(errorMessage)
           }
         }
       )
-      return isDatabaseReachableTask.pipe(
-        Effect.flatMap((isDatabaseReachableTask) => {
-          if (isDatabaseReachableTask.state === 'error') {
-            throw new Error('Provided DATABASE_URL is not reachable')
-          }
-          return Effect.succeed(isDatabaseReachableTask)
-        })
-      )
+      return isDatabaseReachableTask
+    }),
+    Effect.mapError(() => {
+      return new DatabaseNotReachableError()
     })
   )
 }
 
+class DeployCommandFailedError extends Error {
+  readonly _tag = 'DeployCommandFailedError'
+  readonly message = `Failed to deploy command`
+  public static getMessage() {
+    return new DeployCommandFailedError().message
+  }
+}
 function deployCommandsTaskEffectFn() {
   const filePathsEffect = Config.pipe(
-    Effect.flatMap((config) => {
+    Effect.map((config) => {
       const commandConfig = config.getCommand()
       const { outputFolderPath } = commandConfig.config
+      return outputFolderPath
+    }),
+    Effect.map((outputFolderPath) => {
       const filePaths = fs
         .readdirSync(outputFolderPath)
         // Only extract .plv8.sql files, this will need to change if we ever make the extension configurable
@@ -121,7 +125,7 @@ function deployCommandsTaskEffectFn() {
           const filePath = path.join(outputFolderPath, file)
           return filePath
         })
-      return Effect.succeed(filePaths)
+      return filePaths
     })
   )
 
@@ -142,12 +146,7 @@ function deployCommandsTaskEffectFn() {
                   const r = await db.file(filePath)
                   setTitle(`Deployed ${name}`)
                 } catch (e) {
-                  if (e instanceof Error) {
-                    setError(
-                      `Failed to deploy ${name} (because of ${e.message})`
-                    )
-                    throw new DatabaseQueryFailedError(`${e}`)
-                  }
+                  setError(`Failed to deploy ${name} (because of ${e.message})`)
                 }
               }
             )
@@ -157,6 +156,9 @@ function deployCommandsTaskEffectFn() {
           return Effect.all(deployCommands)
         })
       )
+    }),
+    Effect.mapError(() => {
+      return new DeployCommandFailedError()
     })
   )
 
@@ -177,5 +179,18 @@ export function deployCommand() {
     checkDatabaseUrlIsSetTaskEffect,
     checkDatabaseIsReachableTaskEffect,
     deployCommandsTaskEffect,
-  ])
+  ]).pipe(
+    Effect.catchAll((e) => {
+      // This is a hack to make sure the tasuku tasks have time to print their output
+      setTimeout(() => {
+        // TODO: collect errors for actual deploy commands
+        // If 3 out of 4 functions can be deployed, they should be deployed
+        process.exit(1)
+      }, 100)
+      class ApplicationWillTerminateError {
+        readonly _tag = 'ApplicationWillTerminateError'
+      }
+      return Effect.fail(new ApplicationWillTerminateError())
+    })
+  )
 }
