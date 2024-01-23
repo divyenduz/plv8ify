@@ -113,7 +113,7 @@ export class PLV8ifyCLI implements PLV8ify {
   }
 
   private getScopedName(fn: TSFunction, scopePrefix: string) {
-    const scopedName = scopePrefix + '_' + fn.name
+    const scopedName = scopePrefix + fn.name
     return scopedName
   }
 
@@ -280,7 +280,7 @@ export class PLV8ifyCLI implements PLV8ify {
   }: GetPLV8SQLFunctionArgs) {
     const customSchema = this.getFunctionCustomSchema(fn)
     const scopedName =
-      (customSchema ? customSchema + '.' : '') + scopePrefix + '_' + fn.name
+      (customSchema ? customSchema + '.' : '') + scopePrefix + fn.name
     if (this.getFunctionTrigger(fn)) {
       fn.returnType = 'TRIGGER'
     }

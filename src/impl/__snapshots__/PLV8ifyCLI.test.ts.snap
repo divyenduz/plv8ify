@@ -53,8 +53,8 @@ $plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;"
 `;
 
 exports[`PLV8ifyCLI tests getSQLFunction with custom type 1`] = `
-"DROP FUNCTION IF EXISTS plv8ify_test(test test_type[]);
-CREATE OR REPLACE FUNCTION plv8ify_test(test test_type[]) RETURNS JSONB AS $plv8ify$
+"DROP FUNCTION IF EXISTS test(test test_type[]);
+CREATE OR REPLACE FUNCTION test(test test_type[]) RETURNS JSONB AS $plv8ify$
 
       export function hello(test: test_type[]) {
         return {
