@@ -99,8 +99,8 @@ By default plv8ify converts typescript types to postgres types using the followi
   }
 ```
 
-and defaults all other types to either JSONB or the type passed in using the **--fallback-type option**
-It is possible to define additional type mapping by using a custom file (by default **types.ts**) with the following format:
+and defaults all other types to either JSONB or the type passed in using the `--fallback-type option`
+It is possible to define additional type mapping by using a custom file (by default `types.ts`) with the following format:
 
 ```
 typeMap = {
