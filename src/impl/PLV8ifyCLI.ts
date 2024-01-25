@@ -106,14 +106,12 @@ export class PLV8ifyCLI implements PLV8ify {
       customTypeMap = fs.readFileSync(typesFilePath, 'utf8')
       eval(customTypeMap)
       return typeMap
-    } else {
-      console.log(`Not found types file: ${typesFilePath}`)
     }
     return {}
   }
 
   private getScopedName(fn: TSFunction, scopePrefix: string) {
-    const scopedName = scopePrefix + '_' + fn.name
+    const scopedName = scopePrefix + fn.name
     return scopedName
   }
 
@@ -280,7 +278,7 @@ export class PLV8ifyCLI implements PLV8ify {
   }: GetPLV8SQLFunctionArgs) {
     const customSchema = this.getFunctionCustomSchema(fn)
     const scopedName =
-      (customSchema ? customSchema + '.' : '') + scopePrefix + '_' + fn.name
+      (customSchema ? customSchema + '.' : '') + scopePrefix + fn.name
     if (this.getFunctionTrigger(fn)) {
       fn.returnType = 'TRIGGER'
     }

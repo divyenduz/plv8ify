@@ -99,8 +99,8 @@ By default plv8ify converts typescript types to postgres types using the followi
   }
 ```
 
-and defaults all other types to either JSONB or the type passed in using the **--fallback-type option**
-It is possible to define additional type mapping by using a custom file (by default **types.ts**) with the following format:
+and defaults all other types to either JSONB or the type passed in using the `--fallback-type option`
+It is possible to define additional type mapping by using a custom file (by default `types.ts`) with the following format:
 
 ```
 typeMap = {
@@ -183,7 +183,7 @@ Generate PLV8 functions for an input typescript file
 | --write-bundler-output  | Boolean                               | Write the intermediate bundled Javascript output from bundler (currently, only ESBuild interface exists)                                                                                                                                                                                | `false`        |
 | --input-file            | String                                | Specify an input file path (only Typescript supported at the moment)                                                                                                                                                                                                                    | `input.ts`     |
 | --output-folder         | String                                | Specify an output folder                                                                                                                                                                                                                                                                | `plv8ify-dist` |
-| --scope-prefix          | String                                | Specify a scope prefix, by default `plv8ify`, adds `plv8ify_` as prefix for exported typescript functions                                                                                                                                                                               | `plv8ify`      |
+| --scope-prefix          | String                                | Specify a scope prefix, by default `(empty string)`, adds provided string as prefix for exported typescript functions                                                                                                                                                                   | `plv8ify`      |
 | --pg-function-delimiter | String                                | Specify a delimiter for the generated Postgres function                                                                                                                                                                                                                                 | `$plv8ify$`    |
 | --fallback-type         | String                                | Specify a fallback type when `plv8ify` fails to map a detected Typescript type to a Postges type                                                                                                                                                                                        | `JSONB`        |
 | --mode                  | 'inline', 'bundle' or 'start_proc'    | 'inline' will bundle the library in each function, both 'bundle' and 'start_proc' creates a `{prefix}_init` function that loads the library. 'bundle' adds a check to each function to call 'init' if required, whereas 'start_proc' is designed to be used with plv8.start_proc        | `inline`       |

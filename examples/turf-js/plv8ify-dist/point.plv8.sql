@@ -1,5 +1,5 @@
-DROP FUNCTION IF EXISTS plv8ify_point(lat float8,long float8);
-CREATE OR REPLACE FUNCTION plv8ify_point(lat float8,long float8) RETURNS JSONB AS $plv8ify$
+DROP FUNCTION IF EXISTS point(lat float8,long float8);
+CREATE OR REPLACE FUNCTION point(lat float8,long float8) RETURNS JSONB AS $plv8ify$
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __commonJS = (cb, mod) => function __require() {
   return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;

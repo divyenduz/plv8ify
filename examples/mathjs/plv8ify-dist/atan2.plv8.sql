@@ -1,5 +1,5 @@
-DROP FUNCTION IF EXISTS plv8ify_atan2(one float8,two float8);
-CREATE OR REPLACE FUNCTION plv8ify_atan2(one float8,two float8) RETURNS float8 AS $plv8ify$
+DROP FUNCTION IF EXISTS atan2(one float8,two float8);
+CREATE OR REPLACE FUNCTION atan2(one float8,two float8) RETURNS float8 AS $plv8ify$
 var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;

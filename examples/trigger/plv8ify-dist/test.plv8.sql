@@ -1,6 +1,6 @@
-DROP FUNCTION IF EXISTS plv8ify_test();
-CREATE OR REPLACE FUNCTION plv8ify_test() RETURNS TRIGGER AS $plv8ify$
-// input.ts
+DROP FUNCTION IF EXISTS test();
+CREATE OR REPLACE FUNCTION test() RETURNS TRIGGER AS $plv8ify$
+// examples/trigger/input.ts
 function test(NEW, OLD) {
   plv8.elog(NOTICE, "NEW = ", JSON.stringify(NEW));
   plv8.elog(NOTICE, "OLD = ", JSON.stringify(OLD));

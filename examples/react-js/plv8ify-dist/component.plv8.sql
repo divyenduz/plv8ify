@@ -1,5 +1,5 @@
-DROP FUNCTION IF EXISTS plv8ify_component(text text);
-CREATE OR REPLACE FUNCTION plv8ify_component(text text) RETURNS JSONB AS $plv8ify$
+DROP FUNCTION IF EXISTS component(text text);
+CREATE OR REPLACE FUNCTION component(text text) RETURNS JSONB AS $plv8ify$
 var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
@@ -4962,8 +4962,8 @@ var require_server_browser = __commonJS({
 });
 
 // examples/react-js/input.tsx
-var import_react = __toESM(require_react());
-var import_server = __toESM(require_server_browser());
+var import_react = __toESM(require_react(), 1);
+var import_server = __toESM(require_server_browser(), 1);
 function Header({ children }) {
   return /* @__PURE__ */ import_react.default.createElement("h1", null, children);
 }

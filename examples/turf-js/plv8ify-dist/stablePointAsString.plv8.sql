@@ -1,5 +1,5 @@
-DROP FUNCTION IF EXISTS plv8ify_stablePointAsString(lat float8,long float8);
-CREATE OR REPLACE FUNCTION plv8ify_stablePointAsString(lat float8,long float8) RETURNS text AS $plv8ify$
+DROP FUNCTION IF EXISTS stablePointAsString(lat float8,long float8);
+CREATE OR REPLACE FUNCTION stablePointAsString(lat float8,long float8) RETURNS text AS $plv8ify$
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __commonJS = (cb, mod) => function __require() {
   return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;

@@ -35,7 +35,7 @@ Please specify a command. Available commands: generate, version, deploy
     const outputFolderPath = args['--output-folder'] || 'plv8ify-dist'
     const bundler = args['--bundler'] || 'esbuild'
     const writeBundlerOutput = args['--write-bundler-output'] || false
-    const scopePrefix = args['--scope-prefix'] || 'plv8ify'
+    const scopePrefix = args['--scope-prefix'] || ''
     const pgFunctionDelimiter = args['--pg-function-delimiter'] || '$plv8ify$'
     const fallbackReturnType = args['--fallback-type'] || 'JSONB'
     const mode = (args['--mode'] || 'inline') as Mode

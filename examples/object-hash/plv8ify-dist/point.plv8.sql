@@ -1,5 +1,5 @@
-DROP FUNCTION IF EXISTS plv8ify_point(lat float8,long float8);
-CREATE OR REPLACE FUNCTION plv8ify_point(lat float8,long float8) RETURNS JSONB AS $plv8ify$
+DROP FUNCTION IF EXISTS point(lat float8,long float8);
+CREATE OR REPLACE FUNCTION point(lat float8,long float8) RETURNS JSONB AS $plv8ify$
 var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
@@ -898,7 +898,7 @@ var require_object_hash = __commonJS({
 });
 
 // examples/object-hash/input.ts
-var import_object_hash = __toESM(require_object_hash());
+var import_object_hash = __toESM(require_object_hash(), 1);
 function point(lat, long) {
   return (0, import_object_hash.default)([lat, long]);
 }
