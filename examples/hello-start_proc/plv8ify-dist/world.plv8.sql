@@ -1,0 +1,6 @@
+DROP FUNCTION IF EXISTS world();
+CREATE OR REPLACE FUNCTION world() RETURNS text AS $plv8ify$
+
+return world()
+
+$plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;

@@ -1,6 +1,6 @@
-DROP FUNCTION IF EXISTS hello(test test_type[]);
-CREATE OR REPLACE FUNCTION hello(test test_type[]) RETURNS test_type AS $plv8ify$
-// input.ts
+DROP FUNCTION IF EXISTS hello(test JSONB);
+CREATE OR REPLACE FUNCTION hello(test JSONB) RETURNS JSONB AS $plv8ify$
+// examples/hello-custom-type/input.ts
 function hello(test) {
   return {
     name: `Hello ${test[0].name}`,

@@ -1,0 +1,6 @@
+DROP FUNCTION IF EXISTS hello();
+CREATE OR REPLACE FUNCTION hello() RETURNS text AS $plv8ify$
+
+return hello()
+
+$plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;

@@ -1,5 +1,5 @@
-DROP FUNCTION IF EXISTS plv8ify_distance(lat JSONB,long JSONB);
-CREATE OR REPLACE FUNCTION plv8ify_distance(lat JSONB,long JSONB) RETURNS float8 AS $plv8ify$
+DROP FUNCTION IF EXISTS distance(lat JSONB,long JSONB);
+CREATE OR REPLACE FUNCTION distance(lat JSONB,long JSONB) RETURNS float8 AS $plv8ify$
 // node_modules/@turf/helpers/dist/es/index.js
 var earthRadius = 63710088e-1;
 var factors = {

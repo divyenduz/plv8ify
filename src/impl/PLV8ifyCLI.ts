@@ -106,8 +106,6 @@ export class PLV8ifyCLI implements PLV8ify {
       customTypeMap = fs.readFileSync(typesFilePath, 'utf8')
       eval(customTypeMap)
       return typeMap
-    } else {
-      console.log(`Not found types file: ${typesFilePath}`)
     }
     return {}
   }
