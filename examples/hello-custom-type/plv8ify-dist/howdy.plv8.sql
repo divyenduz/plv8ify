@@ -1,5 +1,5 @@
-DROP FUNCTION IF EXISTS howdy(first_name text,last_name text);
-CREATE OR REPLACE FUNCTION howdy(first_name text,last_name text) RETURNS char(255) AS $plv8ify$
+DROP FUNCTION IF EXISTS howdy(first_name varchar(255),last_name text);
+CREATE OR REPLACE FUNCTION howdy(first_name varchar(255),last_name text) RETURNS char(255) AS $plv8ify$
 // examples/hello-custom-type/input.ts
 function hello(test) {
   return {

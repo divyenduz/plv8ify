@@ -174,14 +174,25 @@ export class PLV8ifyCLI implements PLV8ify {
   ) {
     // special case: trigger
     if (PLV8ifyCLI.isTrigger(fn)) {
-      return '';
+      return ''; // trigger fns don't have parameters
     }
 
     return fn.parameters
       .map((p) => {
         const { name, type } = p
-        const mappedType = this.getTypeFromMap(type) || fallbackReturnType
-        return `${name} ${mappedType}`
+
+        // set by comment?
+        for (const comment of fn.comments) {
+          const paramMatch = comment.match(
+            new RegExp(`^//@plv8ify-param\\s${name}\\s(.*)`)
+          )
+          if (paramMatch) {
+            return `${name} ${paramMatch[1]}`
+          }
+        }
+
+        // default to mapping the param type or using a fallback
+        return `${name} ${this.getTypeFromMap(type) || fallbackReturnType}`
       })
       .join(',')
   }

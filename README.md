@@ -163,7 +163,49 @@ return hello(test)
 $plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;
 ```
 
-Additionally, you can decorate your functions with the `//@plv8ify-return <SQL TYPE>`, which allows setting the return type per function, and overrides the configuration in `typeMap`
+Additionally, you can decorate your functions with the `//@plv8ify-return <SQL TYPE>` comment, which allows setting the return type per function, and overrides the configuration in `typeMap`
+
+Similarly, parameter types can be set per function and per parameter with the `//@plv8ify-param <PARAM NAME> <SQL TYPE>` comment
+
+Example:
+input.ts
+
+```ts
+//@plv8ify-param first_name varchar(255)
+//@plv8ify-param last_name text
+//@plv8ify-return char(255)
+export function howdy(first_name: string, last_name: string): string {
+  return `Howdy ${first_name} ${last_name}`
+}
+```
+
+cli command line:
+
+```
+plv8ify generate input.ts
+```
+
+will generate this function:
+
+```sql
+DROP FUNCTION IF EXISTS howdy(first_name varchar(255),last_name text);
+CREATE OR REPLACE FUNCTION howdy(first_name varchar(255),last_name text) RETURNS char(255) AS $plv8ify$
+// examples/hello-custom-type/input.ts
+function hello(test) {
+  return {
+    name: `Hello ${test[0].name}`,
+    age: test[0].age
+  };
+}
+function howdy(first_name, last_name) {
+  return `Howdy ${first_name} ${last_name}`;
+}
+
+
+return howdy(first_name,last_name)
+
+$plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;
+```
 
 ## CLI Usage
 
