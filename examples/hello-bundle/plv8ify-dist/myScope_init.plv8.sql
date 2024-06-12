@@ -8,6 +8,9 @@ function world() {
   return "hello";
 }
 
+globalThis.hello = hello;
+globalThis.world = world;
+globalThis[Symbol.for('myScope_initialized')] = true;
 
 
 

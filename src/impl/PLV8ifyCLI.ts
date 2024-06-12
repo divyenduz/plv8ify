@@ -73,10 +73,7 @@ export class PLV8ifyCLI implements PLV8ify {
         // Remove var from var plv8ify to make it attach to the global scope in start_proc mode
         bundledJs.replace(`var ${scopePrefix} =`, `this.${scopePrefix} =`)
       )
-      .with('bundle', () =>
-        // Remove var from var plv8ify to make it attach to the global scope in start_proc mode
-        bundledJs.replace(`var ${scopePrefix} =`, `globalThis.${scopePrefix} =`)
-      )
+      .with('bundle', () => bundledJs)
       .exhaustive()
     return modeAdjustedBundledJs
   }
@@ -226,6 +223,16 @@ export class PLV8ifyCLI implements PLV8ify {
         returnType: 'void',
       }
 
+      if (mode === 'bundle') {
+        // make the function declarations available in the global scope
+        for (const fn of fns) {
+          bundledJs += `globalThis.${fn.name} = ${fn.name};\n`
+        }
+
+        // set a global symbol so that we can check if the init function has been called
+        bundledJs += `globalThis[Symbol.for('${scopePrefix}_initialized')] = true;\n`
+      }
+
       const initFunction = this.getPLV8SQLFunction({
         fn: virtualInitFn,
         scopePrefix,
@@ -303,7 +310,7 @@ export class PLV8ifyCLI implements PLV8ify {
         .with(
           'bundle',
           () =>
-            `if (globalThis.${scopePrefix} === undefined) plv8.execute('SELECT ${scopePrefix}_init();');`
+            `if (!globalThis[Symbol.for('${scopePrefix}_initialized')]) plv8.execute('SELECT ${scopePrefix}_init();');`
         )
         .otherwise(() => ''),
       match(returnType.toLowerCase())
