@@ -163,6 +163,8 @@ return hello(test)
 $plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;
 ```
 
+Additionally, you can decorate your functions with the `//@plv8ify-return <SQL TYPE>`, which allows setting the return type per function, and overrides the configuration in `typeMap`
+
 ## CLI Usage
 
 ### Version

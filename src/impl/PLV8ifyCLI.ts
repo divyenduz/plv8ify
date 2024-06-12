@@ -36,7 +36,6 @@ export class PLV8ifyCLI implements PLV8ify {
     number: 'float8',
     string: 'text',
     boolean: 'boolean',
-    trigger: 'TRIGGER',
   }
 
   constructor(bundler: BundlerType = 'esbuild') {
@@ -119,15 +118,7 @@ export class PLV8ifyCLI implements PLV8ify {
   }
 
   private getFunctions() {
-    return this._tsCompiler.getFunctions().map((fn) => {
-      if (this.getFunctionTrigger(fn)) {
-        fn.returnType = 'trigger'
-      }
-      return {
-        ...fn,
-        returnType: this.getTypeFromMap(fn.returnType),
-      }
-    })
+    return this._tsCompiler.getFunctions()
   }
 
   private getExportedFunctions() {
@@ -144,14 +135,26 @@ export class PLV8ifyCLI implements PLV8ify {
     return volatility
   }
 
-  private getFunctionTrigger(fn: TSFunction) {
-    const triggerStr = '//@plv8ify-trigger'
-    const comments = fn.comments
-    const trigger = comments.filter((comment) => comment.includes(triggerStr))
-      .length
-      ? true
-      : false
-    return trigger
+  private getFunctionSqlReturnType(fn: TSFunction, fallbackReturnType: string) {
+    // special case: trigger
+    if (PLV8ifyCLI.isTrigger(fn)) {
+      return 'TRIGGER'
+    }
+
+    // set by comment?
+    for (const comment of fn.comments) {
+      const returnMatch = comment.match(/^\/\/@plv8ify-return\s(.*)/)
+      if (returnMatch) {
+        return returnMatch[1]
+      }
+    }
+
+    // default to mapping the return type or using a fallback
+    return this.getTypeFromMap(fn.returnType) || fallbackReturnType
+  }
+
+  private static isTrigger(fn: TSFunction) {
+    return fn.comments.some((comment) => comment.match(/^\/\/@plv8ify-trigger/gimu))
   }
 
   private getFunctionCustomSchema(fn: TSFunction) {
@@ -166,10 +169,15 @@ export class PLV8ifyCLI implements PLV8ify {
   // Input: parsed parameters, output of FunctionDeclaratioin.getParameters()
   // Output: SQL string of bind params
   private getSQLParametersString(
-    parameters: TSFunctionParameter[],
+    fn: TSFunction,
     fallbackReturnType: string
   ) {
-    return parameters
+    // special case: trigger
+    if (PLV8ifyCLI.isTrigger(fn)) {
+      return '';
+    }
+
+    return fn.parameters
       .map((p) => {
         const { name, type } = p
         const mappedType = this.getTypeFromMap(type) || fallbackReturnType
@@ -290,21 +298,15 @@ export class PLV8ifyCLI implements PLV8ify {
     const customSchema = this.getFunctionCustomSchema(fn)
     const scopedName =
       (customSchema ? customSchema + '.' : '') + scopePrefix + fn.name
-    if (this.getFunctionTrigger(fn)) {
-      fn.returnType = 'TRIGGER'
-    }
 
-    const sqlParametersString =
-      fn.returnType && fn.returnType.toUpperCase() === 'TRIGGER'
-        ? ''
-        : this.getSQLParametersString(fn.parameters, fallbackReturnType)
+    const sqlParametersString = this.getSQLParametersString(fn, fallbackReturnType)
     const jsParametersString = this.getJSParametersString(fn.parameters)
     const volatility = this.getFunctionVolatility(fn, defaultVolatility)
-    const returnType = fn.returnType || fallbackReturnType
+    const sqlReturnType = this.getFunctionSqlReturnType(fn, fallbackReturnType)
 
     return [
       `DROP FUNCTION IF EXISTS ${scopedName}(${sqlParametersString});`,
-      `CREATE OR REPLACE FUNCTION ${scopedName}(${sqlParametersString}) RETURNS ${returnType} AS ${pgFunctionDelimiter}`,
+      `CREATE OR REPLACE FUNCTION ${scopedName}(${sqlParametersString}) RETURNS ${sqlReturnType} AS ${pgFunctionDelimiter}`,
       match(mode)
         .with('inline', () => bundledJs)
         .with(
@@ -313,7 +315,7 @@ export class PLV8ifyCLI implements PLV8ify {
             `if (!globalThis[Symbol.for('${scopePrefix}_initialized')]) plv8.execute('SELECT ${scopePrefix}_init();');`
         )
         .otherwise(() => ''),
-      match(returnType.toLowerCase())
+      match(sqlReturnType.toLowerCase())
         .with('void', () => '')
         .otherwise(() => `return ${fn.name}(${jsParametersString})`),
       '',
