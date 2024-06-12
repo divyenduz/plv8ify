@@ -28,13 +28,6 @@ interface GetPLV8SQLFunctionArgs {
   defaultVolatility: Volatility
 }
 
-interface GetInitSQLFunctionArgs {
-  fn: TSFunction
-  scopePrefix: string
-  bundledJs: string
-  volatility: Volatility
-}
-
 export class PLV8ifyCLI implements PLV8ify {
   private _bundler: Bundler
   private _tsCompiler: TSCompiler
@@ -225,17 +218,24 @@ export class PLV8ifyCLI implements PLV8ify {
     let startProcSQLs = []
     if (mode === 'start_proc' || mode === 'bundle') {
       // -- PLV8 + Server
-      const initFunctionName = 'init'
-      const virtualInitFn = {
-        name: initFunctionName,
-      } as TSFunction // TODO: fixme, risky because it doesn't have all the properties of a virtual function
+      const virtualInitFn: TSFunction = {
+        name: '_init',
+        comments: [],
+        isExported: false,
+        parameters: [],
+        returnType: 'void',
+      }
 
-      const initFunction = this.getInitSQLFunction({
+      const initFunction = this.getPLV8SQLFunction({
         fn: virtualInitFn,
         scopePrefix,
+        pgFunctionDelimiter: '$$',
+        mode: 'inline',
         bundledJs,
-        volatility: defaultVolatility,
+        defaultVolatility,
+        fallbackReturnType: 'void',
       })
+
       const initFileName = this.getFileName(
         outputFolder,
         virtualInitFn,
@@ -249,9 +249,13 @@ export class PLV8ifyCLI implements PLV8ify {
 
     if (mode === 'start_proc') {
       const startFunctionName = 'start'
-      const virtualStartFn = {
+      const virtualStartFn: TSFunction = {
         name: startFunctionName,
-      } as TSFunction // TODO: fixme, risky because it doesn't have all the properties of a virtual function
+        comments: [],
+        isExported: false,
+        parameters: [],
+        returnType: 'void',
+      }
       const startProcSQLScript = this.getStartProcSQLScript({ scopePrefix })
       const startProcFileName = this.getFileName(
         outputFolder,
@@ -302,25 +306,12 @@ export class PLV8ifyCLI implements PLV8ify {
             `if (globalThis.${scopePrefix} === undefined) plv8.execute('SELECT ${scopePrefix}_init();');`
         )
         .otherwise(() => ''),
-      `return ${fn.name}(${jsParametersString})`,
+      match(returnType.toLowerCase())
+        .with('void', () => '')
+        .otherwise(() => `return ${fn.name}(${jsParametersString})`),
       '',
       `${pgFunctionDelimiter} LANGUAGE plv8 ${volatility} STRICT;`,
     ].join('\n')
-  }
-
-  // TODO: fixme, can this be replaced with getPLV8SQLFunction
-  private getInitSQLFunction({
-    fn,
-    scopePrefix,
-    bundledJs,
-    volatility,
-  }: GetInitSQLFunctionArgs) {
-    const scopedName = scopePrefix + '_' + fn.name
-    return `DROP FUNCTION IF EXISTS ${scopedName}();
-CREATE OR REPLACE FUNCTION ${scopedName}() RETURNS VOID AS $$
-${bundledJs}
-$$ LANGUAGE plv8 ${volatility} STRICT;
-`
   }
 
   private getStartProcSQLScript = ({ scopePrefix }) =>

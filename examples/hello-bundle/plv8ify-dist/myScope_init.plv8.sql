@@ -1,5 +1,5 @@
 DROP FUNCTION IF EXISTS myScope_init();
-CREATE OR REPLACE FUNCTION myScope_init() RETURNS VOID AS $$
+CREATE OR REPLACE FUNCTION myScope_init() RETURNS void AS $$
 // examples/hello-bundle/input.ts
 function hello() {
   return "world";
@@ -7,6 +7,8 @@ function hello() {
 function world() {
   return "hello";
 }
+
+
 
 
 $$ LANGUAGE plv8 IMMUTABLE STRICT;
