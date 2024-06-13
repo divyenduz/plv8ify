@@ -9,7 +9,7 @@ return test()
 $plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;"
 `;
 
-exports[`PLV8ifyCLI tests getSQLFunction with delimiter 1`] = `
+exports[`PLV8ifyCLI tests getSQLFunction with custom delimiter 1`] = `
 "DROP FUNCTION IF EXISTS plv8ify_test();
 CREATE OR REPLACE FUNCTION plv8ify_test() RETURNS JSONB AS $function$
 console.log('hello')
@@ -17,7 +17,6 @@ return test()
 
 $function$ LANGUAGE plv8 IMMUTABLE STRICT;"
 `;
-
 
 exports[`PLV8ifyCLI tests getSQLFunction with parameters-trigger 1`] = `
 "DROP FUNCTION IF EXISTS plv8ify_test();
@@ -41,7 +40,7 @@ $plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;"
 
 exports[`PLV8ifyCLI tests getSQLFunction with custom-schema 1`] = `
 "DROP FUNCTION IF EXISTS testschema.plv8ify_test();
-CREATE OR REPLACE FUNCTION testschema.plv8ify_test() RETURNS JSONB AS $plv8ify$
+CREATE OR REPLACE FUNCTION testschema.plv8ify_test() RETURNS text AS $plv8ify$
 
 function test() {
   return "hello";

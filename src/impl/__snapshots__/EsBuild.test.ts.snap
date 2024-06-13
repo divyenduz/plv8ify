@@ -12,6 +12,8 @@ export {
 "
 `;
 
+exports[`EsBuild tests getBundleJs - bad syntax 1`] = `[BundlerError: esbuild failed]`;
+
 exports[`EsBuild tests getBundleJs - newline template 1`] = `
 "// src/test-fixtures/newline-template.fixture.ts
 function sayHello() {
@@ -36,17 +38,3 @@ export {
 };
 "
 `;
-
-exports[`EsBuild tests getBundleJs - newline string 2`] = `
-"// src/test-fixtures/newline-string.fixture.ts
-function sayHello() {
-  const greetString = "hello\nworld";
-  return greetString;
-}
-export {
-  sayHello
-};
-"
-`;
-
-exports[`EsBuild tests getBundleJs - bad syntax 1`] = `[BundlerError: esbuild failed]`;
