@@ -1,5 +1,5 @@
-DROP FUNCTION IF EXISTS hello(test test_type[]);
-CREATE OR REPLACE FUNCTION hello(test test_type[]) RETURNS test_type AS $plv8ify$
+DROP FUNCTION IF EXISTS howdy(first_name varchar(255),last_name text);
+CREATE OR REPLACE FUNCTION howdy(first_name varchar(255),last_name text) RETURNS char(255) AS $plv8ify$
 // examples/hello-custom-type/input.ts
 function hello(test) {
   return {
@@ -12,6 +12,6 @@ function howdy(first_name, last_name) {
 }
 
 
-return hello(test)
+return howdy(first_name,last_name)
 
 $plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;

@@ -5,7 +5,7 @@ export function point(lat: number, long: number) {
   return pt
 }
 
-//@plv8ify-volatility-STABLE
+/** @plv8ify_volatility STABLE */
 export function stablePoint(lat: number, long: number) {
   const pt = turfPoint([lat, long])
   return pt

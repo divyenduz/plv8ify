@@ -28,22 +28,25 @@ interface GetPLV8SQLFunctionArgs {
   defaultVolatility: Volatility
 }
 
-interface GetInitSQLFunctionArgs {
-  fn: TSFunction
-  scopePrefix: string
-  bundledJs: string
-  volatility: Volatility
+/** configuration for how a JS function should be transformed into a SQL function */
+type FnSqlConfig = {
+  paramTypeMapping: {
+    [name: string]: string | null
+  }
+  volatility: Volatility | null,
+  sqlReturnType: string | null,
+  customSchema: string,
+  trigger: boolean,
 }
 
 export class PLV8ifyCLI implements PLV8ify {
   private _bundler: Bundler
   private _tsCompiler: TSCompiler
 
-  private _typeMap = {
+  private _typeMap: Record<string, string> = {
     number: 'float8',
     string: 'text',
     boolean: 'boolean',
-    trigger: 'TRIGGER',
   }
 
   constructor(bundler: BundlerType = 'esbuild') {
@@ -80,10 +83,7 @@ export class PLV8ifyCLI implements PLV8ify {
         // Remove var from var plv8ify to make it attach to the global scope in start_proc mode
         bundledJs.replace(`var ${scopePrefix} =`, `this.${scopePrefix} =`)
       )
-      .with('bundle', () =>
-        // Remove var from var plv8ify to make it attach to the global scope in start_proc mode
-        bundledJs.replace(`var ${scopePrefix} =`, `globalThis.${scopePrefix} =`)
-      )
+      .with('bundle', () => bundledJs)
       .exhaustive()
     return modeAdjustedBundledJs
   }
@@ -129,72 +129,11 @@ export class PLV8ifyCLI implements PLV8ify {
   }
 
   private getFunctions() {
-    return this._tsCompiler.getFunctions().map((fn) => {
-      if (this.getFunctionTrigger(fn)) {
-        fn.returnType = 'trigger'
-      }
-      return {
-        ...fn,
-        returnType: this.getTypeFromMap(fn.returnType),
-      }
-    })
+    return this._tsCompiler.getFunctions()
   }
 
   private getExportedFunctions() {
     return this.getFunctions().filter((fn) => fn.isExported)
-  }
-
-  private getFunctionVolatility(fn: TSFunction, defaultVolatility: Volatility) {
-    const volatilityStr = '//@plv8ify-volatility-'
-    const comments = fn.comments
-    const volatility = (comments
-      .filter((comment) => comment.includes(volatilityStr))
-      .map((comment) => comment.replace(volatilityStr, ''))[0] ||
-      defaultVolatility) as Volatility
-    return volatility
-  }
-
-  private getFunctionTrigger(fn: TSFunction) {
-    const triggerStr = '//@plv8ify-trigger'
-    const comments = fn.comments
-    const trigger = comments.filter((comment) => comment.includes(triggerStr))
-      .length
-      ? true
-      : false
-    return trigger
-  }
-
-  private getFunctionCustomSchema(fn: TSFunction) {
-    const schemaStr = '//@plv8ify-schema-name '
-    const comments = fn.comments
-    const schema = comments
-      .filter((comment) => comment.includes(schemaStr))
-      .map((comment) => comment.replace(schemaStr, ''))[0]
-    return schema
-  }
-
-  // Input: parsed parameters, output of FunctionDeclaratioin.getParameters()
-  // Output: SQL string of bind params
-  private getSQLParametersString(
-    parameters: TSFunctionParameter[],
-    fallbackReturnType: string
-  ) {
-    return parameters
-      .map((p) => {
-        const { name, type } = p
-        const mappedType = this.getTypeFromMap(type) || fallbackReturnType
-        return `${name} ${mappedType}`
-      })
-      .join(',')
-  }
-
-  private getJSParametersString(parameters: TSFunctionParameter[]) {
-    return parameters
-      .map((p) => {
-        const { name } = p
-        return `${name}`
-      })
-      .join(',')
   }
 
   getPLV8SQLFunctions({
@@ -225,17 +164,35 @@ export class PLV8ifyCLI implements PLV8ify {
     let startProcSQLs = []
     if (mode === 'start_proc' || mode === 'bundle') {
       // -- PLV8 + Server
-      const initFunctionName = 'init'
-      const virtualInitFn = {
-        name: initFunctionName,
-      } as TSFunction // TODO: fixme, risky because it doesn't have all the properties of a virtual function
+      const virtualInitFn: TSFunction = {
+        name: '_init',
+        comments: [],
+        isExported: false,
+        parameters: [],
+        returnType: 'void',
+        jsdocTags: [],
+      }
 
-      const initFunction = this.getInitSQLFunction({
+      if (mode === 'bundle') {
+        // make the function declarations available in the global scope
+        for (const fn of fns) {
+          bundledJs += `globalThis.${fn.name} = ${fn.name};\n`
+        }
+
+        // set a global symbol so that we can check if the init function has been called
+        bundledJs += `globalThis[Symbol.for('${scopePrefix}_initialized')] = true;\n`
+      }
+
+      const initFunction = this.getPLV8SQLFunction({
         fn: virtualInitFn,
         scopePrefix,
+        pgFunctionDelimiter: '$$',
+        mode: 'inline',
         bundledJs,
-        volatility: defaultVolatility,
+        defaultVolatility,
+        fallbackReturnType: 'void',
       })
+
       const initFileName = this.getFileName(
         outputFolder,
         virtualInitFn,
@@ -249,9 +206,14 @@ export class PLV8ifyCLI implements PLV8ify {
 
     if (mode === 'start_proc') {
       const startFunctionName = 'start'
-      const virtualStartFn = {
+      const virtualStartFn: TSFunction = {
         name: startFunctionName,
-      } as TSFunction // TODO: fixme, risky because it doesn't have all the properties of a virtual function
+        comments: [],
+        isExported: false,
+        parameters: [],
+        returnType: 'void',
+        jsdocTags: [],
+      }
       const startProcSQLScript = this.getStartProcSQLScript({ scopePrefix })
       const startProcFileName = this.getFileName(
         outputFolder,
@@ -267,6 +229,69 @@ export class PLV8ifyCLI implements PLV8ify {
     return sqls.concat(startProcSQLs)
   }
 
+  /**
+   * handles all the processing for jsdoc / magic comments
+   */
+  private getFnSqlConfig (fn: TSFunction): FnSqlConfig {
+    const config: FnSqlConfig = {
+      // defaults
+      paramTypeMapping: {},
+      volatility: null,
+      sqlReturnType: this.getTypeFromMap(fn.returnType) || null,
+      customSchema: '',
+      trigger: false,
+    }
+
+    // default param type mapping
+    for (const param of fn.parameters) {
+      config.paramTypeMapping[param.name] = this.getTypeFromMap(param.type) || null
+    }
+
+    // process magic comments (legacy format)
+    for (const comment of fn.comments) {
+      const volatilityMatch = comment.match(/^\/\/@plv8ify-volatility-(STABLE|IMMUTABLE|VOLATILE)/umi)
+      if (volatilityMatch) config.volatility = volatilityMatch[1] as Volatility
+
+      const schemaMatch = comment.match(/^\/\/@plv8ify-schema-name (.+)/umi)
+      if (schemaMatch) config.customSchema = schemaMatch[1]
+
+      for (const param of fn.parameters) {
+        const paramMatch = comment.match(/^\/\/@plv8ify-param (.+) ([\s\S]+)/umi)
+        if (paramMatch && paramMatch[1] === param.name) config.paramTypeMapping[param.name] = paramMatch[2]
+      }
+
+      const returnMatch = comment.match(/^\/\/@plv8ify-return ([\s\S]+)/umi)
+      if (returnMatch) config.sqlReturnType = returnMatch[1]
+
+      if (comment.match(/^\/\/@plv8ify-trigger/umi)) config.trigger = true
+    }
+
+    // process jsdoc tags
+    for (const tag of fn.jsdocTags) {
+      if (tag.name === 'plv8ify_volatility' && [ 'STABLE', 'IMMUTABLE', 'VOLATILE' ].includes(tag.commentText.toUpperCase())) {
+        config.volatility = tag.commentText as Volatility
+      }
+
+      if (tag.name === 'plv8ify_schema_name') config.customSchema = tag.commentText
+
+      // expected format: `/** @plv8ify_param {sqlParamType} paramName */`
+      const paramMatch = tag.commentText.match(/^\{(.+)\} ([\s\S]+)/umi) // return type should be in curly braces, similar to jsdoc @return
+      if (tag.name === 'plv8ify_param' && paramMatch) config.paramTypeMapping[paramMatch[2]] = paramMatch[1]
+
+      // expected format: `/** @plv8ify_return {sqlType} */`
+      // expected format: `/** @plv8ify_returns {sqlType} */`
+      const returnMatch = tag.commentText.match(/^\{(.+)\}/umi) // param type should be in curly braces, similar to jsdoc @param
+      if ([ 'plv8ify_return', 'plv8ify_returns' ].includes(tag.name) && returnMatch) config.sqlReturnType = returnMatch[1]
+
+      if (tag.name === 'plv8ify_trigger') config.trigger = true
+    }
+
+    // triggers don't have return types
+    if (config.trigger) config.sqlReturnType = 'TRIGGER'
+
+    return config;
+  }
+
   getPLV8SQLFunction({
     fn,
     scopePrefix,
@@ -276,51 +301,42 @@ export class PLV8ifyCLI implements PLV8ify {
     fallbackReturnType,
     defaultVolatility,
   }: GetPLV8SQLFunctionArgs) {
-    const customSchema = this.getFunctionCustomSchema(fn)
+    let {
+      customSchema,
+      paramTypeMapping,
+      volatility,
+      sqlReturnType,
+      trigger
+    } = this.getFnSqlConfig(fn);
+    if (!volatility) volatility = defaultVolatility
+    if (!sqlReturnType) sqlReturnType = fallbackReturnType
+
+    const sqlParametersString = trigger
+      ? '' // triggers don't have parameters
+      : fn.parameters.map(param => `${param.name} ${paramTypeMapping[param.name] || fallbackReturnType}`).join(',')
+
+    const jsParametersString = fn.parameters.map(param => param.name).join(',')
+
     const scopedName =
       (customSchema ? customSchema + '.' : '') + scopePrefix + fn.name
-    if (this.getFunctionTrigger(fn)) {
-      fn.returnType = 'TRIGGER'
-    }
-
-    const sqlParametersString =
-      fn.returnType && fn.returnType.toUpperCase() === 'TRIGGER'
-        ? ''
-        : this.getSQLParametersString(fn.parameters, fallbackReturnType)
-    const jsParametersString = this.getJSParametersString(fn.parameters)
-    const volatility = this.getFunctionVolatility(fn, defaultVolatility)
-    const returnType = fn.returnType || fallbackReturnType
 
     return [
       `DROP FUNCTION IF EXISTS ${scopedName}(${sqlParametersString});`,
-      `CREATE OR REPLACE FUNCTION ${scopedName}(${sqlParametersString}) RETURNS ${returnType} AS ${pgFunctionDelimiter}`,
+      `CREATE OR REPLACE FUNCTION ${scopedName}(${sqlParametersString}) RETURNS ${sqlReturnType} AS ${pgFunctionDelimiter}`,
       match(mode)
         .with('inline', () => bundledJs)
         .with(
           'bundle',
           () =>
-            `if (globalThis.${scopePrefix} === undefined) plv8.execute('SELECT ${scopePrefix}_init();');`
+            `if (!globalThis[Symbol.for('${scopePrefix}_initialized')]) plv8.execute('SELECT ${scopePrefix}_init();');`
         )
         .otherwise(() => ''),
-      `return ${fn.name}(${jsParametersString})`,
+      match(sqlReturnType.toLowerCase())
+        .with('void', () => '')
+        .otherwise(() => `return ${fn.name}(${jsParametersString})`),
       '',
       `${pgFunctionDelimiter} LANGUAGE plv8 ${volatility} STRICT;`,
     ].join('\n')
-  }
-
-  // TODO: fixme, can this be replaced with getPLV8SQLFunction
-  private getInitSQLFunction({
-    fn,
-    scopePrefix,
-    bundledJs,
-    volatility,
-  }: GetInitSQLFunctionArgs) {
-    const scopedName = scopePrefix + '_' + fn.name
-    return `DROP FUNCTION IF EXISTS ${scopedName}();
-CREATE OR REPLACE FUNCTION ${scopedName}() RETURNS VOID AS $$
-${bundledJs}
-$$ LANGUAGE plv8 ${volatility} STRICT;
-`
   }
 
   private getStartProcSQLScript = ({ scopePrefix }) =>

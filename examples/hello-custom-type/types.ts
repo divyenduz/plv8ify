@@ -1,3 +1,4 @@
+// @ts-nocheck
 typeMap = {
   number: 'float8',
   string: 'text',
