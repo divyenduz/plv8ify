@@ -9,9 +9,12 @@ describe('PLV8ifyCLI tests', () => {
     const sql = plv8ify.getPLV8SQLFunction({
       fn: {
         name: 'test',
+        isExported: true,
         parameters: [],
         comments: [],
-      } as TSFunction,
+        returnType: 'void',
+        jsdocTags: []
+      },
       scopePrefix: 'plv8ify_',
       mode: 'inline',
       defaultVolatility: 'IMMUTABLE',
@@ -22,14 +25,17 @@ describe('PLV8ifyCLI tests', () => {
     expect(sql).toMatchSnapshot()
   })
 
-  it('getSQLFunction with delimiter', async () => {
+  it('getSQLFunction with custom delimiter', async () => {
     const plv8ify = new PLV8ifyCLI()
     const sql = plv8ify.getPLV8SQLFunction({
       fn: {
         name: 'test',
+        isExported: true,
         parameters: [],
         comments: [],
-      } as TSFunction,
+        returnType: 'void',
+        jsdocTags: [],
+      },
       scopePrefix: 'plv8ify_',
       mode: 'inline',
       defaultVolatility: 'IMMUTABLE',
@@ -46,12 +52,15 @@ describe('PLV8ifyCLI tests', () => {
     const sql = plv8ify.getPLV8SQLFunction({
       fn: {
         name: 'test',
+        isExported: true,
         parameters: [
           { name: 'NEW', type: 'testRow' },
           { name: 'OLD', type: 'testRow' },
         ],
         comments: ['//@plv8ify-trigger'],
-      } as TSFunction,
+        returnType: 'object',
+        jsdocTags: []
+      },
       scopePrefix: 'plv8ify_',
       mode: 'inline',
       defaultVolatility: 'IMMUTABLE',
@@ -78,9 +87,12 @@ function test(NEW, OLD) {
     const sql = plv8ify.getPLV8SQLFunction({
       fn: {
         name: 'test',
+        isExported: true,
         parameters: [],
         comments: ['//@plv8ify-schema-name testschema'],
-      } as TSFunction,
+        returnType: 'string',
+        jsdocTags: []
+      },
       scopePrefix: 'plv8ify_',
       mode: 'inline',
       defaultVolatility: 'IMMUTABLE',
@@ -102,9 +114,12 @@ function test() {
     const sql = plv8ify.getPLV8SQLFunction({
       fn: {
         name: 'test',
+        isExported: true,
         parameters: [{ name: 'test', type: 'test_type[]' }],
         comments: [],
-      } as TSFunction,
+        returnType: 'object',
+        jsdocTags: []
+      },
       scopePrefix: '',
       mode: 'inline',
       defaultVolatility: 'IMMUTABLE',
