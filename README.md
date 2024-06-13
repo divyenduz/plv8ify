@@ -32,10 +32,10 @@ See all examples in the [examples folder](/examples). Use `yarn examples` to app
 
 ## Deploy on custom schema
 
-To generate a function to be deployed on a schema different than the default one (usually: public) decorate the function with a `//@plv8ify-schema-name <schemaname>` comment
+To generate a function to be deployed on a schema different than the default one (usually: public) decorate the function with a `/** @plv8ify_schema_name <schemaname> */` jsdoc tag
 
-```
-//@plv8ify-schema-name testschema
+```ts
+/** @plv8ify_schema_name testschema */
 export function hello() {
   return 'world'
 }
@@ -43,7 +43,7 @@ export function hello() {
 
 will generate
 
-```
+```sql
 DROP FUNCTION IF EXISTS testschema.plv8ify_hello();
 CREATE OR REPLACE FUNCTION testschema.plv8ify_hello() RETURNS text AS $plv8ify$
 // input.ts
@@ -59,10 +59,10 @@ $plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;
 
 ## Trigger functions
 
-To write a trigger function, decorate the function with the `//@plv8ify-trigger` comment, and have the function return a `testRow` type where `testRow` defines the type of the row for the trigger. You can also add a NEW parameter for insert and update triggers, and OLD for update and delete triggers.
+To write a trigger function, decorate the function with a `/** @plv8ify_trigger */` jsdoc tag, and have the function return a `testRow` type where `testRow` defines the type of the row for the trigger. You can also add a NEW parameter for insert and update triggers, and OLD for update and delete triggers.
 (Tip: you can add @types/pg and @types/plv8-internals to get all standard postgres types/defines and plv8 specific functions recognized by the type checker)
 
-```
+```ts
 type Row = {
   // Either JS or plv8 types can be used here
   id: number
@@ -70,7 +70,7 @@ type Row = {
   event_date_time: Date
 }
 
-//@plv8ify-trigger
+/** @plv8ify_trigger */
 export function test(NEW: Row, OLD: Row): Row {
   plv8.elog(NOTICE, 'NEW = ', JSON.stringify(NEW));
   plv8.elog(NOTICE, 'OLD = ', JSON.stringify(OLD));
@@ -112,9 +112,10 @@ typeMap = {
 The custom types will be merged with the default ones at runtime and will allow using either internal postgres type or custom defined types
 
 Example:
+
 types.ts
 
-```
+```ts
 typeMap = {
   test_type: 'test_type',
   'test_type[]': 'test_type[]',
@@ -123,7 +124,7 @@ typeMap = {
 
 input.ts
 
-```
+```ts
 interface test_type {
   name: string
   age: number
@@ -146,7 +147,7 @@ plv8ify generate input.ts --types-config-file types.ts
 
 will generate this function:
 
-```
+```sql
 DROP FUNCTION IF EXISTS plv8ify_hello(test test_type[]);
 CREATE OR REPLACE FUNCTION plv8ify_hello(test test_type[]) RETURNS JSONB AS $plv8ify$
 // input.ts
@@ -163,17 +164,18 @@ return hello(test)
 $plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;
 ```
 
-Additionally, you can decorate your functions with the `//@plv8ify-return <SQL TYPE>` comment, which allows setting the return type per function, and overrides the configuration in `typeMap`
-
-Similarly, parameter types can be set per function and per parameter with the `//@plv8ify-param <PARAM NAME> <SQL TYPE>` comment
+Additionally, you can decorate your functions with special jsdoc tags to control the type mapping of params and return types on a per function basis:
 
 Example:
+
 input.ts
 
 ```ts
-//@plv8ify-param first_name varchar(255)
-//@plv8ify-param last_name text
-//@plv8ify-return char(255)
+/**
+ * @plv8ify_param {varchar(255)} first_name
+ * @plv8ify_param {text} last_name
+ * @plv8ify_return {char(255)}
+ */
 export function howdy(first_name: string, last_name: string): string {
   return `Howdy ${first_name} ${last_name}`
 }
@@ -207,6 +209,16 @@ return howdy(first_name,last_name)
 $plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;
 ```
 
+### JSDoc Tag Reference
+
+| Behavior | JSDoc Tag | Example |
+| -------- | --------- | ------------- |
+| set the volatility of the generated Postgres function | `/** @plv8ify_volatility <STABLE,IMMUTABLE,VOLATILE> */` | `/** @plv8ify_volatility STABLE */` |
+| set the schema of the generated Postgres function | `/** @plv8ify_schema_name <schemaname> */` | `/** @plv8ify_schema_name my_schema */` |
+| set the TS->SQL type mapping for a parameter | `/** @plv8ify_param {<my_sql_type>} <my_param> */` | `/** @plv8ify_param {timestamptz} ts */` |
+| set the TS->SQL type mapping for the return type | `/** @plv8ify_returns {<SQL TYPE>} */` | `/** @plv8ify_returns {setof my_table} */` |
+| designate the function is a TRIGGER | `/** @plv8ify_trigger */` | `/** @plv8ify_trigger */` |
+
 ## CLI Usage
 
 ### Version
@@ -231,7 +243,7 @@ Generate PLV8 functions for an input typescript file
 | --pg-function-delimiter | String                                | Specify a delimiter for the generated Postgres function                                                                                                                                                                                                                                 | `$plv8ify$`    |
 | --fallback-type         | String                                | Specify a fallback type when `plv8ify` fails to map a detected Typescript type to a Postges type                                                                                                                                                                                        | `JSONB`        |
 | --mode                  | 'inline', 'bundle' or 'start_proc'    | 'inline' will bundle the library in each function, both 'bundle' and 'start_proc' creates a `{prefix}_init` function that loads the library. 'bundle' adds a check to each function to call 'init' if required, whereas 'start_proc' is designed to be used with plv8.start_proc        | `inline`       |
-| --volatility            | 'IMMUTABLE' or 'STABLE' or 'VOLATILE' | Change the volatility of all the generated functions. To change volatility of a specific function use the comment format `//@plv8ify-volatility-STABLE` in the input typescript file (see `examples/turf-js/input.ts`). Note that for now only single-line comment syntax is supported. | `IMMUTABLE`    |
+| --volatility            | 'IMMUTABLE' or 'STABLE' or 'VOLATILE' | Change the volatility of all the generated functions. To change volatility of a specific function use the jsdoc `/** @plv8ify_volatility STABLE` in the input typescript file (see `examples/turf-js/input.ts`).                                                                        | `IMMUTABLE`    |
 | --types-config-file     | String                                | Specify a custom types config file                                                                                                                                                                                                                                                      | types.ts       |
 
 ### Deploy

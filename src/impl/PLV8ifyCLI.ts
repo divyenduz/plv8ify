@@ -170,6 +170,7 @@ export class PLV8ifyCLI implements PLV8ify {
         isExported: false,
         parameters: [],
         returnType: 'void',
+        jsdocTags: [],
       }
 
       if (mode === 'bundle') {
@@ -211,6 +212,7 @@ export class PLV8ifyCLI implements PLV8ify {
         isExported: false,
         parameters: [],
         returnType: 'void',
+        jsdocTags: [],
       }
       const startProcSQLScript = this.getStartProcSQLScript({ scopePrefix })
       const startProcFileName = this.getFileName(
@@ -228,10 +230,9 @@ export class PLV8ifyCLI implements PLV8ify {
   }
 
   /**
-   * handles all the processing for magic comments
+   * handles all the processing for jsdoc / magic comments
    */
   private getFnSqlConfig (fn: TSFunction): FnSqlConfig {
-    // debugger
     const config: FnSqlConfig = {
       // defaults
       paramTypeMapping: {},
@@ -246,6 +247,7 @@ export class PLV8ifyCLI implements PLV8ify {
       config.paramTypeMapping[param.name] = this.getTypeFromMap(param.type) || null
     }
 
+    // process magic comments (legacy format)
     for (const comment of fn.comments) {
       const volatilityMatch = comment.match(/^\/\/@plv8ify-volatility-(STABLE|IMMUTABLE|VOLATILE)/umi)
       if (volatilityMatch) config.volatility = volatilityMatch[1] as Volatility
@@ -264,10 +266,28 @@ export class PLV8ifyCLI implements PLV8ify {
       if (comment.match(/^\/\/@plv8ify-trigger/umi)) config.trigger = true
     }
 
-    if (config.trigger) {
-      // triggers don't have return types
-      config.sqlReturnType = 'TRIGGER'
+    // process jsdoc tags
+    for (const tag of fn.jsdocTags) {
+      if (tag.name === 'plv8ify_volatility' && [ 'STABLE', 'IMMUTABLE', 'VOLATILE' ].includes(tag.commentText.toUpperCase())) {
+        config.volatility = tag.commentText as Volatility
+      }
+
+      if (tag.name === 'plv8ify_schema_name') config.customSchema = tag.commentText
+
+      // expected format: `/** @plv8ify_param {sqlParamType} paramName */`
+      const paramMatch = tag.commentText.match(/^\{(.+)\} ([\s\S]+)/umi) // return type should be in curly braces, similar to jsdoc @return
+      if (tag.name === 'plv8ify_param' && paramMatch) config.paramTypeMapping[paramMatch[2]] = paramMatch[1]
+
+      // expected format: `/** @plv8ify_return {sqlType} */`
+      // expected format: `/** @plv8ify_returns {sqlType} */`
+      const returnMatch = tag.commentText.match(/^\{(.+)\}/umi) // param type should be in curly braces, similar to jsdoc @param
+      if ([ 'plv8ify_return', 'plv8ify_returns' ].includes(tag.name) && returnMatch) config.sqlReturnType = returnMatch[1]
+
+      if (tag.name === 'plv8ify_trigger') config.trigger = true
     }
+
+    // triggers don't have return types
+    if (config.trigger) config.sqlReturnType = 'TRIGGER'
 
     return config;
   }

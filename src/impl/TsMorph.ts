@@ -1,4 +1,4 @@
-import { TSCompiler } from 'src/interfaces/TSCompiler.js'
+import { TSCompiler, TSFunction } from 'src/interfaces/TSCompiler.js'
 import { FunctionDeclaration, Project, SourceFile } from 'ts-morph'
 
 export class TsMorph implements TSCompiler {
@@ -28,6 +28,11 @@ export class TsMorph implements TSCompiler {
     return comments
   }
 
+  private getFunctionJsdocTags(fn: FunctionDeclaration): TSFunction['jsdocTags'] {
+    const jsdocTags = fn.getJsDocs().flatMap((jsdoc) => jsdoc.getTags())
+    return jsdocTags.map(tag => ({ name: tag.getTagName(), commentText: tag.getCommentText() || '' }))
+  }
+
   getFunctions() {
     const fns = this.sourceFile.getFunctions()
     return fns.map((fn) => {
@@ -37,6 +42,7 @@ export class TsMorph implements TSCompiler {
         parameters: this.getFunctionParameters(fn),
         comments: this.getFunctionComments(fn),
         returnType: this.getFunctionReturnType(fn),
+        jsdocTags: this.getFunctionJsdocTags(fn),
       }
     })
   }

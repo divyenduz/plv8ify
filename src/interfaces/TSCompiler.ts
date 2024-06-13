@@ -9,6 +9,7 @@ export interface TSFunction {
   parameters: TSFunctionParameter[]
   comments: string[]
   returnType: string
+  jsdocTags: { name: string, commentText: string }[]
 }
 
 export interface TSCompiler {
