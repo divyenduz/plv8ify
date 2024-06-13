@@ -28,11 +28,22 @@ interface GetPLV8SQLFunctionArgs {
   defaultVolatility: Volatility
 }
 
+/** configuration for how a JS function should be transformed into a SQL function */
+type FnSqlConfig = {
+  paramTypeMapping: {
+    [name: string]: string | null
+  }
+  volatility: Volatility | null,
+  sqlReturnType: string | null,
+  customSchema: string,
+  trigger: boolean,
+}
+
 export class PLV8ifyCLI implements PLV8ify {
   private _bundler: Bundler
   private _tsCompiler: TSCompiler
 
-  private _typeMap = {
+  private _typeMap: Record<string, string> = {
     number: 'float8',
     string: 'text',
     boolean: 'boolean',
@@ -123,87 +134,6 @@ export class PLV8ifyCLI implements PLV8ify {
 
   private getExportedFunctions() {
     return this.getFunctions().filter((fn) => fn.isExported)
-  }
-
-  private getFunctionVolatility(fn: TSFunction, defaultVolatility: Volatility) {
-    const volatilityStr = '//@plv8ify-volatility-'
-    const comments = fn.comments
-    const volatility = (comments
-      .filter((comment) => comment.includes(volatilityStr))
-      .map((comment) => comment.replace(volatilityStr, ''))[0] ||
-      defaultVolatility) as Volatility
-    return volatility
-  }
-
-  private getFunctionSqlReturnType(fn: TSFunction, fallbackReturnType: string) {
-    // special case: trigger
-    if (PLV8ifyCLI.isTrigger(fn)) {
-      return 'TRIGGER'
-    }
-
-    // set by comment?
-    for (const comment of fn.comments) {
-      const returnMatch = comment.match(/^\/\/@plv8ify-return\s(.*)/)
-      if (returnMatch) {
-        return returnMatch[1]
-      }
-    }
-
-    // default to mapping the return type or using a fallback
-    return this.getTypeFromMap(fn.returnType) || fallbackReturnType
-  }
-
-  private static isTrigger(fn: TSFunction) {
-    return fn.comments.some((comment) => comment.match(/^\/\/@plv8ify-trigger/gimu))
-  }
-
-  private getFunctionCustomSchema(fn: TSFunction) {
-    const schemaStr = '//@plv8ify-schema-name '
-    const comments = fn.comments
-    const schema = comments
-      .filter((comment) => comment.includes(schemaStr))
-      .map((comment) => comment.replace(schemaStr, ''))[0]
-    return schema
-  }
-
-  // Input: parsed parameters, output of FunctionDeclaratioin.getParameters()
-  // Output: SQL string of bind params
-  private getSQLParametersString(
-    fn: TSFunction,
-    fallbackReturnType: string
-  ) {
-    // special case: trigger
-    if (PLV8ifyCLI.isTrigger(fn)) {
-      return ''; // trigger fns don't have parameters
-    }
-
-    return fn.parameters
-      .map((p) => {
-        const { name, type } = p
-
-        // set by comment?
-        for (const comment of fn.comments) {
-          const paramMatch = comment.match(
-            new RegExp(`^//@plv8ify-param\\s${name}\\s(.*)`)
-          )
-          if (paramMatch) {
-            return `${name} ${paramMatch[1]}`
-          }
-        }
-
-        // default to mapping the param type or using a fallback
-        return `${name} ${this.getTypeFromMap(type) || fallbackReturnType}`
-      })
-      .join(',')
-  }
-
-  private getJSParametersString(parameters: TSFunctionParameter[]) {
-    return parameters
-      .map((p) => {
-        const { name } = p
-        return `${name}`
-      })
-      .join(',')
   }
 
   getPLV8SQLFunctions({
@@ -297,6 +227,51 @@ export class PLV8ifyCLI implements PLV8ify {
     return sqls.concat(startProcSQLs)
   }
 
+  /**
+   * handles all the processing for magic comments
+   */
+  private getFnSqlConfig (fn: TSFunction): FnSqlConfig {
+    // debugger
+    const config: FnSqlConfig = {
+      // defaults
+      paramTypeMapping: {},
+      volatility: null,
+      sqlReturnType: this.getTypeFromMap(fn.returnType) || null,
+      customSchema: '',
+      trigger: false,
+    }
+
+    // default param type mapping
+    for (const param of fn.parameters) {
+      config.paramTypeMapping[param.name] = this.getTypeFromMap(param.type) || null
+    }
+
+    for (const comment of fn.comments) {
+      const volatilityMatch = comment.match(/^\/\/@plv8ify-volatility-(STABLE|IMMUTABLE|VOLATILE)/umi)
+      if (volatilityMatch) config.volatility = volatilityMatch[1] as Volatility
+
+      const schemaMatch = comment.match(/^\/\/@plv8ify-schema-name (.+)/umi)
+      if (schemaMatch) config.customSchema = schemaMatch[1]
+
+      for (const param of fn.parameters) {
+        const paramMatch = comment.match(/^\/\/@plv8ify-param (.+) ([\s\S]+)/umi)
+        if (paramMatch && paramMatch[1] === param.name) config.paramTypeMapping[param.name] = paramMatch[2]
+      }
+
+      const returnMatch = comment.match(/^\/\/@plv8ify-return ([\s\S]+)/umi)
+      if (returnMatch) config.sqlReturnType = returnMatch[1]
+
+      if (comment.match(/^\/\/@plv8ify-trigger/umi)) config.trigger = true
+    }
+
+    if (config.trigger) {
+      // triggers don't have return types
+      config.sqlReturnType = 'TRIGGER'
+    }
+
+    return config;
+  }
+
   getPLV8SQLFunction({
     fn,
     scopePrefix,
@@ -306,14 +281,24 @@ export class PLV8ifyCLI implements PLV8ify {
     fallbackReturnType,
     defaultVolatility,
   }: GetPLV8SQLFunctionArgs) {
-    const customSchema = this.getFunctionCustomSchema(fn)
+    let {
+      customSchema,
+      paramTypeMapping,
+      volatility,
+      sqlReturnType,
+      trigger
+    } = this.getFnSqlConfig(fn);
+    if (!volatility) volatility = defaultVolatility
+    if (!sqlReturnType) sqlReturnType = fallbackReturnType
+
+    const sqlParametersString = trigger
+      ? '' // triggers don't have parameters
+      : fn.parameters.map(param => `${param.name} ${paramTypeMapping[param.name] || fallbackReturnType}`).join(',')
+
+    const jsParametersString = fn.parameters.map(param => param.name).join(',')
+
     const scopedName =
       (customSchema ? customSchema + '.' : '') + scopePrefix + fn.name
-
-    const sqlParametersString = this.getSQLParametersString(fn, fallbackReturnType)
-    const jsParametersString = this.getJSParametersString(fn.parameters)
-    const volatility = this.getFunctionVolatility(fn, defaultVolatility)
-    const sqlReturnType = this.getFunctionSqlReturnType(fn, fallbackReturnType)
 
     return [
       `DROP FUNCTION IF EXISTS ${scopedName}(${sqlParametersString});`,
