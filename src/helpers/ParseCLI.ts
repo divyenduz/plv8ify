@@ -43,7 +43,7 @@ Please specify a command. Available commands: generate, version, deploy
     const defaultVolatility = (args['--volatility'] ||
       'IMMUTABLE') as Volatility
     const typesFilePath = args['--types-config-file'] || 'types.ts'
-    const deployConcurrency = args['--deploy-concurrency'] || 2
+    const deployConcurrency = args['--deploy-concurrency'] || 10
 
     return {
       command: args._[0] as Command,
