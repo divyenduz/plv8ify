@@ -78,8 +78,8 @@ export async function deployCommand(
 
   await task(
     `Deploying files from ${outputFolderPath} to the provided PostgreSQL database 🚧`.trim(),
-    async ({ setWarning }) => {
-      const taskGroup = await task.group((task) =>
+    ({ setWarning }) =>
+      task.group((task) =>
         deployCommands.map((deployCommand) => {
           const name = getFunctionNameFromFilePath(deployCommand.filePath)
           return task(
@@ -94,12 +94,9 @@ export async function deployCommand(
               }
             }
           )
-        })
+        }),
+        { concurrency: 2 }
       )
-
-      // TODO: add some batching here
-      await Promise.allSettled(taskGroup)
-    }
   )
 
   database.endConnection()
