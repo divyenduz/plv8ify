@@ -17,7 +17,7 @@ function getFunctionNameFromFilePath(filePath: string) {
 export async function deployCommand(
   CLI: ReturnType<typeof ParseCLI.getCommand>
 ) {
-  const outputFolderPath = CLI.config.outputFolderPath
+  const { outputFolderPath, deployConcurrency } = CLI.config
 
   const checkOutputFolderTask = await task(
     `Check if the --output-folder (${outputFolderPath}) exists`,
@@ -95,7 +95,7 @@ export async function deployCommand(
             }
           )
         }),
-        { concurrency: 2 }
+        { concurrency: deployConcurrency }
       )
   )
 
