@@ -20,6 +20,7 @@ export class ParseCLI {
       '--mode': String,
       '--volatility': String,
       '--debug': Boolean,
+      '--deploy-concurrency': Number,
     })
 
     if (args._.length === 0) {
@@ -42,6 +43,7 @@ Please specify a command. Available commands: generate, version, deploy
     const defaultVolatility = (args['--volatility'] ||
       'IMMUTABLE') as Volatility
     const typesFilePath = args['--types-config-file'] || 'types.ts'
+    const deployConcurrency = args['--deploy-concurrency'] || 10
 
     return {
       command: args._[0] as Command,
@@ -57,6 +59,7 @@ Please specify a command. Available commands: generate, version, deploy
         mode,
         defaultVolatility,
         typesFilePath,
+        deployConcurrency,
       },
     }
   }

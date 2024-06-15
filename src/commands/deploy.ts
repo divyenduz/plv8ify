@@ -17,7 +17,7 @@ function getFunctionNameFromFilePath(filePath: string) {
 export async function deployCommand(
   CLI: ReturnType<typeof ParseCLI.getCommand>
 ) {
-  const outputFolderPath = CLI.config.outputFolderPath
+  const { outputFolderPath, deployConcurrency } = CLI.config
 
   const checkOutputFolderTask = await task(
     `Check if the --output-folder (${outputFolderPath}) exists`,
@@ -78,8 +78,8 @@ export async function deployCommand(
 
   await task(
     `Deploying files from ${outputFolderPath} to the provided PostgreSQL database 🚧`.trim(),
-    async ({ setWarning }) => {
-      const taskGroup = await task.group((task) =>
+    ({ setWarning }) =>
+      task.group((task) =>
         deployCommands.map((deployCommand) => {
           const name = getFunctionNameFromFilePath(deployCommand.filePath)
           return task(
@@ -94,12 +94,9 @@ export async function deployCommand(
               }
             }
           )
-        })
+        }),
+        { concurrency: deployConcurrency }
       )
-
-      // TODO: add some batching here
-      await Promise.allSettled(taskGroup)
-    }
   )
 
   database.endConnection()

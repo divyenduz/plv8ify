@@ -250,9 +250,10 @@ Generate PLV8 functions for an input typescript file
 
 Deploy an output folder to a Postgres database (defined by env var `DATABASE_URL`)
 
-| Generate Command Flags | Type   | Description              | Default        |
-| ---------------------- | ------ | ------------------------ | -------------- |
-| --output-folder        | String | Specify an output folder | `plv8ify-dist` |
+| Generate Command Flags | Type   | Description                                                             | Default        |
+| ---------------------- | ------ | ----------------------------------------------------------------------- | -------------- |
+| --output-folder        | String | Specify an output folder                                                | `plv8ify-dist` |
+| --deploy-concurrency   | Number | Specify the maximum allowed deployment tasks to run in parallel         | 10             |
 
 ## Caveats
 
