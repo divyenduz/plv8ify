@@ -42,6 +42,7 @@ type FnSqlConfig = {
 export class PLV8ifyCLI implements PLV8ify {
   private _bundler: Bundler
   private _tsCompiler: TSCompiler
+  private bundleId = Date.now()
 
   private _typeMap: Record<string, string> = {
     number: 'float8',
@@ -179,7 +180,7 @@ export class PLV8ifyCLI implements PLV8ify {
         }
 
         // set a global symbol so that we can check if the init function has been called
-        bundledJs += `globalThis[Symbol.for('${scopePrefix}_initialized')] = true;\n`
+        bundledJs += `globalThis[Symbol.for('${scopePrefix}_initialized')] = ${this.bundleId};\n`
       }
 
       const initFunction = this.getPLV8SQLFunction({
@@ -307,7 +308,7 @@ export class PLV8ifyCLI implements PLV8ify {
         .with(
           'bundle',
           () =>
-            `if (!globalThis[Symbol.for('${scopePrefix}_initialized')]) plv8.execute('SELECT ${scopePrefix}_init();');`
+            `if (globalThis[Symbol.for('${scopePrefix}_initialized')] !== ${this.bundleId}) plv8.execute('SELECT ${scopePrefix}_init();');`
         )
         .otherwise(() => ''),
       match(sqlReturnType.toLowerCase())
