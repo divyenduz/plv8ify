@@ -11,7 +11,6 @@ describe('PLV8ifyCLI tests', () => {
         name: 'test',
         isExported: true,
         parameters: [],
-        comments: [],
         returnType: 'void',
         jsdocTags: []
       },
@@ -32,7 +31,6 @@ describe('PLV8ifyCLI tests', () => {
         name: 'test',
         isExported: true,
         parameters: [],
-        comments: [],
         returnType: 'void',
         jsdocTags: [],
       },
@@ -57,9 +55,10 @@ describe('PLV8ifyCLI tests', () => {
           { name: 'NEW', type: 'testRow' },
           { name: 'OLD', type: 'testRow' },
         ],
-        comments: ['//@plv8ify-trigger'],
         returnType: 'object',
-        jsdocTags: []
+        jsdocTags: [
+          { name: 'plv8ify_trigger', commentText: '' },
+        ]
       },
       scopePrefix: 'plv8ify_',
       mode: 'inline',
@@ -89,9 +88,10 @@ function test(NEW, OLD) {
         name: 'test',
         isExported: true,
         parameters: [],
-        comments: ['//@plv8ify-schema-name testschema'],
         returnType: 'string',
-        jsdocTags: []
+        jsdocTags: [
+          { name: 'plv8ify_schema_name', commentText: 'testschema' },
+        ]
       },
       scopePrefix: 'plv8ify_',
       mode: 'inline',
@@ -116,7 +116,6 @@ function test() {
         name: 'test',
         isExported: true,
         parameters: [{ name: 'test', type: 'test_type[]' }],
-        comments: [],
         returnType: 'object',
         jsdocTags: []
       },

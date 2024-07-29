@@ -23,24 +23,18 @@ export class TsMorph implements TSCompiler {
     })
   }
 
-  private getFunctionComments(fn: FunctionDeclaration) {
-    const comments = fn.getLeadingCommentRanges().map((cr) => cr.getText())
-    return comments
-  }
-
   private getFunctionJsdocTags(fn: FunctionDeclaration): TSFunction['jsdocTags'] {
     const jsdocTags = fn.getJsDocs().flatMap((jsdoc) => jsdoc.getTags())
     return jsdocTags.map(tag => ({ name: tag.getTagName(), commentText: tag.getCommentText() || '' }))
   }
 
-  getFunctions() {
+  getFunctions(): TSFunction[] {
     const fns = this.sourceFile.getFunctions()
     return fns.map((fn) => {
       return {
         name: fn.getName(),
         isExported: fn.isExported(),
         parameters: this.getFunctionParameters(fn),
-        comments: this.getFunctionComments(fn),
         returnType: this.getFunctionReturnType(fn),
         jsdocTags: this.getFunctionJsdocTags(fn),
       }

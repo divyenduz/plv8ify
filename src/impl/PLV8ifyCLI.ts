@@ -166,7 +166,6 @@ export class PLV8ifyCLI implements PLV8ify {
       // -- PLV8 + Server
       const virtualInitFn: TSFunction = {
         name: '_init',
-        comments: [],
         isExported: false,
         parameters: [],
         returnType: 'void',
@@ -208,7 +207,6 @@ export class PLV8ifyCLI implements PLV8ify {
       const startFunctionName = 'start'
       const virtualStartFn: TSFunction = {
         name: startFunctionName,
-        comments: [],
         isExported: false,
         parameters: [],
         returnType: 'void',
@@ -230,7 +228,7 @@ export class PLV8ifyCLI implements PLV8ify {
   }
 
   /**
-   * handles all the processing for jsdoc / magic comments
+   * handles all the processing for jsdoc
    */
   private getFnSqlConfig (fn: TSFunction): FnSqlConfig {
     const config: FnSqlConfig = {
@@ -245,25 +243,6 @@ export class PLV8ifyCLI implements PLV8ify {
     // default param type mapping
     for (const param of fn.parameters) {
       config.paramTypeMapping[param.name] = this.getTypeFromMap(param.type) || null
-    }
-
-    // process magic comments (legacy format)
-    for (const comment of fn.comments) {
-      const volatilityMatch = comment.match(/^\/\/@plv8ify-volatility-(STABLE|IMMUTABLE|VOLATILE)/umi)
-      if (volatilityMatch) config.volatility = volatilityMatch[1] as Volatility
-
-      const schemaMatch = comment.match(/^\/\/@plv8ify-schema-name (.+)/umi)
-      if (schemaMatch) config.customSchema = schemaMatch[1]
-
-      for (const param of fn.parameters) {
-        const paramMatch = comment.match(/^\/\/@plv8ify-param (.+) ([\s\S]+)/umi)
-        if (paramMatch && paramMatch[1] === param.name) config.paramTypeMapping[param.name] = paramMatch[2]
-      }
-
-      const returnMatch = comment.match(/^\/\/@plv8ify-return ([\s\S]+)/umi)
-      if (returnMatch) config.sqlReturnType = returnMatch[1]
-
-      if (comment.match(/^\/\/@plv8ify-trigger/umi)) config.trigger = true
     }
 
     // process jsdoc tags
