@@ -42,6 +42,7 @@ type FnSqlConfig = {
 export class PLV8ifyCLI implements PLV8ify {
   private _bundler: Bundler
   private _tsCompiler: TSCompiler
+  private bundleId = Date.now()
 
   private _typeMap: Record<string, string> = {
     number: 'float8',
@@ -166,7 +167,6 @@ export class PLV8ifyCLI implements PLV8ify {
       // -- PLV8 + Server
       const virtualInitFn: TSFunction = {
         name: '_init',
-        comments: [],
         isExported: false,
         parameters: [],
         returnType: 'void',
@@ -180,7 +180,7 @@ export class PLV8ifyCLI implements PLV8ify {
         }
 
         // set a global symbol so that we can check if the init function has been called
-        bundledJs += `globalThis[Symbol.for('${scopePrefix}_initialized')] = true;\n`
+        bundledJs += `globalThis[Symbol.for('${scopePrefix}_initialized')] = ${this.bundleId};\n`
       }
 
       const initFunction = this.getPLV8SQLFunction({
@@ -208,7 +208,6 @@ export class PLV8ifyCLI implements PLV8ify {
       const startFunctionName = 'start'
       const virtualStartFn: TSFunction = {
         name: startFunctionName,
-        comments: [],
         isExported: false,
         parameters: [],
         returnType: 'void',
@@ -230,7 +229,7 @@ export class PLV8ifyCLI implements PLV8ify {
   }
 
   /**
-   * handles all the processing for jsdoc / magic comments
+   * handles all the processing for jsdoc
    */
   private getFnSqlConfig (fn: TSFunction): FnSqlConfig {
     const config: FnSqlConfig = {
@@ -245,25 +244,6 @@ export class PLV8ifyCLI implements PLV8ify {
     // default param type mapping
     for (const param of fn.parameters) {
       config.paramTypeMapping[param.name] = this.getTypeFromMap(param.type) || null
-    }
-
-    // process magic comments (legacy format)
-    for (const comment of fn.comments) {
-      const volatilityMatch = comment.match(/^\/\/@plv8ify-volatility-(STABLE|IMMUTABLE|VOLATILE)/umi)
-      if (volatilityMatch) config.volatility = volatilityMatch[1] as Volatility
-
-      const schemaMatch = comment.match(/^\/\/@plv8ify-schema-name (.+)/umi)
-      if (schemaMatch) config.customSchema = schemaMatch[1]
-
-      for (const param of fn.parameters) {
-        const paramMatch = comment.match(/^\/\/@plv8ify-param (.+) ([\s\S]+)/umi)
-        if (paramMatch && paramMatch[1] === param.name) config.paramTypeMapping[param.name] = paramMatch[2]
-      }
-
-      const returnMatch = comment.match(/^\/\/@plv8ify-return ([\s\S]+)/umi)
-      if (returnMatch) config.sqlReturnType = returnMatch[1]
-
-      if (comment.match(/^\/\/@plv8ify-trigger/umi)) config.trigger = true
     }
 
     // process jsdoc tags
@@ -328,7 +308,7 @@ export class PLV8ifyCLI implements PLV8ify {
         .with(
           'bundle',
           () =>
-            `if (!globalThis[Symbol.for('${scopePrefix}_initialized')]) plv8.execute('SELECT ${scopePrefix}_init();');`
+            `if (globalThis[Symbol.for('${scopePrefix}_initialized')] !== ${this.bundleId}) plv8.execute('SELECT ${scopePrefix}_init();');`
         )
         .otherwise(() => ''),
       match(sqlReturnType.toLowerCase())
