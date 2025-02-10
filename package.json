@@ -11,7 +11,7 @@
   "dependencies": {
     "arg": "5.0.1",
     "dotenv": "16.0.3",
-    "esbuild": "0.14.18",
+    "esbuild": "0.25.0",
     "postgres": "3.3.3",
     "tasuku": "2.0.1",
     "ts-morph": "13.0.3",
