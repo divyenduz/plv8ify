@@ -16,9 +16,8 @@ type BranchShortMetadata = {
 };
 
 invariant(process.env.XATA_API_KEY, 'XATA_API_KEY is required');
-invariant(process.env.XATA_API_ENVIRONMENT, 'XATA_API_ENVIRONMENT is required');
-invariant(process.env.XATA_ORGANIZATION, 'XATA_ORGANIZATION is required');
-invariant(process.env.XATA_PROJECT_ID, 'XATA_PROJECT_ID is required');
+invariant(process.env.XATA_ORGANIZATIONID, 'XATA_ORGANIZATION is required');
+invariant(process.env.XATA_PROJECTID, 'XATA_PROJECT_ID is required');
 
 const organization = process.env.XATA_ORGANIZATION;
 const projectId = process.env.XATA_PROJECT_ID;

@@ -22,7 +22,6 @@ jobs:
         shell: bash
         run: |
           echo "XATA_API_KEY=${{ secrets.XATA_API_KEY }}" >> $GITHUB_ENV
-          echo "XATA_API_ENVIRONMENT=${{ secrets.XATA_API_ENVIRONMENT }}" >> $GITHUB_ENV
           echo "XATA_ORGANIZATION=${{ secrets.XATA_ORGANIZATION }}" >> $GITHUB_ENV
           echo "XATA_PROJECT_ID=${{ secrets.XATA_PROJECT_ID }}" >> $GITHUB_ENV
 
