@@ -2,7 +2,7 @@ name: Cleanup Non-Main Xata Branches
 
 on:
   schedule:
-    - cron: '0 11 * * *'
+    - cron: '*/30 * * * *'
   workflow_dispatch:
 
 jobs:
