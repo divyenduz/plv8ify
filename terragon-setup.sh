@@ -7,6 +7,8 @@ bun install
 curl -fsSL https://xata.io/install.sh | bash
 
 env
+echo ~/
+export PATH="~/.config/xata/bin:$PATH"
 
 xata status
 xata checkout main
