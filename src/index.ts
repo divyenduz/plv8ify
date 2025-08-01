@@ -1,9 +1,5 @@
 #!/usr/bin/env node
-import { match } from 'ts-pattern'
-
-import { deployCommand } from './commands/deploy.js'
-import { generateCommand } from './commands/generate.js'
-import { versionCommand } from './commands/version.js'
+import { run } from '@stricli/core'
 import { ParseCLI } from './helpers/ParseCLI.js'
 
 type Runtime = 'node' | 'bun'
@@ -20,27 +16,18 @@ function getRuntime(): Runtime {
 
 async function main() {
   const runtime = getRuntime()
-  const CLI = ParseCLI.getCommand()
-
-  if (CLI.config.debug) {
-    console.log(`DEBUG: Running in ${runtime} runtime`)
-  }
-
-  if (CLI.config.bundler === 'bun' && runtime === 'node') {
-    throw new Error('Error: Bun bundler is only available when running with Bun runtime. Please use --bundler esbuild or run with Bun.')
-  }
-
-  match(CLI.command)
-    .with('version', () => {
-      versionCommand()
-    })
-    .with('generate', async () => {
-      await generateCommand(CLI)
-    })
-    .with('deploy', async () => {
-      await deployCommand(CLI)
-    })
-    .exhaustive()
+  const app = ParseCLI.buildCLI()
+  
+  // Parse process.argv and run the appropriate command
+  await run(app, process.argv.slice(2), {
+    process: {
+      stdout: { write: (str: string) => process.stdout.write(str) },
+      stderr: { write: (str: string) => process.stderr.write(str) },
+    },
+  })
 }
 
-main()
+main().catch((error) => {
+  console.error('Fatal error:', error)
+  process.exit(1)
+})

@@ -1,12 +1,14 @@
 import fs from 'fs'
 
-import { ParseCLI } from '../helpers/ParseCLI.js'
+import { ParseCLI, CLIConfig } from '../helpers/ParseCLI.js'
 import { PLV8ifyCLI } from '../impl/PLV8ifyCLI.js'
 
-export async function generateCommand(
-  CLI: ReturnType<typeof ParseCLI.getCommand>
-) {
+export async function generateCommand(CLI: {
+  command: string
+  config: CLIConfig
+}) {
   const {
+    debug,
     bundler,
     writeBundlerOutput,
     inputFilePath,
@@ -18,6 +20,17 @@ export async function generateCommand(
     defaultVolatility,
     typesFilePath,
   } = CLI.config
+
+  // Runtime check
+  const runtime = typeof Bun !== 'undefined' ? 'bun' : 'node'
+  
+  if (debug) {
+    console.log(`DEBUG: Running in ${runtime} runtime`)
+  }
+
+  if (bundler === 'bun' && runtime === 'node') {
+    throw new Error('Bun bundler is not supported in node runtime')
+  }
 
   fs.mkdirSync(outputFolderPath, { recursive: true })
 

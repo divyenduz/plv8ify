@@ -4,7 +4,7 @@ import path from 'path'
 import task from 'tasuku'
 
 import { Database } from '../helpers/Database.js'
-import { ParseCLI } from '../helpers/ParseCLI.js'
+import { ParseCLI, CLIConfig } from '../helpers/ParseCLI.js'
 
 dotenv.config()
 
@@ -14,9 +14,10 @@ function getFunctionNameFromFilePath(filePath: string) {
   return fileName
 }
 
-export async function deployCommand(
-  CLI: ReturnType<typeof ParseCLI.getCommand>
-) {
+export async function deployCommand(CLI: {
+  command: string
+  config: CLIConfig
+}) {
   const { outputFolderPath, deployConcurrency } = CLI.config
 
   const checkOutputFolderTask = await task(
