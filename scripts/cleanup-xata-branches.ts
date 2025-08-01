@@ -1,8 +1,19 @@
-import type { Types } from '@xata.io/api';
 import { $ } from 'bun';
 import chalk from 'chalk';
 import stripAnsi from 'strip-ansi';
 import invariant from 'tiny-invariant';
+
+type BranchShortMetadata = {
+  connectionString?: (string | null) | undefined;
+  createdAt: string;
+  description?: string | undefined;
+  id: string;
+  name: string;
+  parentID?: (string | null) | undefined;
+  publicAccess: boolean;
+  region: string;
+  updatedAt: string;
+};
 
 invariant(process.env.XATA_API_REFRESH_TOKEN, 'XATA_API_REFRESH_TOKEN is required');
 invariant(process.env.XATA_API_ENVIRONMENT, 'XATA_API_ENVIRONMENT is required');
@@ -14,7 +25,7 @@ const projectId = process.env.XATA_PROJECT_ID;
 
 console.log(chalk.cyan(`🔍 Looking for branches in project ${projectId}...`));
 
-let branches: Types.BranchShortMetadata[] = [];
+let branches: BranchShortMetadata[] = [];
 
 try {
   const branchesQuery = await $`xata branch list --organization=${organization} --project=${projectId} --json`.quiet();
@@ -45,7 +56,7 @@ for (const branch of branchesToDelete) {
     console.log(chalk.red(`\n🗑️  Deleting branch: ${chalk.bold(branch.name)} (${branch.id})`));
     const deleteBranchQuery =
       await $`xata branch delete --organization=${organization} --project=${projectId} --branch=${branch.id} --yes --json`.quiet();
-    const deleteBranch: Types.BranchShortMetadata = deleteBranchQuery.json();
+    const deleteBranch: BranchShortMetadata = deleteBranchQuery.json();
     console.log(chalk.green(`✅ Deleted branch: ${chalk.bold(deleteBranch.name)}`));
   } catch (e) {
     console.error(`Failed to delete branch, branch id: ${branch.id}`);
