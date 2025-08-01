@@ -15,7 +15,7 @@ type BranchShortMetadata = {
   updatedAt: string;
 };
 
-invariant(process.env.XATA_API_REFRESH_TOKEN, 'XATA_API_REFRESH_TOKEN is required');
+invariant(process.env.XATA_API_KEY, 'XATA_API_KEY is required');
 invariant(process.env.XATA_API_ENVIRONMENT, 'XATA_API_ENVIRONMENT is required');
 invariant(process.env.XATA_ORGANIZATION, 'XATA_ORGANIZATION is required');
 invariant(process.env.XATA_PROJECT_ID, 'XATA_PROJECT_ID is required');
