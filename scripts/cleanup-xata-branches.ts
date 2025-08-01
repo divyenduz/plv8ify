@@ -19,8 +19,8 @@ invariant(process.env.XATA_API_KEY, 'XATA_API_KEY is required');
 invariant(process.env.XATA_ORGANIZATIONID, 'XATA_ORGANIZATION is required');
 invariant(process.env.XATA_PROJECTID, 'XATA_PROJECT_ID is required');
 
-const organization = process.env.XATA_ORGANIZATION;
-const projectId = process.env.XATA_PROJECT_ID;
+const organization = process.env.XATA_ORGANIZATIONID;
+const projectId = process.env.XATA_PROJECTID;
 
 console.log(chalk.cyan(`🔍 Looking for branches in project ${projectId}...`));
 
