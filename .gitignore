@@ -8,3 +8,7 @@ dist/
 examples/trackfootball
 
 .env
+.xata
+
+CLAUDE.md
+AGENT.md
