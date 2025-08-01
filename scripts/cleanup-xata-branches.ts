@@ -16,10 +16,10 @@ type BranchShortMetadata = {
 };
 
 invariant(process.env.XATA_API_KEY, 'XATA_API_KEY is required');
-invariant(process.env.XATA_ORGANIZATIONID, 'XATA_ORGANIZATION is required');
-invariant(process.env.XATA_PROJECTID, 'XATA_PROJECT_ID is required');
+invariant(process.env.XATA_ORGANIZATIONID, 'XATA_ORGANIZATIONID is required');
+invariant(process.env.XATA_PROJECTID, 'XATA_PROJECTID is required');
 
-const organization = process.env.XATA_ORGANIZATIONID;
+const organizationId = process.env.XATA_ORGANIZATIONID;
 const projectId = process.env.XATA_PROJECTID;
 
 console.log(chalk.cyan(`🔍 Looking for branches in project ${projectId}...`));
@@ -27,7 +27,7 @@ console.log(chalk.cyan(`🔍 Looking for branches in project ${projectId}...`));
 let branches: BranchShortMetadata[] = [];
 
 try {
-  const branchesQuery = await $`xata branch list --organization=${organization} --project=${projectId} --json`.quiet();
+  const branchesQuery = await $`xata branch list --organization=${organizationId} --project=${projectId} --json`.quiet();
   branches = branchesQuery.json();
 } catch (e) {
   console.error(`Failed to get a list of branches`);

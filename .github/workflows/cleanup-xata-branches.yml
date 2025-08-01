@@ -22,8 +22,8 @@ jobs:
         shell: bash
         run: |
           echo "XATA_API_KEY=${{ secrets.XATA_API_KEY }}" >> $GITHUB_ENV
-          echo "XATA_ORGANIZATION=${{ secrets.XATA_ORGANIZATION }}" >> $GITHUB_ENV
-          echo "XATA_PROJECT_ID=${{ secrets.XATA_PROJECT_ID }}" >> $GITHUB_ENV
+          echo "XATA_ORGANIZATIONID=${{ secrets.XATA_ORGANIZATIONID }}" >> $GITHUB_ENV
+          echo "XATA_PROJECTID=${{ secrets.XATA_PROJECTID }}" >> $GITHUB_ENV
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
