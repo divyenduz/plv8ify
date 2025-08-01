@@ -1,4 +1,4 @@
-// Bun Snapshot v1, https://goo.gl/fbAQLP
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
 
 exports[`PLV8ifyCLI tests getSQLFunction with parameters 1`] = `
 "DROP FUNCTION IF EXISTS plv8ify_test();

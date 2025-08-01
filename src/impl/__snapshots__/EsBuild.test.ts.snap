@@ -1,4 +1,4 @@
-// Bun Snapshot v1, https://goo.gl/fbAQLP
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
 
 exports[`EsBuild tests getBundleJs - inline mode 1`] = `
 "// src/test-fixtures/input.fixture.ts
@@ -30,7 +30,7 @@ export {
 exports[`EsBuild tests getBundleJs - newline string 1`] = `
 "// src/test-fixtures/newline-string.fixture.ts
 function sayHello() {
-  const greetString = "hello\nworld";
+  const greetString = "hello\\nworld";
   return greetString;
 }
 export {
