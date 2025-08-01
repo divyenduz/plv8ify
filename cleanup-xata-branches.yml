@@ -1,0 +1,39 @@
+name: Cleanup Non-Main Xata Branches
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    name: Delete Non-Main Xata Branches
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Xata CLI
+        shell: bash
+        run: |
+          curl -fsSL https://xata.io/install.sh | bash
+          echo "/home/runner/.config/xata/bin" >> $GITHUB_PATH
+
+      - name: Set Xata Environment Variables
+        shell: bash
+        run: |
+          echo "XATA_API_REFRESH_TOKEN=${{ secrets.XATA_API_REFRESH_TOKEN }}" >> $GITHUB_ENV
+          echo "XATA_API_ENVIRONMENT=${{ secrets.XATA_API_ENVIRONMENT }}" >> $GITHUB_ENV
+          echo "XATA_ORGANIZATION=${{ secrets.XATA_ORGANIZATION }}" >> $GITHUB_ENV
+          echo "XATA_PROJECT_ID=${{ secrets.XATA_PROJECT_ID }}" >> $GITHUB_ENV
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Run cleanup script
+        shell: bash
+        run: bun run scripts/cleanup-xata-branches.ts
