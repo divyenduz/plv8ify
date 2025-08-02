@@ -19,6 +19,7 @@
     "webpack-node-externals": "3.0.0"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.29.5",
     "@trivago/prettier-plugin-sort-imports": "3.2.0",
     "@turf/distance": "6.5.0",
     "@turf/helpers": "6.5.0",
@@ -57,6 +58,9 @@
     "example:common-types": "bun run --bun src/index.ts generate --input-file examples/common-types/input.ts --types-config-file examples/common-types/types.ts --output-folder examples/common-types/plv8ify-dist",
     "example:hello-custom-type": "bun run --bun src/index.ts generate --input-file examples/hello-custom-type/input.ts --types-config-file examples/hello-custom-type/types.ts --output-folder examples/hello-custom-type/plv8ify-dist",
     "example:trigger": "bun run --bun src/index.ts generate --input-file examples/trigger/input.ts --output-folder examples/trigger/plv8ify-dist",
-    "examples": "bun example:hello; bun example:hello-start_proc; bun example:hello-bundle; bun example:turf-js; bun example:turf-js-distance; bun example:mathjs; bun example:react-js; bun example:object-hash; bun example:turf-js-distance; bun example:common-types; bun example:hello-custom-type; bun example:trigger"
+    "examples": "bun example:hello; bun example:hello-start_proc; bun example:hello-bundle; bun example:turf-js; bun example:turf-js-distance; bun example:mathjs; bun example:react-js; bun example:object-hash; bun example:turf-js-distance; bun example:common-types; bun example:hello-custom-type; bun example:trigger",
+    "changeset": "bun x changeset",
+    "release": "bun run build && bun x changeset publish",
+    "version": "bun x changeset version"
   }
 }

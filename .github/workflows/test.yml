@@ -13,8 +13,6 @@ on:
 env:
   NO_COLOR: true
   CI: 1
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
 jobs:
   build:
@@ -42,19 +40,3 @@ jobs:
 
       - name: Run Tests
         run: bun test
-
-      - name: Release Patch
-        if: endsWith(github.ref, '/main')
-        run: |
-          git config --global user.email "mail@divyendusingh.com"
-          git config --global user.name "Divyendu Singh"
-          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
-          npm version patch
-          bun run build
-          npm publish
-          git push origin main
-
-      # Note: not 1.0.0 yet, semantic-release only supports versions >1.0.0
-      # - name: Release
-      #   if: endsWith(github.ref, '/main')
-      #   run: yarn semantic-release
