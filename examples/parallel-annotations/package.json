@@ -1,0 +1,10 @@
+{
+  "name": "parallel-annotations-example",
+  "version": "1.0.0",
+  "description": "Example demonstrating PARALLEL annotations in PLV8ify",
+  "scripts": {
+    "plv8ify:inline": "plv8ify generate --mode=inline input.ts",
+    "plv8ify:bundle": "plv8ify generate --mode=bundle input.ts",
+    "clean": "rm -rf plv8-generated"
+  }
+}

@@ -6,6 +6,7 @@ import {
   GetPLV8SQLFunctionsArgs,
   PLV8ify,
   Volatility,
+  Parallel,
 } from 'src/interfaces/PLV8ify.js'
 import {
   TSCompiler,
@@ -34,6 +35,7 @@ type FnSqlConfig = {
     [name: string]: string | null
   }
   volatility: Volatility | null,
+  parallel: Parallel | null,
   sqlReturnType: string | null,
   customSchema: string,
   trigger: boolean,
@@ -236,6 +238,7 @@ export class PLV8ifyCLI implements PLV8ify {
       // defaults
       paramTypeMapping: {},
       volatility: null,
+      parallel: null,
       sqlReturnType: this.getTypeFromMap(fn.returnType) || null,
       customSchema: '',
       trigger: false,
@@ -250,6 +253,10 @@ export class PLV8ifyCLI implements PLV8ify {
     for (const tag of fn.jsdocTags) {
       if (tag.name === 'plv8ify_volatility' && [ 'STABLE', 'IMMUTABLE', 'VOLATILE' ].includes(tag.commentText.toUpperCase())) {
         config.volatility = tag.commentText as Volatility
+      }
+
+      if (tag.name === 'plv8ify_parallel' && [ 'SAFE', 'UNSAFE', 'RESTRICTED' ].includes(tag.commentText.toUpperCase())) {
+        config.parallel = tag.commentText.toUpperCase() as Parallel
       }
 
       if (tag.name === 'plv8ify_schema_name') config.customSchema = tag.commentText
@@ -285,6 +292,7 @@ export class PLV8ifyCLI implements PLV8ify {
       customSchema,
       paramTypeMapping,
       volatility,
+      parallel,
       sqlReturnType,
       trigger
     } = this.getFnSqlConfig(fn);
@@ -315,7 +323,7 @@ export class PLV8ifyCLI implements PLV8ify {
         .with('void', () => '')
         .otherwise(() => `return ${fn.name}(${jsParametersString})`),
       '',
-      `${pgFunctionDelimiter} LANGUAGE plv8 ${volatility} STRICT;`,
+      `${pgFunctionDelimiter} LANGUAGE plv8 ${volatility}${parallel ? ` PARALLEL ${parallel}` : ''} STRICT;`,
     ].join('\n')
   }
 
