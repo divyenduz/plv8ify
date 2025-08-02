@@ -1,82 +1,220 @@
-import arg from 'arg'
+import { buildApplication, buildCommand, buildRouteMap, booleanParser, numberParser, buildChoiceParser, type TypedFlagParameter } from '@stricli/core'
 import { Mode, Volatility } from 'src/interfaces/PLV8ify.js'
 
-type Command = 'version' | 'generate' | 'deploy'
 export type BundlerType = 'esbuild' | 'bun'
 
+export interface CLIConfig {
+  debug: boolean
+  bundler: BundlerType
+  writeBundlerOutput: boolean
+  inputFilePath: string
+  outputFolderPath: string
+  scopePrefix: string
+  pgFunctionDelimiter: string
+  fallbackReturnType: string
+  mode: Mode
+  defaultVolatility: Volatility
+  typesFilePath: string
+  deployConcurrency: number
+}
+
 export class ParseCLI {
-  static getCommand() {
-    // CLI Args
-    // TODO: scope config options to commands
-    const args = arg({
-      '--input-file': String,
-      '--output-folder': String,
-      '--types-config-file': String,
-      '--bundler': String, // 'esbuild' or 'bun'
-      '--write-bundler-output': Boolean,
-      '--scope-prefix': String,
-      '--pg-function-delimiter': String,
-      '--fallback-type': String,
-      '--mode': String,
-      '--volatility': String,
-      '--debug': Boolean,
-      '--deploy-concurrency': Number,
-    })
-
-    if (args._.length === 0) {
-      ParseCLI.throwError(`
-plv8ify - Bundle TypeScript/JavaScript and generate PostgreSQL PLV8 functions
-
-Usage: plv8ify <command> [options]
-
-Commands:
-  generate    Bundle input file and generate SQL functions
-  deploy      Deploy generated SQL functions to PostgreSQL database
-  version     Show version information
-
-Run 'plv8ify <command>' for more information on a specific command.
-`)
-      console.error()
-      process.exit(1)
-    }
-
-    const debug = args['--debug'] || false
-    const inputFilePath = args['--input-file'] || 'input.ts'
-    const outputFolderPath = args['--output-folder'] || 'plv8ify-dist'
-    const bundler = args['--bundler'] || 'esbuild'
-    const writeBundlerOutput = args['--write-bundler-output'] || false
-    const scopePrefix = args['--scope-prefix'] || ''
-    const pgFunctionDelimiter = args['--pg-function-delimiter'] || '$plv8ify$'
-    const fallbackReturnType = args['--fallback-type'] || 'JSONB'
-    const mode = (args['--mode'] || 'inline') as Mode
-    const defaultVolatility = (args['--volatility'] ||
-      'IMMUTABLE') as Volatility
-    const typesFilePath = args['--types-config-file'] || 'types.ts'
-    const deployConcurrency = args['--deploy-concurrency'] || 10
-
-    return {
-      command: args._[0] as Command,
-      config: {
-        debug,
-        bundler: bundler as BundlerType,
-        writeBundlerOutput,
-        inputFilePath,
-        outputFolderPath,
-        scopePrefix,
-        pgFunctionDelimiter,
-        fallbackReturnType,
-        mode,
-        defaultVolatility,
-        typesFilePath,
-        deployConcurrency,
-      },
-    }
-  }
-
   static throwError(message?: string) {
     if (message) {
       console.error(message)
     }
     process.exit(1)
+  }
+
+  static buildCLI() {
+    const generateCommand = buildCommand({
+      loader: async () => import('../commands/generate.js'),
+      parameters: {
+        flags: {
+          'input-file': {
+            kind: 'parsed',
+            parse: (input) => input,
+            brief: 'Input TypeScript file',
+            default: 'input.ts',
+          },
+          'output-folder': {
+            kind: 'parsed',
+            parse: (input) => input,
+            brief: 'Output folder for generated files',
+            default: 'plv8ify-dist',
+          },
+          'bundler': {
+            kind: 'parsed',
+            parse: (value) => {
+              if (value !== 'esbuild' && value !== 'bun') {
+                throw new Error(`Invalid bundler: ${value}. Must be 'esbuild' or 'bun'`)
+              }
+              return value as BundlerType
+            },
+            brief: 'Bundler to use',
+            default: 'esbuild' as BundlerType,
+          },
+          'debug': {
+            kind: 'boolean',
+            brief: 'Enable debug mode',
+            default: false,
+          },
+          'types-config-file': {
+            kind: 'parsed',
+            parse: (input) => input,
+            brief: 'Types configuration file',
+            default: 'types.ts',
+          },
+          'write-bundler-output': {
+            kind: 'boolean',
+            brief: 'Write bundler output to file',
+            default: false,
+          },
+          'scope-prefix': {
+            kind: 'parsed',
+            parse: (input) => input,
+            brief: 'Scope prefix for generated functions',
+            default: '',
+          },
+          'pg-function-delimiter': {
+            kind: 'parsed',
+            parse: (input) => input,
+            brief: 'PostgreSQL function delimiter',
+            default: '$plv8ify$',
+          },
+          'fallback-type': {
+            kind: 'parsed',
+            parse: (input) => input,
+            brief: 'Fallback return type',
+            default: 'JSONB',
+          },
+          'mode': {
+            kind: 'parsed',
+            parse: (value) => {
+              if (value !== 'inline' && value !== 'bundle' && value !== 'start_proc') {
+                throw new Error(`Invalid mode: ${value}. Must be 'inline', 'bundle', or 'start_proc'`)
+              }
+              return value as Mode
+            },
+            brief: 'PLV8ify mode',
+            default: 'inline' as Mode,
+          },
+          'volatility': {
+            kind: 'parsed',
+            parse: (value) => {
+              if (value !== 'IMMUTABLE' && value !== 'STABLE' && value !== 'VOLATILE') {
+                throw new Error(`Invalid volatility: ${value}. Must be 'IMMUTABLE', 'STABLE', or 'VOLATILE'`)
+              }
+              return value as Volatility
+            },
+            brief: 'Default function volatility',
+            default: 'IMMUTABLE' as Volatility,
+          },
+        },
+      },
+      docs: {
+        brief: 'Generate PLV8 SQL functions from TypeScript',
+      },
+      func: async (flags) => {
+        const mod = await import('../commands/generate.js')
+        const config: CLIConfig = {
+          debug: flags['debug'],
+          bundler: flags['bundler'],
+          writeBundlerOutput: flags['write-bundler-output'],
+          inputFilePath: flags['input-file'],
+          outputFolderPath: flags['output-folder'],
+          scopePrefix: flags['scope-prefix'],
+          pgFunctionDelimiter: flags['pg-function-delimiter'],
+          fallbackReturnType: flags['fallback-type'],
+          mode: flags['mode'],
+          defaultVolatility: flags['volatility'],
+          typesFilePath: flags['types-config-file'],
+          deployConcurrency: 10, // Not used in generate command
+        }
+        await mod.generateCommand({
+          command: 'generate',
+          config,
+        })
+      },
+    })
+
+    const deployCommand = buildCommand({
+      loader: async () => import('../commands/deploy.js'),
+      parameters: {
+        flags: {
+          'output-folder': {
+            kind: 'parsed',
+            parse: (input) => input,
+            brief: 'Output folder for generated files',
+            default: 'plv8ify-dist',
+          },
+          'debug': {
+            kind: 'boolean',
+            brief: 'Enable debug mode',
+            default: false,
+          },
+          'deploy-concurrency': {
+            kind: 'parsed',
+            parse: numberParser,
+            brief: 'Deploy concurrency limit',
+            default: 10,
+          },
+        },
+      },
+      docs: {
+        brief: 'Deploy PLV8 functions to PostgreSQL database',
+      },
+      func: async (flags) => {
+        const mod = await import('../commands/deploy.js')
+        const config: CLIConfig = {
+          debug: flags['debug'],
+          bundler: 'esbuild' as BundlerType, // Not used in deploy
+          writeBundlerOutput: false,
+          inputFilePath: '',
+          outputFolderPath: flags['output-folder'],
+          scopePrefix: '',
+          pgFunctionDelimiter: '',
+          fallbackReturnType: '',
+          mode: 'inline' as Mode,
+          defaultVolatility: 'IMMUTABLE' as Volatility,
+          typesFilePath: '',
+          deployConcurrency: flags['deploy-concurrency'],
+        }
+        await mod.deployCommand({
+          command: 'deploy',
+          config,
+        })
+      },
+    })
+
+    const versionCommand = buildCommand({
+      loader: async () => import('../commands/version.js'),
+      parameters: {},
+      docs: {
+        brief: 'Show version information',
+      },
+      func: async () => {
+        const mod = await import('../commands/version.js')
+        mod.versionCommand()
+      },
+    })
+
+    const routeMap = buildRouteMap({
+      routes: {
+        generate: generateCommand,
+        deploy: deployCommand,
+        version: versionCommand,
+      },
+      docs: {
+        brief: 'PLV8ify - TypeScript to PostgreSQL PLV8 compiler',
+      },
+    })
+
+    return buildApplication(routeMap, {
+      name: 'plv8ify',
+      scanner: {
+        caseStyle: 'original',
+      },
+    })
   }
 }
