@@ -26,77 +26,9 @@ var __toESM = (module, isNodeMode) => {
 var require_typed_function = __commonJS({
   "node_modules/typed-function/lib/umd/typed-function.js"(exports, module) {
     (function(global, factory2) {
-      typeof exports === "object" && typeof module !== "undefined" ? module.exports = factory2() : typeof define === "function" && define.amd ? define(factory2) : (global = typeof globalThis !== "undefined" ? globalThis : global || self, global.typed = factory2());
+      typeof exports === "object" && typeof module !== "undefined" ? module.exports = factory2() : typeof define === "function" && define.amd ? define(factory2) : (global = typeof globalThis !== "undefined" ? globalThis : global || self, global["'typed'"] = factory2());
     })(exports, function() {
       "use strict";
-      function _createForOfIteratorHelper(o, allowArrayLike) {
-        var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"];
-        if (!it) {
-          if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") {
-            if (it)
-              o = it;
-            var i = 0;
-            var F = function F2() {
-            };
-            return { s: F, n: function n() {
-              if (i >= o.length)
-                return { done: true };
-              return { done: false, value: o[i++] };
-            }, e: function e(_e) {
-              throw _e;
-            }, f: F };
-          }
-          throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-        }
-        var normalCompletion = true, didErr = false, err;
-        return { s: function s() {
-          it = it.call(o);
-        }, n: function n() {
-          var step = it.next();
-          normalCompletion = step.done;
-          return step;
-        }, e: function e(_e2) {
-          didErr = true;
-          err = _e2;
-        }, f: function f() {
-          try {
-            if (!normalCompletion && it.return != null)
-              it.return();
-          } finally {
-            if (didErr)
-              throw err;
-          }
-        } };
-      }
-      function _unsupportedIterableToArray(o, minLen) {
-        if (!o)
-          return;
-        if (typeof o === "string")
-          return _arrayLikeToArray(o, minLen);
-        var n = Object.prototype.toString.call(o).slice(8, -1);
-        if (n === "Object" && o.constructor)
-          n = o.constructor.name;
-        if (n === "Map" || n === "Set")
-          return Array.from(o);
-        if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n))
-          return _arrayLikeToArray(o, minLen);
-      }
-      function _arrayLikeToArray(arr, len) {
-        if (len == null || len > arr.length)
-          len = arr.length;
-        for (var i = 0, arr2 = new Array(len); i < len; i++) {
-          arr2[i] = arr[i];
-        }
-        return arr2;
-      }
-      function _typeof(obj) {
-        "@babel/helpers - typeof";
-        return _typeof = typeof Symbol == "function" && typeof Symbol.iterator == "symbol" ? function(obj2) {
-          return typeof obj2;
-        } : function(obj2) {
-          return obj2 && typeof Symbol == "function" && obj2.constructor === Symbol && obj2 !== Symbol.prototype ? "symbol" : typeof obj2;
-        }, _typeof(obj);
-      }
       function ok() {
         return true;
       }
@@ -106,29 +38,29 @@ var require_typed_function = __commonJS({
       function undef() {
         return void 0;
       }
-      var NOT_TYPED_FUNCTION = "Argument is not a typed-function.";
+      const NOT_TYPED_FUNCTION = "Argument is not a typed-function.";
       function create() {
         function isPlainObject2(x) {
-          return _typeof(x) === "object" && x !== null && x.constructor === Object;
+          return typeof x === "object" && x !== null && x.constructor === Object;
         }
-        var _types = [{
+        const _types = [{
           name: "number",
-          test: function test(x) {
+          test: function(x) {
             return typeof x === "number";
           }
         }, {
           name: "string",
-          test: function test(x) {
+          test: function(x) {
             return typeof x === "string";
           }
         }, {
           name: "boolean",
-          test: function test(x) {
+          test: function(x) {
             return typeof x === "boolean";
           }
         }, {
           name: "Function",
-          test: function test(x) {
+          test: function(x) {
             return typeof x === "function";
           }
         }, {
@@ -136,12 +68,12 @@ var require_typed_function = __commonJS({
           test: Array.isArray
         }, {
           name: "Date",
-          test: function test(x) {
+          test: function(x) {
             return x instanceof Date;
           }
         }, {
           name: "RegExp",
-          test: function test(x) {
+          test: function(x) {
             return x instanceof RegExp;
           }
         }, {
@@ -149,59 +81,51 @@ var require_typed_function = __commonJS({
           test: isPlainObject2
         }, {
           name: "null",
-          test: function test(x) {
+          test: function(x) {
             return x === null;
           }
         }, {
           name: "undefined",
-          test: function test(x) {
+          test: function(x) {
             return x === void 0;
           }
         }];
-        var anyType = {
+        const anyType = {
           name: "any",
           test: ok,
           isAny: true
         };
-        var typeMap;
-        var typeList;
-        var nConversions = 0;
-        var typed2 = {
+        let typeMap;
+        let typeList;
+        let nConversions = 0;
+        let typed2 = {
           createCount: 0
         };
         function findType(typeName) {
-          var type = typeMap.get(typeName);
+          const type = typeMap.get(typeName);
           if (type) {
             return type;
           }
-          var message = 'Unknown type "' + typeName + '"';
-          var name21 = typeName.toLowerCase();
-          var otherName;
-          var _iterator = _createForOfIteratorHelper(typeList), _step;
-          try {
-            for (_iterator.s(); !(_step = _iterator.n()).done; ) {
-              otherName = _step.value;
-              if (otherName.toLowerCase() === name21) {
-                message += '. Did you mean "' + otherName + '" ?';
-                break;
-              }
+          let message = 'Unknown type "' + typeName + '"';
+          const name21 = typeName.toLowerCase();
+          let otherName;
+          for (otherName of typeList) {
+            if (otherName.toLowerCase() === name21) {
+              message += '. Did you mean "' + otherName + '" ?';
+              break;
             }
-          } catch (err) {
-            _iterator.e(err);
-          } finally {
-            _iterator.f();
           }
           throw new TypeError(message);
         }
         function addTypes(types) {
-          var beforeSpec = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : "any";
-          var beforeIndex = beforeSpec ? findType(beforeSpec).index : typeList.length;
-          var newTypes = [];
-          for (var i = 0; i < types.length; ++i) {
+          let beforeSpec = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : "any";
+          const beforeIndex = beforeSpec ? findType(beforeSpec).index : typeList.length;
+          const newTypes = [];
+          for (let i = 0; i < types.length; ++i) {
             if (!types[i] || typeof types[i].name !== "string" || typeof types[i].test !== "function") {
               throw new TypeError("Object with properties {name: string, test: function} expected");
             }
-            var typeName = types[i].name;
+            const typeName = types[i].name;
             if (typeMap.has(typeName)) {
               throw new TypeError('Duplicate type name "' + typeName + '"');
             }
@@ -214,10 +138,10 @@ var require_typed_function = __commonJS({
               conversionsTo: []
             });
           }
-          var affectedTypes = typeList.slice(beforeIndex);
+          const affectedTypes = typeList.slice(beforeIndex);
           typeList = typeList.slice(0, beforeIndex).concat(newTypes).concat(affectedTypes);
-          for (var _i = beforeIndex + newTypes.length; _i < typeList.length; ++_i) {
-            typeMap.get(typeList[_i]).index = _i;
+          for (let i = beforeIndex + newTypes.length; i < typeList.length; ++i) {
+            typeMap.get(typeList[i]).index = i;
           }
         }
         function clear() {
@@ -229,23 +153,15 @@ var require_typed_function = __commonJS({
         clear();
         addTypes(_types);
         function clearConversions() {
-          var typeName;
-          var _iterator2 = _createForOfIteratorHelper(typeList), _step2;
-          try {
-            for (_iterator2.s(); !(_step2 = _iterator2.n()).done; ) {
-              typeName = _step2.value;
-              typeMap.get(typeName).conversionsTo = [];
-            }
-          } catch (err) {
-            _iterator2.e(err);
-          } finally {
-            _iterator2.f();
+          let typeName;
+          for (typeName of typeList) {
+            typeMap.get(typeName).conversionsTo = [];
           }
           nConversions = 0;
         }
         function findTypeNames(value) {
-          var matches = typeList.filter(function(name21) {
-            var type = typeMap.get(name21);
+          const matches = typeList.filter((name21) => {
+            const type = typeMap.get(name21);
             return !type.isAny && type.test(value);
           });
           if (matches.length) {
@@ -260,75 +176,53 @@ var require_typed_function = __commonJS({
           if (!isTypedFunction(fn)) {
             throw new TypeError(NOT_TYPED_FUNCTION);
           }
-          var exact = options && options.exact;
-          var stringSignature = Array.isArray(signature) ? signature.join(",") : signature;
-          var params = parseSignature(stringSignature);
-          var canonicalSignature = stringifyParams(params);
+          const exact = options && options.exact;
+          const stringSignature = Array.isArray(signature) ? signature.join(",") : signature;
+          const params = parseSignature(stringSignature);
+          const canonicalSignature = stringifyParams(params);
           if (!exact || canonicalSignature in fn.signatures) {
-            var match = fn._typedFunctionData.signatureMap.get(canonicalSignature);
+            const match = fn._typedFunctionData.signatureMap.get(canonicalSignature);
             if (match) {
               return match;
             }
           }
-          var nParams = params.length;
-          var remainingSignatures;
+          const nParams = params.length;
+          let remainingSignatures;
           if (exact) {
             remainingSignatures = [];
-            var name21;
+            let name21;
             for (name21 in fn.signatures) {
               remainingSignatures.push(fn._typedFunctionData.signatureMap.get(name21));
             }
           } else {
             remainingSignatures = fn._typedFunctionData.signatures;
           }
-          for (var i = 0; i < nParams; ++i) {
-            var want = params[i];
-            var filteredSignatures = [];
-            var possibility = void 0;
-            var _iterator3 = _createForOfIteratorHelper(remainingSignatures), _step3;
-            try {
-              for (_iterator3.s(); !(_step3 = _iterator3.n()).done; ) {
-                possibility = _step3.value;
-                var have = getParamAtIndex(possibility.params, i);
-                if (!have || want.restParam && !have.restParam) {
+          for (let i = 0; i < nParams; ++i) {
+            const want = params[i];
+            const filteredSignatures = [];
+            let possibility;
+            for (possibility of remainingSignatures) {
+              const have = getParamAtIndex(possibility.params, i);
+              if (!have || want.restParam && !have.restParam) {
+                continue;
+              }
+              if (!have.hasAny) {
+                const haveTypes = paramTypeSet(have);
+                if (want.types.some((wtype) => !haveTypes.has(wtype.name))) {
                   continue;
                 }
-                if (!have.hasAny) {
-                  var _ret = function() {
-                    var haveTypes = paramTypeSet(have);
-                    if (want.types.some(function(wtype) {
-                      return !haveTypes.has(wtype.name);
-                    })) {
-                      return "continue";
-                    }
-                  }();
-                  if (_ret === "continue")
-                    continue;
-                }
-                filteredSignatures.push(possibility);
               }
-            } catch (err) {
-              _iterator3.e(err);
-            } finally {
-              _iterator3.f();
+              filteredSignatures.push(possibility);
             }
             remainingSignatures = filteredSignatures;
             if (remainingSignatures.length === 0)
               break;
           }
-          var candidate;
-          var _iterator4 = _createForOfIteratorHelper(remainingSignatures), _step4;
-          try {
-            for (_iterator4.s(); !(_step4 = _iterator4.n()).done; ) {
-              candidate = _step4.value;
-              if (candidate.params.length <= nParams) {
-                return candidate;
-              }
+          let candidate;
+          for (candidate of remainingSignatures) {
+            if (candidate.params.length <= nParams) {
+              return candidate;
             }
-          } catch (err) {
-            _iterator4.e(err);
-          } finally {
-            _iterator4.f();
           }
           throw new TypeError("Signature not found (signature: " + (fn.name || "unnamed") + "(" + stringifyParams(params, ", ") + "))");
         }
@@ -336,16 +230,16 @@ var require_typed_function = __commonJS({
           return findSignature(fn, signature, options).implementation;
         }
         function convert(value, typeName) {
-          var type = findType(typeName);
+          const type = findType(typeName);
           if (type.test(value)) {
             return value;
           }
-          var conversions = type.conversionsTo;
+          const conversions = type.conversionsTo;
           if (conversions.length === 0) {
             throw new Error("There are no conversions to " + typeName + " defined.");
           }
-          for (var i = 0; i < conversions.length; i++) {
-            var fromType = findType(conversions[i].from);
+          for (let i = 0; i < conversions.length; i++) {
+            const fromType = findType(conversions[i].from);
             if (fromType.test(value)) {
               return conversions[i].convert(value);
             }
@@ -353,20 +247,16 @@ var require_typed_function = __commonJS({
           throw new Error("Cannot convert " + value + " to " + typeName);
         }
         function stringifyParams(params) {
-          var separator = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : ",";
-          return params.map(function(p) {
-            return p.name;
-          }).join(separator);
+          let separator = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : ",";
+          return params.map((p) => p.name).join(separator);
         }
         function parseParam(param) {
-          var restParam = param.indexOf("...") === 0;
-          var types = !restParam ? param : param.length > 3 ? param.slice(3) : "any";
-          var typeDefs = types.split("|").map(function(s) {
-            return findType(s.trim());
-          });
-          var hasAny = false;
-          var paramName = restParam ? "..." : "";
-          var exactTypes = typeDefs.map(function(type) {
+          const restParam = param.indexOf("...") === 0;
+          const types = !restParam ? param : param.length > 3 ? param.slice(3) : "any";
+          const typeDefs = types.split("|").map((s) => findType(s.trim()));
+          let hasAny = false;
+          let paramName = restParam ? "..." : "";
+          const exactTypes = typeDefs.map(function(type) {
             hasAny = type.isAny || hasAny;
             paramName += type.name + "|";
             return {
@@ -387,14 +277,12 @@ var require_typed_function = __commonJS({
           };
         }
         function expandParam(param) {
-          var typeNames = param.types.map(function(t) {
-            return t.name;
-          });
-          var matchingConversions = availableConversions(typeNames);
-          var hasAny = param.hasAny;
-          var newName = param.name;
-          var convertibleTypes = matchingConversions.map(function(conversion) {
-            var type = findType(conversion.from);
+          const typeNames = param.types.map((t) => t.name);
+          const matchingConversions = availableConversions(typeNames);
+          let hasAny = param.hasAny;
+          let newName = param.name;
+          const convertibleTypes = matchingConversions.map(function(conversion) {
+            const type = findType(conversion.from);
             hasAny = type.isAny || hasAny;
             newName += "|" + conversion.from;
             return {
@@ -417,24 +305,22 @@ var require_typed_function = __commonJS({
         function paramTypeSet(param) {
           if (!param.typeSet) {
             param.typeSet = /* @__PURE__ */ new Set();
-            param.types.forEach(function(type) {
-              return param.typeSet.add(type.name);
-            });
+            param.types.forEach((type) => param.typeSet.add(type.name));
           }
           return param.typeSet;
         }
         function parseSignature(rawSignature) {
-          var params = [];
+          const params = [];
           if (typeof rawSignature !== "string") {
             throw new TypeError("Signatures must be strings");
           }
-          var signature = rawSignature.trim();
+          const signature = rawSignature.trim();
           if (signature === "") {
             return params;
           }
-          var rawParams = signature.split(",");
-          for (var i = 0; i < rawParams.length; ++i) {
-            var parsedParam = parseParam(rawParams[i].trim());
+          const rawParams = signature.split(",");
+          for (let i = 0; i < rawParams.length; ++i) {
+            const parsedParam = parseParam(rawParams[i].trim());
             if (parsedParam.restParam && i !== rawParams.length - 1) {
               throw new SyntaxError('Unexpected rest parameter "' + rawParams[i] + '": only allowed for the last parameter');
             }
@@ -446,7 +332,7 @@ var require_typed_function = __commonJS({
           return params;
         }
         function hasRestParam(params) {
-          var param = last(params);
+          const param = last(params);
           return param ? param.restParam : false;
         }
         function compileTest(param) {
@@ -455,17 +341,17 @@ var require_typed_function = __commonJS({
           } else if (param.types.length === 1) {
             return findType(param.types[0].name).test;
           } else if (param.types.length === 2) {
-            var test0 = findType(param.types[0].name).test;
-            var test1 = findType(param.types[1].name).test;
+            const test0 = findType(param.types[0].name).test;
+            const test1 = findType(param.types[1].name).test;
             return function or(x) {
               return test0(x) || test1(x);
             };
           } else {
-            var tests = param.types.map(function(type) {
+            const tests = param.types.map(function(type) {
               return findType(type.name).test;
             });
             return function or(x) {
-              for (var i = 0; i < tests.length; i++) {
+              for (let i = 0; i < tests.length; i++) {
                 if (tests[i](x)) {
                   return true;
                 }
@@ -475,13 +361,13 @@ var require_typed_function = __commonJS({
           }
         }
         function compileTests(params) {
-          var tests, test0, test1;
+          let tests, test0, test1;
           if (hasRestParam(params)) {
             tests = initial(params).map(compileTest);
-            var varIndex = tests.length;
-            var lastTest = compileTest(last(params));
-            var testRestParam = function testRestParam2(args) {
-              for (var i = varIndex; i < args.length; i++) {
+            const varIndex = tests.length;
+            const lastTest = compileTest(last(params));
+            const testRestParam = function(args) {
+              for (let i = varIndex; i < args.length; i++) {
                 if (!lastTest(args[i])) {
                   return false;
                 }
@@ -489,7 +375,7 @@ var require_typed_function = __commonJS({
               return true;
             };
             return function testArgs(args) {
-              for (var i = 0; i < tests.length; i++) {
+              for (let i = 0; i < tests.length; i++) {
                 if (!tests[i](args[i])) {
                   return false;
                 }
@@ -515,7 +401,7 @@ var require_typed_function = __commonJS({
             } else {
               tests = params.map(compileTest);
               return function testArgs(args) {
-                for (var i = 0; i < tests.length; i++) {
+                for (let i = 0; i < tests.length; i++) {
                   if (!tests[i](args[i])) {
                     return false;
                   }
@@ -529,7 +415,7 @@ var require_typed_function = __commonJS({
           return index < params.length ? params[index] : hasRestParam(params) ? last(params) : null;
         }
         function getTypeSetAtIndex(params, index) {
-          var param = getParamAtIndex(params, index);
+          const param = getParamAtIndex(params, index);
           if (!param) {
             return /* @__PURE__ */ new Set();
           }
@@ -539,34 +425,26 @@ var require_typed_function = __commonJS({
           return type.conversion === null || type.conversion === void 0;
         }
         function mergeExpectedParams(signatures, index) {
-          var typeSet = /* @__PURE__ */ new Set();
-          signatures.forEach(function(signature) {
-            var paramSet = getTypeSetAtIndex(signature.params, index);
-            var name21;
-            var _iterator5 = _createForOfIteratorHelper(paramSet), _step5;
-            try {
-              for (_iterator5.s(); !(_step5 = _iterator5.n()).done; ) {
-                name21 = _step5.value;
-                typeSet.add(name21);
-              }
-            } catch (err) {
-              _iterator5.e(err);
-            } finally {
-              _iterator5.f();
+          const typeSet = /* @__PURE__ */ new Set();
+          signatures.forEach((signature) => {
+            const paramSet = getTypeSetAtIndex(signature.params, index);
+            let name21;
+            for (name21 of paramSet) {
+              typeSet.add(name21);
             }
           });
           return typeSet.has("any") ? ["any"] : Array.from(typeSet);
         }
         function createError(name21, args, signatures) {
-          var err, expected;
-          var _name = name21 || "unnamed";
-          var matchingSignatures = signatures;
-          var index;
-          var _loop = function _loop2() {
-            var nextMatchingDefs = [];
-            matchingSignatures.forEach(function(signature) {
-              var param = getParamAtIndex(signature.params, index);
-              var test = compileTest(param);
+          let err, expected;
+          const _name = name21 || "unnamed";
+          let matchingSignatures = signatures;
+          let index;
+          for (index = 0; index < args.length; index++) {
+            const nextMatchingDefs = [];
+            matchingSignatures.forEach((signature) => {
+              const param = getParamAtIndex(signature.params, index);
+              const test = compileTest(param);
               if ((index < signature.params.length || hasRestParam(signature.params)) && test(args[index])) {
                 nextMatchingDefs.push(signature);
               }
@@ -574,7 +452,7 @@ var require_typed_function = __commonJS({
             if (nextMatchingDefs.length === 0) {
               expected = mergeExpectedParams(matchingSignatures, index);
               if (expected.length > 0) {
-                var actualTypes = findTypeNames(args[index]);
+                const actualTypes = findTypeNames(args[index]);
                 err = new TypeError("Unexpected type of argument in function " + _name + " (expected: " + expected.join(" or ") + ", actual: " + actualTypes.join(" | ") + ", index: " + index + ")");
                 err.data = {
                   category: "wrongType",
@@ -583,20 +461,13 @@ var require_typed_function = __commonJS({
                   actual: actualTypes,
                   expected
                 };
-                return {
-                  v: err
-                };
+                return err;
               }
             } else {
               matchingSignatures = nextMatchingDefs;
             }
-          };
-          for (index = 0; index < args.length; index++) {
-            var _ret2 = _loop();
-            if (_typeof(_ret2) === "object")
-              return _ret2.v;
           }
-          var lengths = matchingSignatures.map(function(signature) {
+          const lengths = matchingSignatures.map(function(signature) {
             return hasRestParam(signature.params) ? Infinity : signature.params.length;
           });
           if (args.length < Math.min.apply(null, lengths)) {
@@ -610,7 +481,7 @@ var require_typed_function = __commonJS({
             };
             return err;
           }
-          var maxLength = Math.max.apply(null, lengths);
+          const maxLength = Math.max.apply(null, lengths);
           if (args.length > maxLength) {
             err = new TypeError("Too many arguments in function " + _name + " (expected: " + maxLength + ", actual: " + args.length + ")");
             err.data = {
@@ -621,8 +492,8 @@ var require_typed_function = __commonJS({
             };
             return err;
           }
-          var argTypes = [];
-          for (var i = 0; i < args.length; ++i) {
+          const argTypes = [];
+          for (let i = 0; i < args.length; ++i) {
             argTypes.push(findTypeNames(args[i]).join("|"));
           }
           err = new TypeError('Arguments of type "' + argTypes.join(", ") + '" do not match any of the defined signatures of function ' + _name + ".");
@@ -633,8 +504,8 @@ var require_typed_function = __commonJS({
           return err;
         }
         function getLowestTypeIndex(param) {
-          var min2 = typeList.length + 1;
-          for (var i = 0; i < param.types.length; i++) {
+          let min2 = typeList.length + 1;
+          for (let i = 0; i < param.types.length; i++) {
             if (isExactType(param.types[i])) {
               min2 = Math.min(min2, param.types[i].typeIndex);
             }
@@ -642,8 +513,8 @@ var require_typed_function = __commonJS({
           return min2;
         }
         function getLowestConversionIndex(param) {
-          var min2 = nConversions + 1;
-          for (var i = 0; i < param.types.length; i++) {
+          let min2 = nConversions + 1;
+          for (let i = 0; i < param.types.length; i++) {
             if (!isExactType(param.types[i])) {
               min2 = Math.min(min2, param.types[i].conversionIndex);
             }
@@ -672,14 +543,14 @@ var require_typed_function = __commonJS({
           } else if (param2.hasConversion) {
             return -1;
           }
-          var typeDiff = getLowestTypeIndex(param1) - getLowestTypeIndex(param2);
+          const typeDiff = getLowestTypeIndex(param1) - getLowestTypeIndex(param2);
           if (typeDiff < 0) {
             return -1;
           }
           if (typeDiff > 0) {
             return 1;
           }
-          var convDiff = getLowestConversionIndex(param1) - getLowestConversionIndex(param2);
+          const convDiff = getLowestConversionIndex(param1) - getLowestConversionIndex(param2);
           if (convDiff < 0) {
             return -1;
           }
@@ -689,12 +560,12 @@ var require_typed_function = __commonJS({
           return 0;
         }
         function compareSignatures(signature1, signature2) {
-          var pars1 = signature1.params;
-          var pars2 = signature2.params;
-          var last1 = last(pars1);
-          var last2 = last(pars2);
-          var hasRest1 = hasRestParam(pars1);
-          var hasRest2 = hasRestParam(pars2);
+          const pars1 = signature1.params;
+          const pars2 = signature2.params;
+          const last1 = last(pars1);
+          const last2 = last(pars2);
+          const hasRest1 = hasRestParam(pars1);
+          const hasRest2 = hasRestParam(pars2);
           if (hasRest1 && last1.hasAny) {
             if (!hasRest2 || !last2.hasAny) {
               return 1;
@@ -702,38 +573,22 @@ var require_typed_function = __commonJS({
           } else if (hasRest2 && last2.hasAny) {
             return -1;
           }
-          var any1 = 0;
-          var conv1 = 0;
-          var par;
-          var _iterator6 = _createForOfIteratorHelper(pars1), _step6;
-          try {
-            for (_iterator6.s(); !(_step6 = _iterator6.n()).done; ) {
-              par = _step6.value;
-              if (par.hasAny)
-                ++any1;
-              if (par.hasConversion)
-                ++conv1;
-            }
-          } catch (err) {
-            _iterator6.e(err);
-          } finally {
-            _iterator6.f();
+          let any1 = 0;
+          let conv1 = 0;
+          let par;
+          for (par of pars1) {
+            if (par.hasAny)
+              ++any1;
+            if (par.hasConversion)
+              ++conv1;
           }
-          var any2 = 0;
-          var conv2 = 0;
-          var _iterator7 = _createForOfIteratorHelper(pars2), _step7;
-          try {
-            for (_iterator7.s(); !(_step7 = _iterator7.n()).done; ) {
-              par = _step7.value;
-              if (par.hasAny)
-                ++any2;
-              if (par.hasConversion)
-                ++conv2;
-            }
-          } catch (err) {
-            _iterator7.e(err);
-          } finally {
-            _iterator7.f();
+          let any2 = 0;
+          let conv2 = 0;
+          for (par of pars2) {
+            if (par.hasAny)
+              ++any2;
+            if (par.hasConversion)
+              ++conv2;
           }
           if (any1 !== any2) {
             return any1 - any2;
@@ -755,23 +610,22 @@ var require_typed_function = __commonJS({
           } else if (hasRest2) {
             return -1;
           }
-          var lengthCriterion = (pars1.length - pars2.length) * (hasRest1 ? -1 : 1);
+          const lengthCriterion = (pars1.length - pars2.length) * (hasRest1 ? -1 : 1);
           if (lengthCriterion !== 0) {
             return lengthCriterion;
           }
-          var comparisons = [];
-          var tc = 0;
-          for (var i = 0; i < pars1.length; ++i) {
-            var thisComparison = compareParams(pars1[i], pars2[i]);
+          const comparisons = [];
+          let tc = 0;
+          for (let i = 0; i < pars1.length; ++i) {
+            const thisComparison = compareParams(pars1[i], pars2[i]);
             comparisons.push(thisComparison);
             tc += thisComparison;
           }
           if (tc !== 0) {
             return tc;
           }
-          var c;
-          for (var _i2 = 0, _comparisons = comparisons; _i2 < _comparisons.length; _i2++) {
-            c = _comparisons[_i2];
+          let c;
+          for (c of comparisons) {
             if (c !== 0) {
               return c;
             }
@@ -782,48 +636,36 @@ var require_typed_function = __commonJS({
           if (typeNames.length === 0) {
             return [];
           }
-          var types = typeNames.map(findType);
+          const types = typeNames.map(findType);
           if (typeNames.length > 1) {
-            types.sort(function(t1, t2) {
-              return t1.index - t2.index;
-            });
+            types.sort((t1, t2) => t1.index - t2.index);
           }
-          var matches = types[0].conversionsTo;
+          let matches = types[0].conversionsTo;
           if (typeNames.length === 1) {
             return matches;
           }
           matches = matches.concat([]);
-          var knownTypes = new Set(typeNames);
-          for (var i = 1; i < types.length; ++i) {
-            var newMatch = void 0;
-            var _iterator8 = _createForOfIteratorHelper(types[i].conversionsTo), _step8;
-            try {
-              for (_iterator8.s(); !(_step8 = _iterator8.n()).done; ) {
-                newMatch = _step8.value;
-                if (!knownTypes.has(newMatch.from)) {
-                  matches.push(newMatch);
-                  knownTypes.add(newMatch.from);
-                }
+          const knownTypes = new Set(typeNames);
+          for (let i = 1; i < types.length; ++i) {
+            let newMatch;
+            for (newMatch of types[i].conversionsTo) {
+              if (!knownTypes.has(newMatch.from)) {
+                matches.push(newMatch);
+                knownTypes.add(newMatch.from);
               }
-            } catch (err) {
-              _iterator8.e(err);
-            } finally {
-              _iterator8.f();
             }
           }
           return matches;
         }
         function compileArgsPreprocessing(params, fn) {
-          var fnConvert = fn;
-          if (params.some(function(p) {
-            return p.hasConversion;
-          })) {
-            var restParam = hasRestParam(params);
-            var compiledConversions = params.map(compileArgConversion);
+          let fnConvert = fn;
+          if (params.some((p) => p.hasConversion)) {
+            const restParam = hasRestParam(params);
+            const compiledConversions = params.map(compileArgConversion);
             fnConvert = function convertArgs() {
-              var args = [];
-              var last2 = restParam ? arguments.length - 1 : arguments.length;
-              for (var i = 0; i < last2; i++) {
+              const args = [];
+              const last2 = restParam ? arguments.length - 1 : arguments.length;
+              for (let i = 0; i < last2; i++) {
                 args[i] = compiledConversions[i](arguments[i]);
               }
               if (restParam) {
@@ -832,9 +674,9 @@ var require_typed_function = __commonJS({
               return fn.apply(this, args);
             };
           }
-          var fnPreprocess = fnConvert;
+          let fnPreprocess = fnConvert;
           if (hasRestParam(params)) {
-            var offset = params.length - 1;
+            const offset = params.length - 1;
             fnPreprocess = function preprocessRestParams() {
               return fnConvert.apply(this, slice(arguments, 0, offset).concat([slice(arguments, offset)]));
             };
@@ -842,9 +684,9 @@ var require_typed_function = __commonJS({
           return fnPreprocess;
         }
         function compileArgConversion(param) {
-          var test0, test1, conversion0, conversion1;
-          var tests = [];
-          var conversions = [];
+          let test0, test1, conversion0, conversion1;
+          const tests = [];
+          const conversions = [];
           param.types.forEach(function(type) {
             if (type.conversion) {
               tests.push(findType(type.conversion.from).test);
@@ -881,7 +723,7 @@ var require_typed_function = __commonJS({
               };
             default:
               return function convertArg(arg) {
-                for (var i = 0; i < conversions.length; i++) {
+                for (let i = 0; i < conversions.length; i++) {
                   if (tests[i](arg)) {
                     return conversions[i](arg);
                   }
@@ -893,19 +735,15 @@ var require_typed_function = __commonJS({
         function splitParams(params) {
           function _splitParams(params2, index, paramsSoFar) {
             if (index < params2.length) {
-              var param = params2[index];
-              var resultingParams = [];
+              const param = params2[index];
+              let resultingParams = [];
               if (param.restParam) {
-                var exactTypes = param.types.filter(isExactType);
+                const exactTypes = param.types.filter(isExactType);
                 if (exactTypes.length < param.types.length) {
                   resultingParams.push({
                     types: exactTypes,
-                    name: "..." + exactTypes.map(function(t) {
-                      return t.name;
-                    }).join("|"),
-                    hasAny: exactTypes.some(function(t) {
-                      return t.isAny;
-                    }),
+                    name: "..." + exactTypes.map((t) => t.name).join("|"),
+                    hasAny: exactTypes.some((t) => t.isAny),
                     hasConversion: false,
                     restParam: true
                   });
@@ -932,38 +770,30 @@ var require_typed_function = __commonJS({
           return _splitParams(params, 0, []);
         }
         function conflicting(params1, params2) {
-          var ii = Math.max(params1.length, params2.length);
-          for (var i = 0; i < ii; i++) {
-            var typeSet1 = getTypeSetAtIndex(params1, i);
-            var typeSet2 = getTypeSetAtIndex(params2, i);
-            var overlap = false;
-            var name21 = void 0;
-            var _iterator9 = _createForOfIteratorHelper(typeSet2), _step9;
-            try {
-              for (_iterator9.s(); !(_step9 = _iterator9.n()).done; ) {
-                name21 = _step9.value;
-                if (typeSet1.has(name21)) {
-                  overlap = true;
-                  break;
-                }
+          const ii = Math.max(params1.length, params2.length);
+          for (let i = 0; i < ii; i++) {
+            const typeSet1 = getTypeSetAtIndex(params1, i);
+            const typeSet2 = getTypeSetAtIndex(params2, i);
+            let overlap = false;
+            let name21;
+            for (name21 of typeSet2) {
+              if (typeSet1.has(name21)) {
+                overlap = true;
+                break;
               }
-            } catch (err) {
-              _iterator9.e(err);
-            } finally {
-              _iterator9.f();
             }
             if (!overlap) {
               return false;
             }
           }
-          var len1 = params1.length;
-          var len2 = params2.length;
-          var restParam1 = hasRestParam(params1);
-          var restParam2 = hasRestParam(params2);
+          const len1 = params1.length;
+          const len2 = params2.length;
+          const restParam1 = hasRestParam(params1);
+          const restParam2 = hasRestParam(params2);
           return restParam1 ? restParam2 ? len1 === len2 : len2 >= len1 : restParam2 ? len1 >= len2 : len1 === len2;
         }
         function clearResolutions(functionList) {
-          return functionList.map(function(fn) {
+          return functionList.map((fn) => {
             if (isReferToSelf(fn)) {
               return referToSelf(fn.referToSelf.callback);
             }
@@ -974,47 +804,39 @@ var require_typed_function = __commonJS({
           });
         }
         function collectResolutions(references, functionList, signatureMap) {
-          var resolvedReferences = [];
-          var reference;
-          var _iterator10 = _createForOfIteratorHelper(references), _step10;
-          try {
-            for (_iterator10.s(); !(_step10 = _iterator10.n()).done; ) {
-              reference = _step10.value;
-              var resolution = signatureMap[reference];
-              if (typeof resolution !== "number") {
-                throw new TypeError('No definition for referenced signature "' + reference + '"');
-              }
-              resolution = functionList[resolution];
-              if (typeof resolution !== "function") {
-                return false;
-              }
-              resolvedReferences.push(resolution);
+          const resolvedReferences = [];
+          let reference;
+          for (reference of references) {
+            let resolution = signatureMap[reference];
+            if (typeof resolution !== "number") {
+              throw new TypeError('No definition for referenced signature "' + reference + '"');
             }
-          } catch (err) {
-            _iterator10.e(err);
-          } finally {
-            _iterator10.f();
+            resolution = functionList[resolution];
+            if (typeof resolution !== "function") {
+              return false;
+            }
+            resolvedReferences.push(resolution);
           }
           return resolvedReferences;
         }
         function resolveReferences(functionList, signatureMap, self2) {
-          var resolvedFunctions = clearResolutions(functionList);
-          var isResolved = new Array(resolvedFunctions.length).fill(false);
-          var leftUnresolved = true;
+          const resolvedFunctions = clearResolutions(functionList);
+          const isResolved = new Array(resolvedFunctions.length).fill(false);
+          let leftUnresolved = true;
           while (leftUnresolved) {
             leftUnresolved = false;
-            var nothingResolved = true;
-            for (var i = 0; i < resolvedFunctions.length; ++i) {
+            let nothingResolved = true;
+            for (let i = 0; i < resolvedFunctions.length; ++i) {
               if (isResolved[i])
                 continue;
-              var fn = resolvedFunctions[i];
+              const fn = resolvedFunctions[i];
               if (isReferToSelf(fn)) {
                 resolvedFunctions[i] = fn.referToSelf.callback(self2);
                 resolvedFunctions[i].referToSelf = fn.referToSelf;
                 isResolved[i] = true;
                 nothingResolved = false;
               } else if (isReferTo(fn)) {
-                var resolvedReferences = collectResolutions(fn.referTo.references, resolvedFunctions, signatureMap);
+                const resolvedReferences = collectResolutions(fn.referTo.references, resolvedFunctions, signatureMap);
                 if (resolvedReferences) {
                   resolvedFunctions[i] = fn.referTo.callback.apply(this, resolvedReferences);
                   resolvedFunctions[i].referTo = fn.referTo;
@@ -1032,9 +854,9 @@ var require_typed_function = __commonJS({
           return resolvedFunctions;
         }
         function validateDeprecatedThis(signaturesMap) {
-          var deprecatedThisRegex = /\bthis(\(|\.signatures\b)/;
-          Object.keys(signaturesMap).forEach(function(signature) {
-            var fn = signaturesMap[signature];
+          const deprecatedThisRegex = /\bthis(\(|\.signatures\b)/;
+          Object.keys(signaturesMap).forEach((signature) => {
+            const fn = signaturesMap[signature];
             if (deprecatedThisRegex.test(fn.toString())) {
               throw new SyntaxError("Using `this` to self-reference a function is deprecated since typed-function@3. Use typed.referTo and typed.referToSelf instead.");
             }
@@ -1048,122 +870,102 @@ var require_typed_function = __commonJS({
           if (typed2.warnAgainstDeprecatedThis) {
             validateDeprecatedThis(rawSignaturesMap);
           }
-          var parsedParams = [];
-          var originalFunctions = [];
-          var signaturesMap = {};
-          var preliminarySignatures = [];
-          var signature;
-          var _loop2 = function _loop22() {
+          const parsedParams = [];
+          const originalFunctions = [];
+          const signaturesMap = {};
+          const preliminarySignatures = [];
+          let signature;
+          for (signature in rawSignaturesMap) {
             if (!Object.prototype.hasOwnProperty.call(rawSignaturesMap, signature)) {
-              return "continue";
+              continue;
             }
-            var params = parseSignature(signature);
+            const params = parseSignature(signature);
             if (!params)
-              return "continue";
+              continue;
             parsedParams.forEach(function(pp) {
               if (conflicting(pp, params)) {
                 throw new TypeError('Conflicting signatures "' + stringifyParams(pp) + '" and "' + stringifyParams(params) + '".');
               }
             });
             parsedParams.push(params);
-            var functionIndex = originalFunctions.length;
+            const functionIndex = originalFunctions.length;
             originalFunctions.push(rawSignaturesMap[signature]);
-            var conversionParams = params.map(expandParam);
-            var sp = void 0;
-            var _iterator11 = _createForOfIteratorHelper(splitParams(conversionParams)), _step11;
-            try {
-              for (_iterator11.s(); !(_step11 = _iterator11.n()).done; ) {
-                sp = _step11.value;
-                var spName = stringifyParams(sp);
-                preliminarySignatures.push({
-                  params: sp,
-                  name: spName,
-                  fn: functionIndex
-                });
-                if (sp.every(function(p) {
-                  return !p.hasConversion;
-                })) {
-                  signaturesMap[spName] = functionIndex;
-                }
+            const conversionParams = params.map(expandParam);
+            let sp;
+            for (sp of splitParams(conversionParams)) {
+              const spName = stringifyParams(sp);
+              preliminarySignatures.push({
+                params: sp,
+                name: spName,
+                fn: functionIndex
+              });
+              if (sp.every((p) => !p.hasConversion)) {
+                signaturesMap[spName] = functionIndex;
               }
-            } catch (err) {
-              _iterator11.e(err);
-            } finally {
-              _iterator11.f();
             }
-          };
-          for (signature in rawSignaturesMap) {
-            var _ret3 = _loop2();
-            if (_ret3 === "continue")
-              continue;
           }
           preliminarySignatures.sort(compareSignatures);
-          var resolvedFunctions = resolveReferences(originalFunctions, signaturesMap, theTypedFn);
-          var s;
+          const resolvedFunctions = resolveReferences(originalFunctions, signaturesMap, theTypedFn);
+          let s;
           for (s in signaturesMap) {
             if (Object.prototype.hasOwnProperty.call(signaturesMap, s)) {
               signaturesMap[s] = resolvedFunctions[signaturesMap[s]];
             }
           }
-          var signatures = [];
-          var internalSignatureMap = /* @__PURE__ */ new Map();
-          for (var _i3 = 0, _preliminarySignature = preliminarySignatures; _i3 < _preliminarySignature.length; _i3++) {
-            s = _preliminarySignature[_i3];
+          const signatures = [];
+          const internalSignatureMap = /* @__PURE__ */ new Map();
+          for (s of preliminarySignatures) {
             if (!internalSignatureMap.has(s.name)) {
               s.fn = resolvedFunctions[s.fn];
               signatures.push(s);
               internalSignatureMap.set(s.name, s);
             }
           }
-          var ok0 = signatures[0] && signatures[0].params.length <= 2 && !hasRestParam(signatures[0].params);
-          var ok1 = signatures[1] && signatures[1].params.length <= 2 && !hasRestParam(signatures[1].params);
-          var ok2 = signatures[2] && signatures[2].params.length <= 2 && !hasRestParam(signatures[2].params);
-          var ok3 = signatures[3] && signatures[3].params.length <= 2 && !hasRestParam(signatures[3].params);
-          var ok4 = signatures[4] && signatures[4].params.length <= 2 && !hasRestParam(signatures[4].params);
-          var ok5 = signatures[5] && signatures[5].params.length <= 2 && !hasRestParam(signatures[5].params);
-          var allOk = ok0 && ok1 && ok2 && ok3 && ok4 && ok5;
-          for (var i = 0; i < signatures.length; ++i) {
+          const ok0 = signatures[0] && signatures[0].params.length <= 2 && !hasRestParam(signatures[0].params);
+          const ok1 = signatures[1] && signatures[1].params.length <= 2 && !hasRestParam(signatures[1].params);
+          const ok2 = signatures[2] && signatures[2].params.length <= 2 && !hasRestParam(signatures[2].params);
+          const ok3 = signatures[3] && signatures[3].params.length <= 2 && !hasRestParam(signatures[3].params);
+          const ok4 = signatures[4] && signatures[4].params.length <= 2 && !hasRestParam(signatures[4].params);
+          const ok5 = signatures[5] && signatures[5].params.length <= 2 && !hasRestParam(signatures[5].params);
+          const allOk = ok0 && ok1 && ok2 && ok3 && ok4 && ok5;
+          for (let i = 0; i < signatures.length; ++i) {
             signatures[i].test = compileTests(signatures[i].params);
           }
-          var test00 = ok0 ? compileTest(signatures[0].params[0]) : notOk;
-          var test10 = ok1 ? compileTest(signatures[1].params[0]) : notOk;
-          var test20 = ok2 ? compileTest(signatures[2].params[0]) : notOk;
-          var test30 = ok3 ? compileTest(signatures[3].params[0]) : notOk;
-          var test40 = ok4 ? compileTest(signatures[4].params[0]) : notOk;
-          var test50 = ok5 ? compileTest(signatures[5].params[0]) : notOk;
-          var test01 = ok0 ? compileTest(signatures[0].params[1]) : notOk;
-          var test11 = ok1 ? compileTest(signatures[1].params[1]) : notOk;
-          var test21 = ok2 ? compileTest(signatures[2].params[1]) : notOk;
-          var test31 = ok3 ? compileTest(signatures[3].params[1]) : notOk;
-          var test41 = ok4 ? compileTest(signatures[4].params[1]) : notOk;
-          var test51 = ok5 ? compileTest(signatures[5].params[1]) : notOk;
-          for (var _i4 = 0; _i4 < signatures.length; ++_i4) {
-            signatures[_i4].implementation = compileArgsPreprocessing(signatures[_i4].params, signatures[_i4].fn);
+          const test00 = ok0 ? compileTest(signatures[0].params[0]) : notOk;
+          const test10 = ok1 ? compileTest(signatures[1].params[0]) : notOk;
+          const test20 = ok2 ? compileTest(signatures[2].params[0]) : notOk;
+          const test30 = ok3 ? compileTest(signatures[3].params[0]) : notOk;
+          const test40 = ok4 ? compileTest(signatures[4].params[0]) : notOk;
+          const test50 = ok5 ? compileTest(signatures[5].params[0]) : notOk;
+          const test01 = ok0 ? compileTest(signatures[0].params[1]) : notOk;
+          const test11 = ok1 ? compileTest(signatures[1].params[1]) : notOk;
+          const test21 = ok2 ? compileTest(signatures[2].params[1]) : notOk;
+          const test31 = ok3 ? compileTest(signatures[3].params[1]) : notOk;
+          const test41 = ok4 ? compileTest(signatures[4].params[1]) : notOk;
+          const test51 = ok5 ? compileTest(signatures[5].params[1]) : notOk;
+          for (let i = 0; i < signatures.length; ++i) {
+            signatures[i].implementation = compileArgsPreprocessing(signatures[i].params, signatures[i].fn);
           }
-          var fn0 = ok0 ? signatures[0].implementation : undef;
-          var fn1 = ok1 ? signatures[1].implementation : undef;
-          var fn2 = ok2 ? signatures[2].implementation : undef;
-          var fn3 = ok3 ? signatures[3].implementation : undef;
-          var fn4 = ok4 ? signatures[4].implementation : undef;
-          var fn5 = ok5 ? signatures[5].implementation : undef;
-          var len0 = ok0 ? signatures[0].params.length : -1;
-          var len1 = ok1 ? signatures[1].params.length : -1;
-          var len2 = ok2 ? signatures[2].params.length : -1;
-          var len3 = ok3 ? signatures[3].params.length : -1;
-          var len4 = ok4 ? signatures[4].params.length : -1;
-          var len5 = ok5 ? signatures[5].params.length : -1;
-          var iStart = allOk ? 6 : 0;
-          var iEnd = signatures.length;
-          var tests = signatures.map(function(s2) {
-            return s2.test;
-          });
-          var fns = signatures.map(function(s2) {
-            return s2.implementation;
-          });
-          var generic = function generic2() {
-            for (var _i5 = iStart; _i5 < iEnd; _i5++) {
-              if (tests[_i5](arguments)) {
-                return fns[_i5].apply(this, arguments);
+          const fn0 = ok0 ? signatures[0].implementation : undef;
+          const fn1 = ok1 ? signatures[1].implementation : undef;
+          const fn2 = ok2 ? signatures[2].implementation : undef;
+          const fn3 = ok3 ? signatures[3].implementation : undef;
+          const fn4 = ok4 ? signatures[4].implementation : undef;
+          const fn5 = ok5 ? signatures[5].implementation : undef;
+          const len0 = ok0 ? signatures[0].params.length : -1;
+          const len1 = ok1 ? signatures[1].params.length : -1;
+          const len2 = ok2 ? signatures[2].params.length : -1;
+          const len3 = ok3 ? signatures[3].params.length : -1;
+          const len4 = ok4 ? signatures[4].params.length : -1;
+          const len5 = ok5 ? signatures[5].params.length : -1;
+          const iStart = allOk ? 6 : 0;
+          const iEnd = signatures.length;
+          const tests = signatures.map((s2) => s2.test);
+          const fns = signatures.map((s2) => s2.implementation);
+          const generic = function generic2() {
+            for (let i = iStart; i < iEnd; i++) {
+              if (tests[i](arguments)) {
+                return fns[i].apply(this, arguments);
               }
             }
             return typed2.onMismatch(name21, arguments, signatures);
@@ -1215,7 +1017,7 @@ var require_typed_function = __commonJS({
           return Array.prototype.slice.call(arr, start, end);
         }
         function findInArray(arr, test) {
-          for (var i = 0; i < arr.length; i++) {
+          for (let i = 0; i < arr.length; i++) {
             if (test(arr[i])) {
               return arr[i];
             }
@@ -1226,10 +1028,8 @@ var require_typed_function = __commonJS({
           return Array.prototype.concat.apply([], arr.map(callback));
         }
         function referTo() {
-          var references = initial(arguments).map(function(s) {
-            return stringifyParams(parseSignature(s));
-          });
-          var callback = last(arguments);
+          const references = initial(arguments).map((s) => stringifyParams(parseSignature(s)));
+          const callback = last(arguments);
           if (typeof callback !== "function") {
             throw new TypeError("Callback function expected as last argument");
           }
@@ -1254,17 +1054,17 @@ var require_typed_function = __commonJS({
           };
         }
         function isReferTo(objectOrFn) {
-          return objectOrFn && _typeof(objectOrFn.referTo) === "object" && Array.isArray(objectOrFn.referTo.references) && typeof objectOrFn.referTo.callback === "function";
+          return objectOrFn && typeof objectOrFn.referTo === "object" && Array.isArray(objectOrFn.referTo.references) && typeof objectOrFn.referTo.callback === "function";
         }
         function isReferToSelf(objectOrFn) {
-          return objectOrFn && _typeof(objectOrFn.referToSelf) === "object" && typeof objectOrFn.referToSelf.callback === "function";
+          return objectOrFn && typeof objectOrFn.referToSelf === "object" && typeof objectOrFn.referToSelf.callback === "function";
         }
         function checkName(nameSoFar, newName) {
           if (!nameSoFar) {
             return newName;
           }
           if (newName && newName !== nameSoFar) {
-            var err = new Error("Function names do not match (expected: " + nameSoFar + ", actual: " + newName + ")");
+            const err = new Error("Function names do not match (expected: " + nameSoFar + ", actual: " + newName + ")");
             err.data = {
               actual: newName,
               expected: nameSoFar
@@ -1274,8 +1074,8 @@ var require_typed_function = __commonJS({
           return nameSoFar;
         }
         function getObjectName(obj) {
-          var name21;
-          for (var key in obj) {
+          let name21;
+          for (const key in obj) {
             if (Object.prototype.hasOwnProperty.call(obj, key) && (isTypedFunction(obj[key]) || typeof obj[key].signature === "string")) {
               name21 = checkName(name21, obj[key].name);
             }
@@ -1283,12 +1083,12 @@ var require_typed_function = __commonJS({
           return name21;
         }
         function mergeSignatures(dest, source) {
-          var key;
+          let key;
           for (key in source) {
             if (Object.prototype.hasOwnProperty.call(source, key)) {
               if (key in dest) {
                 if (source[key] !== dest[key]) {
-                  var err = new Error('Signature "' + key + '" is defined twice');
+                  const err = new Error('Signature "' + key + '" is defined twice');
                   err.data = {
                     signature: key,
                     sourceFunction: source[key],
@@ -1301,16 +1101,16 @@ var require_typed_function = __commonJS({
             }
           }
         }
-        var saveTyped = typed2;
-        typed2 = function typed3(maybeName) {
-          var named = typeof maybeName === "string";
-          var start = named ? 1 : 0;
-          var name21 = named ? maybeName : "";
-          var allSignatures = {};
-          for (var i = start; i < arguments.length; ++i) {
-            var item = arguments[i];
-            var theseSignatures = {};
-            var thisName = void 0;
+        const saveTyped = typed2;
+        typed2 = function(maybeName) {
+          const named = typeof maybeName === "string";
+          const start = named ? 1 : 0;
+          let name21 = named ? maybeName : "";
+          const allSignatures = {};
+          for (let i = start; i < arguments.length; ++i) {
+            const item = arguments[i];
+            let theseSignatures = {};
+            let thisName;
             if (typeof item === "function") {
               thisName = item.name;
               if (typeof item.signature === "string") {
@@ -1325,7 +1125,7 @@ var require_typed_function = __commonJS({
               }
             }
             if (Object.keys(theseSignatures).length === 0) {
-              var err = new TypeError("Argument to 'typed' at index " + i + " is not a (typed) function, nor an object with signatures as keys and functions as values.");
+              const err = new TypeError("Argument to 'typed' at index " + i + " is not a (typed) function, nor an object with signatures as keys and functions as values.");
               err.data = {
                 index: i,
                 argument: item
@@ -1356,7 +1156,7 @@ var require_typed_function = __commonJS({
         typed2.isTypedFunction = isTypedFunction;
         typed2.warnAgainstDeprecatedThis = true;
         typed2.addType = function(type, beforeObjectTest) {
-          var before = "any";
+          let before = "any";
           if (beforeObjectTest !== false && typeMap.has("Object")) {
             before = "Object";
           }
@@ -1371,44 +1171,51 @@ var require_typed_function = __commonJS({
           }
         }
         typed2.addConversion = function(conversion) {
+          let options = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {
+            override: false
+          };
           _validateConversion(conversion);
-          var to = findType(conversion.to);
-          if (to.conversionsTo.every(function(other) {
-            return other.from !== conversion.from;
-          })) {
-            to.conversionsTo.push({
-              from: conversion.from,
-              convert: conversion.convert,
-              index: nConversions++
-            });
-          } else {
-            throw new Error('There is already a conversion from "' + conversion.from + '" to "' + to.name + '"');
+          const to = findType(conversion.to);
+          const existing = to.conversionsTo.find((other) => other.from === conversion.from);
+          if (existing) {
+            if (options && options.override) {
+              typed2.removeConversion({
+                from: existing.from,
+                to: conversion.to,
+                convert: existing.convert
+              });
+            } else {
+              throw new Error('There is already a conversion from "' + conversion.from + '" to "' + to.name + '"');
+            }
           }
+          to.conversionsTo.push({
+            from: conversion.from,
+            convert: conversion.convert,
+            index: nConversions++
+          });
         };
-        typed2.addConversions = function(conversions) {
-          conversions.forEach(typed2.addConversion);
+        typed2.addConversions = function(conversions, options) {
+          conversions.forEach((conversion) => typed2.addConversion(conversion, options));
         };
         typed2.removeConversion = function(conversion) {
           _validateConversion(conversion);
-          var to = findType(conversion.to);
-          var existingConversion = findInArray(to.conversionsTo, function(c) {
-            return c.from === conversion.from;
-          });
+          const to = findType(conversion.to);
+          const existingConversion = findInArray(to.conversionsTo, (c) => c.from === conversion.from);
           if (!existingConversion) {
             throw new Error("Attempt to remove nonexistent conversion from " + conversion.from + " to " + conversion.to);
           }
           if (existingConversion.convert !== conversion.convert) {
             throw new Error("Conversion to remove does not match existing conversion");
           }
-          var index = to.conversionsTo.indexOf(existingConversion);
+          const index = to.conversionsTo.indexOf(existingConversion);
           to.conversionsTo.splice(index, 1);
         };
         typed2.resolve = function(tf, argList) {
           if (!isTypedFunction(tf)) {
             throw new TypeError(NOT_TYPED_FUNCTION);
           }
-          var sigs = tf._typedFunctionData.signatures;
-          for (var i = 0; i < sigs.length; ++i) {
+          const sigs = tf._typedFunctionData.signatures;
+          for (let i = 0; i < sigs.length; ++i) {
             if (sigs[i].test(argList)) {
               return sigs[i];
             }
@@ -1423,624 +1230,16 @@ var require_typed_function = __commonJS({
   }
 });
 
-// node_modules/complex.js/complex.js
-var require_complex = __commonJS({
-  "node_modules/complex.js/complex.js"(exports, module) {
-    (function(root) {
-      "use strict";
-      var cosh2 = Math.cosh || function(x) {
-        return Math.abs(x) < 1e-9 ? 1 - x : (Math.exp(x) + Math.exp(-x)) * 0.5;
-      };
-      var sinh2 = Math.sinh || function(x) {
-        return Math.abs(x) < 1e-9 ? x : (Math.exp(x) - Math.exp(-x)) * 0.5;
-      };
-      var cosm1 = function(x) {
-        var b = Math.PI / 4;
-        if (-b > x || x > b) {
-          return Math.cos(x) - 1;
-        }
-        var xx = x * x;
-        return xx * (xx * (xx * (xx * (xx * (xx * (xx * (xx / 20922789888e3 - 1 / 87178291200) + 1 / 479001600) - 1 / 3628800) + 1 / 40320) - 1 / 720) + 1 / 24) - 1 / 2);
-      };
-      var hypot2 = function(x, y) {
-        var a = Math.abs(x);
-        var b = Math.abs(y);
-        if (a < 3e3 && b < 3e3) {
-          return Math.sqrt(a * a + b * b);
-        }
-        if (a < b) {
-          a = b;
-          b = x / y;
-        } else {
-          b = y / x;
-        }
-        return a * Math.sqrt(1 + b * b);
-      };
-      var parser_exit = function() {
-        throw SyntaxError("Invalid Param");
-      };
-      function logHypot(a, b) {
-        var _a = Math.abs(a);
-        var _b = Math.abs(b);
-        if (a === 0) {
-          return Math.log(_b);
-        }
-        if (b === 0) {
-          return Math.log(_a);
-        }
-        if (_a < 3e3 && _b < 3e3) {
-          return Math.log(a * a + b * b) * 0.5;
-        }
-        a = a / 2;
-        b = b / 2;
-        return 0.5 * Math.log(a * a + b * b) + Math.LN2;
-      }
-      var parse2 = function(a, b) {
-        var z = { "re": 0, "im": 0 };
-        if (a === void 0 || a === null) {
-          z["re"] = z["im"] = 0;
-        } else if (b !== void 0) {
-          z["re"] = a;
-          z["im"] = b;
-        } else
-          switch (typeof a) {
-            case "object":
-              if ("im" in a && "re" in a) {
-                z["re"] = a["re"];
-                z["im"] = a["im"];
-              } else if ("abs" in a && "arg" in a) {
-                if (!Number.isFinite(a["abs"]) && Number.isFinite(a["arg"])) {
-                  return Complex3["INFINITY"];
-                }
-                z["re"] = a["abs"] * Math.cos(a["arg"]);
-                z["im"] = a["abs"] * Math.sin(a["arg"]);
-              } else if ("r" in a && "phi" in a) {
-                if (!Number.isFinite(a["r"]) && Number.isFinite(a["phi"])) {
-                  return Complex3["INFINITY"];
-                }
-                z["re"] = a["r"] * Math.cos(a["phi"]);
-                z["im"] = a["r"] * Math.sin(a["phi"]);
-              } else if (a.length === 2) {
-                z["re"] = a[0];
-                z["im"] = a[1];
-              } else {
-                parser_exit();
-              }
-              break;
-            case "string":
-              z["im"] = z["re"] = 0;
-              var tokens = a.match(/\d+\.?\d*e[+-]?\d+|\d+\.?\d*|\.\d+|./g);
-              var plus = 1;
-              var minus = 0;
-              if (tokens === null) {
-                parser_exit();
-              }
-              for (var i = 0; i < tokens.length; i++) {
-                var c = tokens[i];
-                if (c === " " || c === "	" || c === "\n") {
-                } else if (c === "+") {
-                  plus++;
-                } else if (c === "-") {
-                  minus++;
-                } else if (c === "i" || c === "I") {
-                  if (plus + minus === 0) {
-                    parser_exit();
-                  }
-                  if (tokens[i + 1] !== " " && !isNaN(tokens[i + 1])) {
-                    z["im"] += parseFloat((minus % 2 ? "-" : "") + tokens[i + 1]);
-                    i++;
-                  } else {
-                    z["im"] += parseFloat((minus % 2 ? "-" : "") + "1");
-                  }
-                  plus = minus = 0;
-                } else {
-                  if (plus + minus === 0 || isNaN(c)) {
-                    parser_exit();
-                  }
-                  if (tokens[i + 1] === "i" || tokens[i + 1] === "I") {
-                    z["im"] += parseFloat((minus % 2 ? "-" : "") + c);
-                    i++;
-                  } else {
-                    z["re"] += parseFloat((minus % 2 ? "-" : "") + c);
-                  }
-                  plus = minus = 0;
-                }
-              }
-              if (plus + minus > 0) {
-                parser_exit();
-              }
-              break;
-            case "number":
-              z["im"] = 0;
-              z["re"] = a;
-              break;
-            default:
-              parser_exit();
-          }
-        if (isNaN(z["re"]) || isNaN(z["im"])) {
-        }
-        return z;
-      };
-      function Complex3(a, b) {
-        if (!(this instanceof Complex3)) {
-          return new Complex3(a, b);
-        }
-        var z = parse2(a, b);
-        this["re"] = z["re"];
-        this["im"] = z["im"];
-      }
-      Complex3.prototype = {
-        "re": 0,
-        "im": 0,
-        "sign": function() {
-          var abs2 = this["abs"]();
-          return new Complex3(this["re"] / abs2, this["im"] / abs2);
-        },
-        "add": function(a, b) {
-          var z = new Complex3(a, b);
-          if (this["isInfinite"]() && z["isInfinite"]()) {
-            return Complex3["NAN"];
-          }
-          if (this["isInfinite"]() || z["isInfinite"]()) {
-            return Complex3["INFINITY"];
-          }
-          return new Complex3(this["re"] + z["re"], this["im"] + z["im"]);
-        },
-        "sub": function(a, b) {
-          var z = new Complex3(a, b);
-          if (this["isInfinite"]() && z["isInfinite"]()) {
-            return Complex3["NAN"];
-          }
-          if (this["isInfinite"]() || z["isInfinite"]()) {
-            return Complex3["INFINITY"];
-          }
-          return new Complex3(this["re"] - z["re"], this["im"] - z["im"]);
-        },
-        "mul": function(a, b) {
-          var z = new Complex3(a, b);
-          if (this["isInfinite"]() && z["isZero"]() || this["isZero"]() && z["isInfinite"]()) {
-            return Complex3["NAN"];
-          }
-          if (this["isInfinite"]() || z["isInfinite"]()) {
-            return Complex3["INFINITY"];
-          }
-          if (z["im"] === 0 && this["im"] === 0) {
-            return new Complex3(this["re"] * z["re"], 0);
-          }
-          return new Complex3(this["re"] * z["re"] - this["im"] * z["im"], this["re"] * z["im"] + this["im"] * z["re"]);
-        },
-        "div": function(a, b) {
-          var z = new Complex3(a, b);
-          if (this["isZero"]() && z["isZero"]() || this["isInfinite"]() && z["isInfinite"]()) {
-            return Complex3["NAN"];
-          }
-          if (this["isInfinite"]() || z["isZero"]()) {
-            return Complex3["INFINITY"];
-          }
-          if (this["isZero"]() || z["isInfinite"]()) {
-            return Complex3["ZERO"];
-          }
-          a = this["re"];
-          b = this["im"];
-          var c = z["re"];
-          var d = z["im"];
-          var t, x;
-          if (d === 0) {
-            return new Complex3(a / c, b / c);
-          }
-          if (Math.abs(c) < Math.abs(d)) {
-            x = c / d;
-            t = c * x + d;
-            return new Complex3((a * x + b) / t, (b * x - a) / t);
-          } else {
-            x = d / c;
-            t = d * x + c;
-            return new Complex3((a + b * x) / t, (b - a * x) / t);
-          }
-        },
-        "pow": function(a, b) {
-          var z = new Complex3(a, b);
-          a = this["re"];
-          b = this["im"];
-          if (z["isZero"]()) {
-            return Complex3["ONE"];
-          }
-          if (z["im"] === 0) {
-            if (b === 0 && a > 0) {
-              return new Complex3(Math.pow(a, z["re"]), 0);
-            } else if (a === 0) {
-              switch ((z["re"] % 4 + 4) % 4) {
-                case 0:
-                  return new Complex3(Math.pow(b, z["re"]), 0);
-                case 1:
-                  return new Complex3(0, Math.pow(b, z["re"]));
-                case 2:
-                  return new Complex3(-Math.pow(b, z["re"]), 0);
-                case 3:
-                  return new Complex3(0, -Math.pow(b, z["re"]));
-              }
-            }
-          }
-          if (a === 0 && b === 0 && z["re"] > 0 && z["im"] >= 0) {
-            return Complex3["ZERO"];
-          }
-          var arg = Math.atan2(b, a);
-          var loh = logHypot(a, b);
-          a = Math.exp(z["re"] * loh - z["im"] * arg);
-          b = z["im"] * loh + z["re"] * arg;
-          return new Complex3(a * Math.cos(b), a * Math.sin(b));
-        },
-        "sqrt": function() {
-          var a = this["re"];
-          var b = this["im"];
-          var r = this["abs"]();
-          var re, im;
-          if (a >= 0) {
-            if (b === 0) {
-              return new Complex3(Math.sqrt(a), 0);
-            }
-            re = 0.5 * Math.sqrt(2 * (r + a));
-          } else {
-            re = Math.abs(b) / Math.sqrt(2 * (r - a));
-          }
-          if (a <= 0) {
-            im = 0.5 * Math.sqrt(2 * (r - a));
-          } else {
-            im = Math.abs(b) / Math.sqrt(2 * (r + a));
-          }
-          return new Complex3(re, b < 0 ? -im : im);
-        },
-        "exp": function() {
-          var tmp = Math.exp(this["re"]);
-          if (this["im"] === 0) {
-          }
-          return new Complex3(tmp * Math.cos(this["im"]), tmp * Math.sin(this["im"]));
-        },
-        "expm1": function() {
-          var a = this["re"];
-          var b = this["im"];
-          return new Complex3(Math.expm1(a) * Math.cos(b) + cosm1(b), Math.exp(a) * Math.sin(b));
-        },
-        "log": function() {
-          var a = this["re"];
-          var b = this["im"];
-          if (b === 0 && a > 0) {
-          }
-          return new Complex3(logHypot(a, b), Math.atan2(b, a));
-        },
-        "abs": function() {
-          return hypot2(this["re"], this["im"]);
-        },
-        "arg": function() {
-          return Math.atan2(this["im"], this["re"]);
-        },
-        "sin": function() {
-          var a = this["re"];
-          var b = this["im"];
-          return new Complex3(Math.sin(a) * cosh2(b), Math.cos(a) * sinh2(b));
-        },
-        "cos": function() {
-          var a = this["re"];
-          var b = this["im"];
-          return new Complex3(Math.cos(a) * cosh2(b), -Math.sin(a) * sinh2(b));
-        },
-        "tan": function() {
-          var a = 2 * this["re"];
-          var b = 2 * this["im"];
-          var d = Math.cos(a) + cosh2(b);
-          return new Complex3(Math.sin(a) / d, sinh2(b) / d);
-        },
-        "cot": function() {
-          var a = 2 * this["re"];
-          var b = 2 * this["im"];
-          var d = Math.cos(a) - cosh2(b);
-          return new Complex3(-Math.sin(a) / d, sinh2(b) / d);
-        },
-        "sec": function() {
-          var a = this["re"];
-          var b = this["im"];
-          var d = 0.5 * cosh2(2 * b) + 0.5 * Math.cos(2 * a);
-          return new Complex3(Math.cos(a) * cosh2(b) / d, Math.sin(a) * sinh2(b) / d);
-        },
-        "csc": function() {
-          var a = this["re"];
-          var b = this["im"];
-          var d = 0.5 * cosh2(2 * b) - 0.5 * Math.cos(2 * a);
-          return new Complex3(Math.sin(a) * cosh2(b) / d, -Math.cos(a) * sinh2(b) / d);
-        },
-        "asin": function() {
-          var a = this["re"];
-          var b = this["im"];
-          var t1 = new Complex3(b * b - a * a + 1, -2 * a * b)["sqrt"]();
-          var t2 = new Complex3(t1["re"] - b, t1["im"] + a)["log"]();
-          return new Complex3(t2["im"], -t2["re"]);
-        },
-        "acos": function() {
-          var a = this["re"];
-          var b = this["im"];
-          var t1 = new Complex3(b * b - a * a + 1, -2 * a * b)["sqrt"]();
-          var t2 = new Complex3(t1["re"] - b, t1["im"] + a)["log"]();
-          return new Complex3(Math.PI / 2 - t2["im"], t2["re"]);
-        },
-        "atan": function() {
-          var a = this["re"];
-          var b = this["im"];
-          if (a === 0) {
-            if (b === 1) {
-              return new Complex3(0, Infinity);
-            }
-            if (b === -1) {
-              return new Complex3(0, -Infinity);
-            }
-          }
-          var d = a * a + (1 - b) * (1 - b);
-          var t1 = new Complex3((1 - b * b - a * a) / d, -2 * a / d).log();
-          return new Complex3(-0.5 * t1["im"], 0.5 * t1["re"]);
-        },
-        "acot": function() {
-          var a = this["re"];
-          var b = this["im"];
-          if (b === 0) {
-            return new Complex3(Math.atan2(1, a), 0);
-          }
-          var d = a * a + b * b;
-          return d !== 0 ? new Complex3(a / d, -b / d).atan() : new Complex3(a !== 0 ? a / 0 : 0, b !== 0 ? -b / 0 : 0).atan();
-        },
-        "asec": function() {
-          var a = this["re"];
-          var b = this["im"];
-          if (a === 0 && b === 0) {
-            return new Complex3(0, Infinity);
-          }
-          var d = a * a + b * b;
-          return d !== 0 ? new Complex3(a / d, -b / d).acos() : new Complex3(a !== 0 ? a / 0 : 0, b !== 0 ? -b / 0 : 0).acos();
-        },
-        "acsc": function() {
-          var a = this["re"];
-          var b = this["im"];
-          if (a === 0 && b === 0) {
-            return new Complex3(Math.PI / 2, Infinity);
-          }
-          var d = a * a + b * b;
-          return d !== 0 ? new Complex3(a / d, -b / d).asin() : new Complex3(a !== 0 ? a / 0 : 0, b !== 0 ? -b / 0 : 0).asin();
-        },
-        "sinh": function() {
-          var a = this["re"];
-          var b = this["im"];
-          return new Complex3(sinh2(a) * Math.cos(b), cosh2(a) * Math.sin(b));
-        },
-        "cosh": function() {
-          var a = this["re"];
-          var b = this["im"];
-          return new Complex3(cosh2(a) * Math.cos(b), sinh2(a) * Math.sin(b));
-        },
-        "tanh": function() {
-          var a = 2 * this["re"];
-          var b = 2 * this["im"];
-          var d = cosh2(a) + Math.cos(b);
-          return new Complex3(sinh2(a) / d, Math.sin(b) / d);
-        },
-        "coth": function() {
-          var a = 2 * this["re"];
-          var b = 2 * this["im"];
-          var d = cosh2(a) - Math.cos(b);
-          return new Complex3(sinh2(a) / d, -Math.sin(b) / d);
-        },
-        "csch": function() {
-          var a = this["re"];
-          var b = this["im"];
-          var d = Math.cos(2 * b) - cosh2(2 * a);
-          return new Complex3(-2 * sinh2(a) * Math.cos(b) / d, 2 * cosh2(a) * Math.sin(b) / d);
-        },
-        "sech": function() {
-          var a = this["re"];
-          var b = this["im"];
-          var d = Math.cos(2 * b) + cosh2(2 * a);
-          return new Complex3(2 * cosh2(a) * Math.cos(b) / d, -2 * sinh2(a) * Math.sin(b) / d);
-        },
-        "asinh": function() {
-          var tmp = this["im"];
-          this["im"] = -this["re"];
-          this["re"] = tmp;
-          var res = this["asin"]();
-          this["re"] = -this["im"];
-          this["im"] = tmp;
-          tmp = res["re"];
-          res["re"] = -res["im"];
-          res["im"] = tmp;
-          return res;
-        },
-        "acosh": function() {
-          var res = this["acos"]();
-          if (res["im"] <= 0) {
-            var tmp = res["re"];
-            res["re"] = -res["im"];
-            res["im"] = tmp;
-          } else {
-            var tmp = res["im"];
-            res["im"] = -res["re"];
-            res["re"] = tmp;
-          }
-          return res;
-        },
-        "atanh": function() {
-          var a = this["re"];
-          var b = this["im"];
-          var noIM = a > 1 && b === 0;
-          var oneMinus = 1 - a;
-          var onePlus = 1 + a;
-          var d = oneMinus * oneMinus + b * b;
-          var x = d !== 0 ? new Complex3((onePlus * oneMinus - b * b) / d, (b * oneMinus + onePlus * b) / d) : new Complex3(a !== -1 ? a / 0 : 0, b !== 0 ? b / 0 : 0);
-          var temp = x["re"];
-          x["re"] = logHypot(x["re"], x["im"]) / 2;
-          x["im"] = Math.atan2(x["im"], temp) / 2;
-          if (noIM) {
-            x["im"] = -x["im"];
-          }
-          return x;
-        },
-        "acoth": function() {
-          var a = this["re"];
-          var b = this["im"];
-          if (a === 0 && b === 0) {
-            return new Complex3(0, Math.PI / 2);
-          }
-          var d = a * a + b * b;
-          return d !== 0 ? new Complex3(a / d, -b / d).atanh() : new Complex3(a !== 0 ? a / 0 : 0, b !== 0 ? -b / 0 : 0).atanh();
-        },
-        "acsch": function() {
-          var a = this["re"];
-          var b = this["im"];
-          if (b === 0) {
-            return new Complex3(a !== 0 ? Math.log(a + Math.sqrt(a * a + 1)) : Infinity, 0);
-          }
-          var d = a * a + b * b;
-          return d !== 0 ? new Complex3(a / d, -b / d).asinh() : new Complex3(a !== 0 ? a / 0 : 0, b !== 0 ? -b / 0 : 0).asinh();
-        },
-        "asech": function() {
-          var a = this["re"];
-          var b = this["im"];
-          if (this["isZero"]()) {
-            return Complex3["INFINITY"];
-          }
-          var d = a * a + b * b;
-          return d !== 0 ? new Complex3(a / d, -b / d).acosh() : new Complex3(a !== 0 ? a / 0 : 0, b !== 0 ? -b / 0 : 0).acosh();
-        },
-        "inverse": function() {
-          if (this["isZero"]()) {
-            return Complex3["INFINITY"];
-          }
-          if (this["isInfinite"]()) {
-            return Complex3["ZERO"];
-          }
-          var a = this["re"];
-          var b = this["im"];
-          var d = a * a + b * b;
-          return new Complex3(a / d, -b / d);
-        },
-        "conjugate": function() {
-          return new Complex3(this["re"], -this["im"]);
-        },
-        "neg": function() {
-          return new Complex3(-this["re"], -this["im"]);
-        },
-        "ceil": function(places) {
-          places = Math.pow(10, places || 0);
-          return new Complex3(Math.ceil(this["re"] * places) / places, Math.ceil(this["im"] * places) / places);
-        },
-        "floor": function(places) {
-          places = Math.pow(10, places || 0);
-          return new Complex3(Math.floor(this["re"] * places) / places, Math.floor(this["im"] * places) / places);
-        },
-        "round": function(places) {
-          places = Math.pow(10, places || 0);
-          return new Complex3(Math.round(this["re"] * places) / places, Math.round(this["im"] * places) / places);
-        },
-        "equals": function(a, b) {
-          var z = new Complex3(a, b);
-          return Math.abs(z["re"] - this["re"]) <= Complex3["EPSILON"] && Math.abs(z["im"] - this["im"]) <= Complex3["EPSILON"];
-        },
-        "clone": function() {
-          return new Complex3(this["re"], this["im"]);
-        },
-        "toString": function() {
-          var a = this["re"];
-          var b = this["im"];
-          var ret = "";
-          if (this["isNaN"]()) {
-            return "NaN";
-          }
-          if (this["isInfinite"]()) {
-            return "Infinity";
-          }
-          if (Math.abs(a) < Complex3["EPSILON"]) {
-            a = 0;
-          }
-          if (Math.abs(b) < Complex3["EPSILON"]) {
-            b = 0;
-          }
-          if (b === 0) {
-            return ret + a;
-          }
-          if (a !== 0) {
-            ret += a;
-            ret += " ";
-            if (b < 0) {
-              b = -b;
-              ret += "-";
-            } else {
-              ret += "+";
-            }
-            ret += " ";
-          } else if (b < 0) {
-            b = -b;
-            ret += "-";
-          }
-          if (b !== 1) {
-            ret += b;
-          }
-          return ret + "i";
-        },
-        "toVector": function() {
-          return [this["re"], this["im"]];
-        },
-        "valueOf": function() {
-          if (this["im"] === 0) {
-            return this["re"];
-          }
-          return null;
-        },
-        "isNaN": function() {
-          return isNaN(this["re"]) || isNaN(this["im"]);
-        },
-        "isZero": function() {
-          return this["im"] === 0 && this["re"] === 0;
-        },
-        "isFinite": function() {
-          return isFinite(this["re"]) && isFinite(this["im"]);
-        },
-        "isInfinite": function() {
-          return !(this["isNaN"]() || this["isFinite"]());
-        }
-      };
-      Complex3["ZERO"] = new Complex3(0, 0);
-      Complex3["ONE"] = new Complex3(1, 0);
-      Complex3["I"] = new Complex3(0, 1);
-      Complex3["PI"] = new Complex3(Math.PI, 0);
-      Complex3["E"] = new Complex3(Math.E, 0);
-      Complex3["INFINITY"] = new Complex3(Infinity, Infinity);
-      Complex3["NAN"] = new Complex3(NaN, NaN);
-      Complex3["EPSILON"] = 1e-15;
-      if (typeof define === "function" && define["amd"]) {
-        define([], function() {
-          return Complex3;
-        });
-      } else if (typeof exports === "object") {
-        Object.defineProperty(Complex3, "__esModule", { "value": true });
-        Complex3["default"] = Complex3;
-        Complex3["Complex"] = Complex3;
-        module["exports"] = Complex3;
-      } else {
-        root["Complex"] = Complex3;
-      }
-    })(exports);
-  }
-});
-
 // node_modules/@babel/runtime/helpers/esm/extends.js
 function _extends() {
-  _extends = Object.assign ? Object.assign.bind() : function(target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i];
-      for (var key in source) {
-        if (Object.prototype.hasOwnProperty.call(source, key)) {
-          target[key] = source[key];
-        }
-      }
+  return _extends = Object.assign ? Object.assign.bind() : function(n) {
+    for (var e = 1; e < arguments.length; e++) {
+      var t = arguments[e];
+      for (var r in t)
+        ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]);
     }
-    return target;
-  };
-  return _extends.apply(this, arguments);
+    return n;
+  }, _extends.apply(null, arguments);
 }
 
 // node_modules/mathjs/lib/esm/core/config.js
@@ -3749,7 +2948,7 @@ P.hyperbolicTangent = P.tanh = function() {
   return divide(x.sinh(), x.cosh(), Ctor.precision = pr, Ctor.rounding = rm);
 };
 P.inverseCosine = P.acos = function() {
-  var halfPi, x = this, Ctor = x.constructor, k = x.abs().cmp(1), pr = Ctor.precision, rm = Ctor.rounding;
+  var x = this, Ctor = x.constructor, k = x.abs().cmp(1), pr = Ctor.precision, rm = Ctor.rounding;
   if (k !== -1) {
     return k === 0 ? x.isNeg() ? getPi(Ctor, pr, rm) : new Ctor(0) : new Ctor(NaN);
   }
@@ -3757,11 +2956,10 @@ P.inverseCosine = P.acos = function() {
     return getPi(Ctor, pr + 4, rm).times(0.5);
   Ctor.precision = pr + 6;
   Ctor.rounding = 1;
-  x = x.asin();
-  halfPi = getPi(Ctor, pr + 4, rm).times(0.5);
+  x = new Ctor(1).minus(x).div(x.plus(1)).sqrt().atan();
   Ctor.precision = pr;
   Ctor.rounding = rm;
-  return halfPi.minus(x);
+  return x.times(2);
 };
 P.inverseHyperbolicCosine = P.acosh = function() {
   var pr, rm, x = this, Ctor = x.constructor;
@@ -4966,14 +4164,16 @@ function intPow(Ctor, x, n, pr) {
 function isOdd(n) {
   return n.d[n.d.length - 1] & 1;
 }
-function maxOrMin(Ctor, args, ltgt) {
-  var y, x = new Ctor(args[0]), i = 0;
+function maxOrMin(Ctor, args, n) {
+  var k, y, x = new Ctor(args[0]), i = 0;
   for (; ++i < args.length; ) {
     y = new Ctor(args[i]);
     if (!y.s) {
       x = y;
       break;
-    } else if (x[ltgt](y)) {
+    }
+    k = x.cmp(y);
+    if (k === n || k === 0 && x.s === n) {
       x = y;
     }
   }
@@ -5555,7 +4755,8 @@ function clone2(obj) {
           x.d = [v];
         }
         return;
-      } else if (v * 0 !== 0) {
+      }
+      if (v * 0 !== 0) {
         if (!v)
           x.s = NaN;
         x.e = NaN;
@@ -5563,18 +4764,28 @@ function clone2(obj) {
         return;
       }
       return parseDecimal(x, v.toString());
-    } else if (t !== "string") {
-      throw Error(invalidArgument + v);
     }
-    if ((i2 = v.charCodeAt(0)) === 45) {
-      v = v.slice(1);
-      x.s = -1;
-    } else {
-      if (i2 === 43)
+    if (t === "string") {
+      if ((i2 = v.charCodeAt(0)) === 45) {
         v = v.slice(1);
-      x.s = 1;
+        x.s = -1;
+      } else {
+        if (i2 === 43)
+          v = v.slice(1);
+        x.s = 1;
+      }
+      return isDecimal.test(v) ? parseDecimal(x, v) : parseOther(x, v);
     }
-    return isDecimal.test(v) ? parseDecimal(x, v) : parseOther(x, v);
+    if (t === "bigint") {
+      if (v < 0) {
+        v = -v;
+        x.s = -1;
+      } else {
+        x.s = 1;
+      }
+      return parseDecimal(x, v.toString());
+    }
+    throw Error(invalidArgument + v);
   }
   Decimal2.prototype = P;
   Decimal2.ROUND_UP = 0;
@@ -5684,10 +4895,10 @@ function log10(x) {
   return new this(x).log(10);
 }
 function max() {
-  return maxOrMin(this, arguments, "lt");
+  return maxOrMin(this, arguments, -1);
 }
 function min() {
-  return maxOrMin(this, arguments, "gt");
+  return maxOrMin(this, arguments, 1);
 }
 function mod(x, y) {
   return new this(x).mod(y);
@@ -5838,31 +5049,620 @@ var createBigNumberClass = /* @__PURE__ */ factory(name, dependencies2, (_ref) =
   isClass: true
 });
 
+// node_modules/complex.js/dist/complex.mjs
+var cosh2 = Math.cosh || function(x) {
+  return Math.abs(x) < 1e-9 ? 1 - x : (Math.exp(x) + Math.exp(-x)) * 0.5;
+};
+var sinh2 = Math.sinh || function(x) {
+  return Math.abs(x) < 1e-9 ? x : (Math.exp(x) - Math.exp(-x)) * 0.5;
+};
+var cosm1 = function(x) {
+  const b = Math.PI / 4;
+  if (-b > x || x > b) {
+    return Math.cos(x) - 1;
+  }
+  const xx = x * x;
+  return xx * (xx * (xx * (xx * (xx * (xx * (xx * (xx / 20922789888e3 - 1 / 87178291200) + 1 / 479001600) - 1 / 3628800) + 1 / 40320) - 1 / 720) + 1 / 24) - 1 / 2);
+};
+var hypot2 = function(x, y) {
+  x = Math.abs(x);
+  y = Math.abs(y);
+  if (x < y)
+    [x, y] = [y, x];
+  if (x < 1e8)
+    return Math.sqrt(x * x + y * y);
+  y /= x;
+  return x * Math.sqrt(1 + y * y);
+};
+var parser_exit = function() {
+  throw SyntaxError("Invalid Param");
+};
+function logHypot(a, b) {
+  const _a = Math.abs(a);
+  const _b = Math.abs(b);
+  if (a === 0) {
+    return Math.log(_b);
+  }
+  if (b === 0) {
+    return Math.log(_a);
+  }
+  if (_a < 3e3 && _b < 3e3) {
+    return Math.log(a * a + b * b) * 0.5;
+  }
+  a = a * 0.5;
+  b = b * 0.5;
+  return 0.5 * Math.log(a * a + b * b) + Math.LN2;
+}
+var P2 = { "re": 0, "im": 0 };
+var parse = function(a, b) {
+  const z = P2;
+  if (a === void 0 || a === null) {
+    z["re"] = z["im"] = 0;
+  } else if (b !== void 0) {
+    z["re"] = a;
+    z["im"] = b;
+  } else
+    switch (typeof a) {
+      case "object":
+        if ("im" in a && "re" in a) {
+          z["re"] = a["re"];
+          z["im"] = a["im"];
+        } else if ("abs" in a && "arg" in a) {
+          if (!isFinite(a["abs"]) && isFinite(a["arg"])) {
+            return Complex["INFINITY"];
+          }
+          z["re"] = a["abs"] * Math.cos(a["arg"]);
+          z["im"] = a["abs"] * Math.sin(a["arg"]);
+        } else if ("r" in a && "phi" in a) {
+          if (!isFinite(a["r"]) && isFinite(a["phi"])) {
+            return Complex["INFINITY"];
+          }
+          z["re"] = a["r"] * Math.cos(a["phi"]);
+          z["im"] = a["r"] * Math.sin(a["phi"]);
+        } else if (a.length === 2) {
+          z["re"] = a[0];
+          z["im"] = a[1];
+        } else {
+          parser_exit();
+        }
+        break;
+      case "string":
+        z["im"] = z["re"] = 0;
+        const tokens = a.replace(/_/g, "").match(/\d+\.?\d*e[+-]?\d+|\d+\.?\d*|\.\d+|./g);
+        let plus = 1;
+        let minus = 0;
+        if (tokens === null) {
+          parser_exit();
+        }
+        for (let i = 0; i < tokens.length; i++) {
+          const c = tokens[i];
+          if (c === " " || c === "	" || c === "\n") {
+          } else if (c === "+") {
+            plus++;
+          } else if (c === "-") {
+            minus++;
+          } else if (c === "i" || c === "I") {
+            if (plus + minus === 0) {
+              parser_exit();
+            }
+            if (tokens[i + 1] !== " " && !isNaN(tokens[i + 1])) {
+              z["im"] += parseFloat((minus % 2 ? "-" : "") + tokens[i + 1]);
+              i++;
+            } else {
+              z["im"] += parseFloat((minus % 2 ? "-" : "") + "1");
+            }
+            plus = minus = 0;
+          } else {
+            if (plus + minus === 0 || isNaN(c)) {
+              parser_exit();
+            }
+            if (tokens[i + 1] === "i" || tokens[i + 1] === "I") {
+              z["im"] += parseFloat((minus % 2 ? "-" : "") + c);
+              i++;
+            } else {
+              z["re"] += parseFloat((minus % 2 ? "-" : "") + c);
+            }
+            plus = minus = 0;
+          }
+        }
+        if (plus + minus > 0) {
+          parser_exit();
+        }
+        break;
+      case "number":
+        z["im"] = 0;
+        z["re"] = a;
+        break;
+      default:
+        parser_exit();
+    }
+  if (isNaN(z["re"]) || isNaN(z["im"])) {
+  }
+  return z;
+};
+function Complex(a, b) {
+  if (!(this instanceof Complex)) {
+    return new Complex(a, b);
+  }
+  const z = parse(a, b);
+  this["re"] = z["re"];
+  this["im"] = z["im"];
+}
+Complex.prototype = {
+  "re": 0,
+  "im": 0,
+  "sign": function() {
+    const abs2 = hypot2(this["re"], this["im"]);
+    return new Complex(this["re"] / abs2, this["im"] / abs2);
+  },
+  "add": function(a, b) {
+    const z = parse(a, b);
+    const tInfin = this["isInfinite"]();
+    const zInfin = !(isFinite(z["re"]) && isFinite(z["im"]));
+    if (tInfin || zInfin) {
+      if (tInfin && zInfin) {
+        return Complex["NAN"];
+      }
+      return Complex["INFINITY"];
+    }
+    return new Complex(this["re"] + z["re"], this["im"] + z["im"]);
+  },
+  "sub": function(a, b) {
+    const z = parse(a, b);
+    const tInfin = this["isInfinite"]();
+    const zInfin = !(isFinite(z["re"]) && isFinite(z["im"]));
+    if (tInfin || zInfin) {
+      if (tInfin && zInfin) {
+        return Complex["NAN"];
+      }
+      return Complex["INFINITY"];
+    }
+    return new Complex(this["re"] - z["re"], this["im"] - z["im"]);
+  },
+  "mul": function(a, b) {
+    const z = parse(a, b);
+    const tInfin = this["isInfinite"]();
+    const zInfin = !(isFinite(z["re"]) && isFinite(z["im"]));
+    const tIsZero = this["re"] === 0 && this["im"] === 0;
+    const zIsZero = z["re"] === 0 && z["im"] === 0;
+    if (tInfin && zIsZero || zInfin && tIsZero) {
+      return Complex["NAN"];
+    }
+    if (tInfin || zInfin) {
+      return Complex["INFINITY"];
+    }
+    if (z["im"] === 0 && this["im"] === 0) {
+      return new Complex(this["re"] * z["re"], 0);
+    }
+    return new Complex(this["re"] * z["re"] - this["im"] * z["im"], this["re"] * z["im"] + this["im"] * z["re"]);
+  },
+  "div": function(a, b) {
+    const z = parse(a, b);
+    const tInfin = this["isInfinite"]();
+    const zInfin = !(isFinite(z["re"]) && isFinite(z["im"]));
+    const tIsZero = this["re"] === 0 && this["im"] === 0;
+    const zIsZero = z["re"] === 0 && z["im"] === 0;
+    if (tIsZero && zIsZero || tInfin && zInfin) {
+      return Complex["NAN"];
+    }
+    if (zIsZero || tInfin) {
+      return Complex["INFINITY"];
+    }
+    if (tIsZero || zInfin) {
+      return Complex["ZERO"];
+    }
+    if (z["im"] === 0) {
+      return new Complex(this["re"] / z["re"], this["im"] / z["re"]);
+    }
+    if (Math.abs(z["re"]) < Math.abs(z["im"])) {
+      const x = z["re"] / z["im"];
+      const t = z["re"] * x + z["im"];
+      return new Complex((this["re"] * x + this["im"]) / t, (this["im"] * x - this["re"]) / t);
+    } else {
+      const x = z["im"] / z["re"];
+      const t = z["im"] * x + z["re"];
+      return new Complex((this["re"] + this["im"] * x) / t, (this["im"] - this["re"] * x) / t);
+    }
+  },
+  "pow": function(a, b) {
+    const z = parse(a, b);
+    const tIsZero = this["re"] === 0 && this["im"] === 0;
+    const zIsZero = z["re"] === 0 && z["im"] === 0;
+    if (zIsZero) {
+      return Complex["ONE"];
+    }
+    if (z["im"] === 0) {
+      if (this["im"] === 0 && this["re"] > 0) {
+        return new Complex(Math.pow(this["re"], z["re"]), 0);
+      } else if (this["re"] === 0) {
+        switch ((z["re"] % 4 + 4) % 4) {
+          case 0:
+            return new Complex(Math.pow(this["im"], z["re"]), 0);
+          case 1:
+            return new Complex(0, Math.pow(this["im"], z["re"]));
+          case 2:
+            return new Complex(-Math.pow(this["im"], z["re"]), 0);
+          case 3:
+            return new Complex(0, -Math.pow(this["im"], z["re"]));
+        }
+      }
+    }
+    if (tIsZero && z["re"] > 0) {
+      return Complex["ZERO"];
+    }
+    const arg = Math.atan2(this["im"], this["re"]);
+    const loh = logHypot(this["re"], this["im"]);
+    let re = Math.exp(z["re"] * loh - z["im"] * arg);
+    let im = z["im"] * loh + z["re"] * arg;
+    return new Complex(re * Math.cos(im), re * Math.sin(im));
+  },
+  "sqrt": function() {
+    const a = this["re"];
+    const b = this["im"];
+    if (b === 0) {
+      if (a >= 0) {
+        return new Complex(Math.sqrt(a), 0);
+      } else {
+        return new Complex(0, Math.sqrt(-a));
+      }
+    }
+    const r = hypot2(a, b);
+    let re = Math.sqrt(0.5 * (r + Math.abs(a)));
+    let im = Math.abs(b) / (2 * re);
+    if (a >= 0) {
+      return new Complex(re, b < 0 ? -im : im);
+    } else {
+      return new Complex(im, b < 0 ? -re : re);
+    }
+  },
+  "exp": function() {
+    const er = Math.exp(this["re"]);
+    if (this["im"] === 0) {
+      return new Complex(er, 0);
+    }
+    return new Complex(er * Math.cos(this["im"]), er * Math.sin(this["im"]));
+  },
+  "expm1": function() {
+    const a = this["re"];
+    const b = this["im"];
+    return new Complex(Math.expm1(a) * Math.cos(b) + cosm1(b), Math.exp(a) * Math.sin(b));
+  },
+  "log": function() {
+    const a = this["re"];
+    const b = this["im"];
+    if (b === 0 && a > 0) {
+      return new Complex(Math.log(a), 0);
+    }
+    return new Complex(logHypot(a, b), Math.atan2(b, a));
+  },
+  "abs": function() {
+    return hypot2(this["re"], this["im"]);
+  },
+  "arg": function() {
+    return Math.atan2(this["im"], this["re"]);
+  },
+  "sin": function() {
+    const a = this["re"];
+    const b = this["im"];
+    return new Complex(Math.sin(a) * cosh2(b), Math.cos(a) * sinh2(b));
+  },
+  "cos": function() {
+    const a = this["re"];
+    const b = this["im"];
+    return new Complex(Math.cos(a) * cosh2(b), -Math.sin(a) * sinh2(b));
+  },
+  "tan": function() {
+    const a = 2 * this["re"];
+    const b = 2 * this["im"];
+    const d = Math.cos(a) + cosh2(b);
+    return new Complex(Math.sin(a) / d, sinh2(b) / d);
+  },
+  "cot": function() {
+    const a = 2 * this["re"];
+    const b = 2 * this["im"];
+    const d = Math.cos(a) - cosh2(b);
+    return new Complex(-Math.sin(a) / d, sinh2(b) / d);
+  },
+  "sec": function() {
+    const a = this["re"];
+    const b = this["im"];
+    const d = 0.5 * cosh2(2 * b) + 0.5 * Math.cos(2 * a);
+    return new Complex(Math.cos(a) * cosh2(b) / d, Math.sin(a) * sinh2(b) / d);
+  },
+  "csc": function() {
+    const a = this["re"];
+    const b = this["im"];
+    const d = 0.5 * cosh2(2 * b) - 0.5 * Math.cos(2 * a);
+    return new Complex(Math.sin(a) * cosh2(b) / d, -Math.cos(a) * sinh2(b) / d);
+  },
+  "asin": function() {
+    const a = this["re"];
+    const b = this["im"];
+    const t1 = new Complex(b * b - a * a + 1, -2 * a * b)["sqrt"]();
+    const t2 = new Complex(t1["re"] - b, t1["im"] + a)["log"]();
+    return new Complex(t2["im"], -t2["re"]);
+  },
+  "acos": function() {
+    const a = this["re"];
+    const b = this["im"];
+    const t1 = new Complex(b * b - a * a + 1, -2 * a * b)["sqrt"]();
+    const t2 = new Complex(t1["re"] - b, t1["im"] + a)["log"]();
+    return new Complex(Math.PI / 2 - t2["im"], t2["re"]);
+  },
+  "atan": function() {
+    const a = this["re"];
+    const b = this["im"];
+    if (a === 0) {
+      if (b === 1) {
+        return new Complex(0, Infinity);
+      }
+      if (b === -1) {
+        return new Complex(0, -Infinity);
+      }
+    }
+    const d = a * a + (1 - b) * (1 - b);
+    const t1 = new Complex((1 - b * b - a * a) / d, -2 * a / d).log();
+    return new Complex(-0.5 * t1["im"], 0.5 * t1["re"]);
+  },
+  "acot": function() {
+    const a = this["re"];
+    const b = this["im"];
+    if (b === 0) {
+      return new Complex(Math.atan2(1, a), 0);
+    }
+    const d = a * a + b * b;
+    return d !== 0 ? new Complex(a / d, -b / d).atan() : new Complex(a !== 0 ? a / 0 : 0, b !== 0 ? -b / 0 : 0).atan();
+  },
+  "asec": function() {
+    const a = this["re"];
+    const b = this["im"];
+    if (a === 0 && b === 0) {
+      return new Complex(0, Infinity);
+    }
+    const d = a * a + b * b;
+    return d !== 0 ? new Complex(a / d, -b / d).acos() : new Complex(a !== 0 ? a / 0 : 0, b !== 0 ? -b / 0 : 0).acos();
+  },
+  "acsc": function() {
+    const a = this["re"];
+    const b = this["im"];
+    if (a === 0 && b === 0) {
+      return new Complex(Math.PI / 2, Infinity);
+    }
+    const d = a * a + b * b;
+    return d !== 0 ? new Complex(a / d, -b / d).asin() : new Complex(a !== 0 ? a / 0 : 0, b !== 0 ? -b / 0 : 0).asin();
+  },
+  "sinh": function() {
+    const a = this["re"];
+    const b = this["im"];
+    return new Complex(sinh2(a) * Math.cos(b), cosh2(a) * Math.sin(b));
+  },
+  "cosh": function() {
+    const a = this["re"];
+    const b = this["im"];
+    return new Complex(cosh2(a) * Math.cos(b), sinh2(a) * Math.sin(b));
+  },
+  "tanh": function() {
+    const a = 2 * this["re"];
+    const b = 2 * this["im"];
+    const d = cosh2(a) + Math.cos(b);
+    return new Complex(sinh2(a) / d, Math.sin(b) / d);
+  },
+  "coth": function() {
+    const a = 2 * this["re"];
+    const b = 2 * this["im"];
+    const d = cosh2(a) - Math.cos(b);
+    return new Complex(sinh2(a) / d, -Math.sin(b) / d);
+  },
+  "csch": function() {
+    const a = this["re"];
+    const b = this["im"];
+    const d = Math.cos(2 * b) - cosh2(2 * a);
+    return new Complex(-2 * sinh2(a) * Math.cos(b) / d, 2 * cosh2(a) * Math.sin(b) / d);
+  },
+  "sech": function() {
+    const a = this["re"];
+    const b = this["im"];
+    const d = Math.cos(2 * b) + cosh2(2 * a);
+    return new Complex(2 * cosh2(a) * Math.cos(b) / d, -2 * sinh2(a) * Math.sin(b) / d);
+  },
+  "asinh": function() {
+    let tmp = this["im"];
+    this["im"] = -this["re"];
+    this["re"] = tmp;
+    const res = this["asin"]();
+    this["re"] = -this["im"];
+    this["im"] = tmp;
+    tmp = res["re"];
+    res["re"] = -res["im"];
+    res["im"] = tmp;
+    return res;
+  },
+  "acosh": function() {
+    const res = this["acos"]();
+    if (res["im"] <= 0) {
+      const tmp = res["re"];
+      res["re"] = -res["im"];
+      res["im"] = tmp;
+    } else {
+      const tmp = res["im"];
+      res["im"] = -res["re"];
+      res["re"] = tmp;
+    }
+    return res;
+  },
+  "atanh": function() {
+    const a = this["re"];
+    const b = this["im"];
+    const noIM = a > 1 && b === 0;
+    const oneMinus = 1 - a;
+    const onePlus = 1 + a;
+    const d = oneMinus * oneMinus + b * b;
+    const x = d !== 0 ? new Complex((onePlus * oneMinus - b * b) / d, (b * oneMinus + onePlus * b) / d) : new Complex(a !== -1 ? a / 0 : 0, b !== 0 ? b / 0 : 0);
+    const temp = x["re"];
+    x["re"] = logHypot(x["re"], x["im"]) / 2;
+    x["im"] = Math.atan2(x["im"], temp) / 2;
+    if (noIM) {
+      x["im"] = -x["im"];
+    }
+    return x;
+  },
+  "acoth": function() {
+    const a = this["re"];
+    const b = this["im"];
+    if (a === 0 && b === 0) {
+      return new Complex(0, Math.PI / 2);
+    }
+    const d = a * a + b * b;
+    return d !== 0 ? new Complex(a / d, -b / d).atanh() : new Complex(a !== 0 ? a / 0 : 0, b !== 0 ? -b / 0 : 0).atanh();
+  },
+  "acsch": function() {
+    const a = this["re"];
+    const b = this["im"];
+    if (b === 0) {
+      return new Complex(a !== 0 ? Math.log(a + Math.sqrt(a * a + 1)) : Infinity, 0);
+    }
+    const d = a * a + b * b;
+    return d !== 0 ? new Complex(a / d, -b / d).asinh() : new Complex(a !== 0 ? a / 0 : 0, b !== 0 ? -b / 0 : 0).asinh();
+  },
+  "asech": function() {
+    const a = this["re"];
+    const b = this["im"];
+    if (this["isZero"]()) {
+      return Complex["INFINITY"];
+    }
+    const d = a * a + b * b;
+    return d !== 0 ? new Complex(a / d, -b / d).acosh() : new Complex(a !== 0 ? a / 0 : 0, b !== 0 ? -b / 0 : 0).acosh();
+  },
+  "inverse": function() {
+    if (this["isZero"]()) {
+      return Complex["INFINITY"];
+    }
+    if (this["isInfinite"]()) {
+      return Complex["ZERO"];
+    }
+    const a = this["re"];
+    const b = this["im"];
+    const d = a * a + b * b;
+    return new Complex(a / d, -b / d);
+  },
+  "conjugate": function() {
+    return new Complex(this["re"], -this["im"]);
+  },
+  "neg": function() {
+    return new Complex(-this["re"], -this["im"]);
+  },
+  "ceil": function(places) {
+    places = Math.pow(10, places || 0);
+    return new Complex(Math.ceil(this["re"] * places) / places, Math.ceil(this["im"] * places) / places);
+  },
+  "floor": function(places) {
+    places = Math.pow(10, places || 0);
+    return new Complex(Math.floor(this["re"] * places) / places, Math.floor(this["im"] * places) / places);
+  },
+  "round": function(places) {
+    places = Math.pow(10, places || 0);
+    return new Complex(Math.round(this["re"] * places) / places, Math.round(this["im"] * places) / places);
+  },
+  "equals": function(a, b) {
+    const z = parse(a, b);
+    return Math.abs(z["re"] - this["re"]) <= Complex["EPSILON"] && Math.abs(z["im"] - this["im"]) <= Complex["EPSILON"];
+  },
+  "clone": function() {
+    return new Complex(this["re"], this["im"]);
+  },
+  "toString": function() {
+    let a = this["re"];
+    let b = this["im"];
+    let ret = "";
+    if (this["isNaN"]()) {
+      return "NaN";
+    }
+    if (this["isInfinite"]()) {
+      return "Infinity";
+    }
+    if (Math.abs(a) < Complex["EPSILON"]) {
+      a = 0;
+    }
+    if (Math.abs(b) < Complex["EPSILON"]) {
+      b = 0;
+    }
+    if (b === 0) {
+      return ret + a;
+    }
+    if (a !== 0) {
+      ret += a;
+      ret += " ";
+      if (b < 0) {
+        b = -b;
+        ret += "-";
+      } else {
+        ret += "+";
+      }
+      ret += " ";
+    } else if (b < 0) {
+      b = -b;
+      ret += "-";
+    }
+    if (b !== 1) {
+      ret += b;
+    }
+    return ret + "i";
+  },
+  "toVector": function() {
+    return [this["re"], this["im"]];
+  },
+  "valueOf": function() {
+    if (this["im"] === 0) {
+      return this["re"];
+    }
+    return null;
+  },
+  "isNaN": function() {
+    return isNaN(this["re"]) || isNaN(this["im"]);
+  },
+  "isZero": function() {
+    return this["im"] === 0 && this["re"] === 0;
+  },
+  "isFinite": function() {
+    return isFinite(this["re"]) && isFinite(this["im"]);
+  },
+  "isInfinite": function() {
+    return !this["isFinite"]();
+  }
+};
+Complex["ZERO"] = new Complex(0, 0);
+Complex["ONE"] = new Complex(1, 0);
+Complex["I"] = new Complex(0, 1);
+Complex["PI"] = new Complex(Math.PI, 0);
+Complex["E"] = new Complex(Math.E, 0);
+Complex["INFINITY"] = new Complex(Infinity, Infinity);
+Complex["NAN"] = new Complex(NaN, NaN);
+Complex["EPSILON"] = 1e-15;
+
 // node_modules/mathjs/lib/esm/type/complex/Complex.js
-var import_complex = __toESM(require_complex(), 1);
 var name2 = "Complex";
 var dependencies3 = [];
 var createComplexClass = /* @__PURE__ */ factory(name2, dependencies3, () => {
-  Object.defineProperty(import_complex.default, "name", {
+  Object.defineProperty(Complex, "name", {
     value: "Complex"
   });
-  import_complex.default.prototype.constructor = import_complex.default;
-  import_complex.default.prototype.type = "Complex";
-  import_complex.default.prototype.isComplex = true;
-  import_complex.default.prototype.toJSON = function() {
+  Complex.prototype.constructor = Complex;
+  Complex.prototype.type = "Complex";
+  Complex.prototype.isComplex = true;
+  Complex.prototype.toJSON = function() {
     return {
       mathjs: "Complex",
       re: this.re,
       im: this.im
     };
   };
-  import_complex.default.prototype.toPolar = function() {
+  Complex.prototype.toPolar = function() {
     return {
       r: this.abs(),
       phi: this.arg()
     };
   };
-  import_complex.default.prototype.format = function(options) {
+  Complex.prototype.format = function(options) {
     var str = "";
     var im = this.im;
     var re = this.re;
@@ -5905,12 +5705,12 @@ var createComplexClass = /* @__PURE__ */ factory(name2, dependencies3, () => {
     }
     return str;
   };
-  import_complex.default.fromPolar = function(args) {
+  Complex.fromPolar = function(args) {
     switch (arguments.length) {
       case 1: {
         var arg = arguments[0];
         if (typeof arg === "object") {
-          return (0, import_complex.default)(arg);
+          return Complex(arg);
         } else {
           throw new TypeError("Input has to be an object with r and phi keys.");
         }
@@ -5923,7 +5723,7 @@ var createComplexClass = /* @__PURE__ */ factory(name2, dependencies3, () => {
             phi = phi.toNumber("rad");
           }
           if (isNumber(phi)) {
-            return new import_complex.default({
+            return new Complex({
               r,
               phi
             });
@@ -5937,11 +5737,11 @@ var createComplexClass = /* @__PURE__ */ factory(name2, dependencies3, () => {
         throw new SyntaxError("Wrong number of arguments in function fromPolar");
     }
   };
-  import_complex.default.prototype.valueOf = import_complex.default.prototype.toString;
-  import_complex.default.fromJSON = function(json) {
-    return new import_complex.default(json);
+  Complex.prototype.valueOf = Complex.prototype.toString;
+  Complex.fromJSON = function(json) {
+    return new Complex(json);
   };
-  import_complex.default.compare = function(a, b) {
+  Complex.compare = function(a, b) {
     if (a.re > b.re) {
       return 1;
     }
@@ -5956,14 +5756,14 @@ var createComplexClass = /* @__PURE__ */ factory(name2, dependencies3, () => {
     }
     return 0;
   };
-  return import_complex.default;
+  return Complex;
 }, {
   isClass: true
 });
 
 // node_modules/fraction.js/fraction.js
 var MAX_CYCLE_LEN = 2e3;
-var P2 = {
+var P3 = {
   "s": 1,
   "n": 0,
   "d": 1
@@ -6006,7 +5806,7 @@ function factorize(num) {
   }
   return factors;
 }
-var parse = function(p1, p2) {
+var parse2 = function(p1, p2) {
   var n = 0, d = 1, s = 1;
   var v = 0, w = 0, x = 0, y = 1, z = 1;
   var A = 0, B = 1;
@@ -6137,9 +5937,9 @@ var parse = function(p1, p2) {
   if (d === 0) {
     throw DivisionByZero();
   }
-  P2["s"] = s < 0 ? -1 : 1;
-  P2["n"] = Math.abs(n);
-  P2["d"] = Math.abs(d);
+  P3["s"] = s < 0 ? -1 : 1;
+  P3["n"] = Math.abs(n);
+  P3["d"] = Math.abs(d);
 };
 function modpow(b, e, m) {
   var r = 1;
@@ -6192,14 +5992,14 @@ function gcd(a, b) {
   }
 }
 function Fraction(a, b) {
-  parse(a, b);
+  parse2(a, b);
   if (this instanceof Fraction) {
-    a = gcd(P2["d"], P2["n"]);
-    this["s"] = P2["s"];
-    this["n"] = P2["n"] / a;
-    this["d"] = P2["d"] / a;
+    a = gcd(P3["d"], P3["n"]);
+    this["s"] = P3["s"];
+    this["n"] = P3["n"] / a;
+    this["d"] = P3["d"] / a;
   } else {
-    return newFraction(P2["s"] * P2["n"], P2["d"]);
+    return newFraction(P3["s"] * P3["n"], P3["d"]);
   }
 }
 var DivisionByZero = function() {
@@ -6222,20 +6022,20 @@ Fraction.prototype = {
     return newFraction(-this["s"] * this["n"], this["d"]);
   },
   "add": function(a, b) {
-    parse(a, b);
-    return newFraction(this["s"] * this["n"] * P2["d"] + P2["s"] * this["d"] * P2["n"], this["d"] * P2["d"]);
+    parse2(a, b);
+    return newFraction(this["s"] * this["n"] * P3["d"] + P3["s"] * this["d"] * P3["n"], this["d"] * P3["d"]);
   },
   "sub": function(a, b) {
-    parse(a, b);
-    return newFraction(this["s"] * this["n"] * P2["d"] - P2["s"] * this["d"] * P2["n"], this["d"] * P2["d"]);
+    parse2(a, b);
+    return newFraction(this["s"] * this["n"] * P3["d"] - P3["s"] * this["d"] * P3["n"], this["d"] * P3["d"]);
   },
   "mul": function(a, b) {
-    parse(a, b);
-    return newFraction(this["s"] * P2["s"] * this["n"] * P2["n"], this["d"] * P2["d"]);
+    parse2(a, b);
+    return newFraction(this["s"] * P3["s"] * this["n"] * P3["n"], this["d"] * P3["d"]);
   },
   "div": function(a, b) {
-    parse(a, b);
-    return newFraction(this["s"] * P2["s"] * this["n"] * P2["d"], this["d"] * P2["n"]);
+    parse2(a, b);
+    return newFraction(this["s"] * P3["s"] * this["n"] * P3["d"], this["d"] * P3["n"]);
   },
   "clone": function() {
     return newFraction(this["s"] * this["n"], this["d"]);
@@ -6247,22 +6047,22 @@ Fraction.prototype = {
     if (a === void 0) {
       return newFraction(this["s"] * this["n"] % this["d"], 1);
     }
-    parse(a, b);
-    if (P2["n"] === 0 && this["d"] === 0) {
+    parse2(a, b);
+    if (P3["n"] === 0 && this["d"] === 0) {
       throw DivisionByZero();
     }
-    return newFraction(this["s"] * (P2["d"] * this["n"]) % (P2["n"] * this["d"]), P2["d"] * this["d"]);
+    return newFraction(this["s"] * (P3["d"] * this["n"]) % (P3["n"] * this["d"]), P3["d"] * this["d"]);
   },
   "gcd": function(a, b) {
-    parse(a, b);
-    return newFraction(gcd(P2["n"], this["n"]) * gcd(P2["d"], this["d"]), P2["d"] * this["d"]);
+    parse2(a, b);
+    return newFraction(gcd(P3["n"], this["n"]) * gcd(P3["d"], this["d"]), P3["d"] * this["d"]);
   },
   "lcm": function(a, b) {
-    parse(a, b);
-    if (P2["n"] === 0 && this["n"] === 0) {
+    parse2(a, b);
+    if (P3["n"] === 0 && this["n"] === 0) {
       return newFraction(0, 1);
     }
-    return newFraction(P2["n"] * this["n"], gcd(P2["n"], this["n"]) * gcd(P2["d"], this["d"]));
+    return newFraction(P3["n"] * this["n"], gcd(P3["n"], this["n"]) * gcd(P3["d"], this["d"]));
   },
   "ceil": function(places) {
     places = Math.pow(10, places || 0);
@@ -6285,16 +6085,20 @@ Fraction.prototype = {
     }
     return newFraction(Math.round(places * this["s"] * this["n"] / this["d"]), places);
   },
+  "roundTo": function(a, b) {
+    parse2(a, b);
+    return newFraction(this["s"] * Math.round(this["n"] * P3["d"] / (this["d"] * P3["n"])) * P3["n"], P3["d"]);
+  },
   "inverse": function() {
     return newFraction(this["s"] * this["d"], this["n"]);
   },
   "pow": function(a, b) {
-    parse(a, b);
-    if (P2["d"] === 1) {
-      if (P2["s"] < 0) {
-        return newFraction(Math.pow(this["s"] * this["d"], P2["n"]), Math.pow(this["n"], P2["n"]));
+    parse2(a, b);
+    if (P3["d"] === 1) {
+      if (P3["s"] < 0) {
+        return newFraction(Math.pow(this["s"] * this["d"], P3["n"]), Math.pow(this["n"], P3["n"]));
       } else {
-        return newFraction(Math.pow(this["s"] * this["n"], P2["n"]), Math.pow(this["d"], P2["n"]));
+        return newFraction(Math.pow(this["s"] * this["n"], P3["n"]), Math.pow(this["d"], P3["n"]));
       }
     }
     if (this["s"] < 0)
@@ -6310,9 +6114,9 @@ Fraction.prototype = {
         n = 0;
         break;
       }
-      N[k] *= P2["n"];
-      if (N[k] % P2["d"] === 0) {
-        N[k] /= P2["d"];
+      N[k] *= P3["n"];
+      if (N[k] % P3["d"] === 0) {
+        N[k] /= P3["d"];
       } else
         return null;
       n *= Math.pow(k, N[k]);
@@ -6320,25 +6124,25 @@ Fraction.prototype = {
     for (var k in D) {
       if (k === "1")
         continue;
-      D[k] *= P2["n"];
-      if (D[k] % P2["d"] === 0) {
-        D[k] /= P2["d"];
+      D[k] *= P3["n"];
+      if (D[k] % P3["d"] === 0) {
+        D[k] /= P3["d"];
       } else
         return null;
       d *= Math.pow(k, D[k]);
     }
-    if (P2["s"] < 0) {
+    if (P3["s"] < 0) {
       return newFraction(d, n);
     }
     return newFraction(n, d);
   },
   "equals": function(a, b) {
-    parse(a, b);
-    return this["s"] * this["n"] * P2["d"] === P2["s"] * P2["n"] * this["d"];
+    parse2(a, b);
+    return this["s"] * this["n"] * P3["d"] === P3["s"] * P3["n"] * this["d"];
   },
   "compare": function(a, b) {
-    parse(a, b);
-    var t = this["s"] * this["n"] * P2["d"] - P2["s"] * P2["n"] * this["d"];
+    parse2(a, b);
+    var t = this["s"] * this["n"] * P3["d"] - P3["s"] * P3["n"] * this["d"];
     return (0 < t) - (t < 0);
   },
   "simplify": function(eps) {
@@ -6360,8 +6164,8 @@ Fraction.prototype = {
     return this;
   },
   "divisible": function(a, b) {
-    parse(a, b);
-    return !(!(P2["n"] * this["d"]) || this["n"] * P2["d"] % (P2["n"] * this["d"]));
+    parse2(a, b);
+    return !(!(P3["n"] * this["d"]) || this["n"] * P3["d"] % (P3["n"] * this["d"]));
   },
   "valueOf": function() {
     return this["s"] * this["n"] / this["d"];
@@ -8816,20 +8620,14 @@ function atan23(one, two) {
 }
 
 /*!
- *  decimal.js v10.4.3
+ *  decimal.js v10.6.0
  *  An arbitrary-precision Decimal type for JavaScript.
  *  https://github.com/MikeMcl/decimal.js
- *  Copyright (c) 2022 Michael Mclaughlin <M8ch88l@gmail.com>
+ *  Copyright (c) 2025 Michael Mclaughlin <M8ch88l@gmail.com>
  *  MIT Licence
  */
 /**
- * @license Complex.js v2.1.1 12/05/2020
- *
- * Copyright (c) 2020, Robert Eisele (robert@xarg.org)
- * Dual licensed under the MIT or GPL Version 2 licenses.
- **/
-/**
- * @license Fraction.js v4.3.5 31/08/2023
+ * @license Fraction.js v4.3.7 31/08/2023
  * https://www.xarg.org/2014/03/rational-numbers-in-javascript/
  *
  * Copyright (c) 2023, Robert Eisele (robert@raw.org)

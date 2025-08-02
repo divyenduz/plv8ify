@@ -10,7 +10,7 @@ function world() {
 
 globalThis.hello = hello;
 globalThis.world = world;
-globalThis[Symbol.for('myScope_initialized')] = true;
+globalThis[Symbol.for('myScope_initialized')] = 1754114242091;
 
 
 
