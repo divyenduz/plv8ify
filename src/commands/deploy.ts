@@ -20,10 +20,10 @@ export async function deployCommand(
   const { outputFolderPath, deployConcurrency } = CLI.config
 
   const checkOutputFolderTask = await task(
-    `Check if the --output-folder (${outputFolderPath}) exists`,
+    `Checking output folder: ${outputFolderPath}`,
     async ({ setError }) => {
       if (!fs.statSync(outputFolderPath)) {
-        const errorMessage = `${outputFolderPath} doesn't exist`
+        const errorMessage = `Output folder '${outputFolderPath}' not found. Please run 'plv8ify generate' first to create SQL files.`
         setError(errorMessage)
       }
     }
@@ -36,10 +36,10 @@ export async function deployCommand(
   const databaseUrl = process.env.DATABASE_URL
 
   const databaseUrlIsSetTask = await task(
-    'Check if the DATABASE_URL env var is set',
+    'Checking DATABASE_URL environment variable',
     async ({ setError }) => {
       if (!databaseUrl) {
-        const errorMessage = `DATABASE_URL not set in environment`
+        const errorMessage = `DATABASE_URL environment variable is not set. Please set it to your PostgreSQL connection string (e.g., postgres://user:password@host:port/database)`
         setError(errorMessage)
       }
     }
@@ -50,11 +50,11 @@ export async function deployCommand(
 
   const database = new Database(databaseUrl)
   const isDatabaseReachableTask = await task(
-    'Check if the provided DATABASE_URL is reachable',
+    'Connecting to PostgreSQL database',
     async ({ setError }) => {
       const isReachable = await database.isDatabaseReachable()
       if (!isReachable) {
-        const errorMessage = `Provided DATABASE_URL: ${databaseUrl} is not reachable`
+        const errorMessage = `Failed to connect to database. Please check your DATABASE_URL and ensure the PostgreSQL server is running and accessible.`
         setError(errorMessage)
       }
     }
@@ -77,20 +77,20 @@ export async function deployCommand(
     })
 
   await task(
-    `Deploying files from ${outputFolderPath} to the provided PostgreSQL database 🚧`.trim(),
+    `Deploying SQL functions to PostgreSQL database`,
     ({ setWarning }) =>
       task.group((task) =>
         deployCommands.map((deployCommand) => {
           const name = getFunctionNameFromFilePath(deployCommand.filePath)
           return task(
-            `Deploying ${name}`,
+            `Deploying function: ${name}`,
             async ({ setTitle: _setTitle, setError: _setError }) => {
               try {
                 await deployCommand.sqlQueryPromise
-                _setTitle(`Deployed ${name}`)
+                _setTitle(`✓ Deployed: ${name}`)
               } catch (e) {
-                _setError(`Failed to deploy ${name} (because of ${e.message})`)
-                setWarning(`Failed to some functions (see below))`)
+                _setError(`✗ Failed: ${name} - ${e.message}`)
+                setWarning(`Some functions failed to deploy (see errors above)`)
               }
             }
           )

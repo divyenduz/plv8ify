@@ -25,7 +25,16 @@ export class ParseCLI {
 
     if (args._.length === 0) {
       ParseCLI.throwError(`
-Please specify a command. Available commands: generate, version, deploy
+plv8ify - Bundle TypeScript/JavaScript and generate PostgreSQL PLV8 functions
+
+Usage: plv8ify <command> [options]
+
+Commands:
+  generate    Bundle input file and generate SQL functions
+  deploy      Deploy generated SQL functions to PostgreSQL database
+  version     Show version information
+
+Run 'plv8ify <command>' for more information on a specific command.
 `)
       console.error()
       process.exit(1)

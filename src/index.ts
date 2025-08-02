@@ -27,7 +27,7 @@ async function main() {
   }
 
   if (CLI.config.bundler === 'bun' && runtime === 'node') {
-    throw new Error('Bun bundler is not supported in node runtime')
+    throw new Error('Error: Bun bundler is only available when running with Bun runtime. Please use --bundler esbuild or run with Bun.')
   }
 
   match(CLI.command)
