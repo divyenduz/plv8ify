@@ -22,6 +22,7 @@
     "@trivago/prettier-plugin-sort-imports": "3.2.0",
     "@turf/distance": "6.5.0",
     "@turf/helpers": "6.5.0",
+    "@types/bun": "^1.2.19",
     "@types/dotenv": "8.2.0",
     "@types/node": "18.11.7",
     "bun-types": "1.0.1",

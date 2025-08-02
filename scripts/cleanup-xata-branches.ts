@@ -1,6 +1,5 @@
 import { $ } from 'bun';
 import chalk from 'chalk';
-import stripAnsi from 'strip-ansi';
 import invariant from 'tiny-invariant';
 
 type BranchShortMetadata = {
@@ -54,7 +53,7 @@ for (const branch of branchesToDelete) {
   try {
     console.log(chalk.red(`\n🗑️  Deleting branch: ${chalk.bold(branch.name)} (${branch.id})`));
     const deleteBranchQuery =
-      await $`xata branch delete --organization=${organization} --project=${projectId} --branch=${branch.id} --yes --json`.quiet();
+      await $`xata branch delete --organization=${organizationId} --project=${projectId} --branch=${branch.id} --yes --json`.quiet();
     const deleteBranch: BranchShortMetadata = deleteBranchQuery.json();
     console.log(chalk.green(`✅ Deleted branch: ${chalk.bold(deleteBranch.name)}`));
   } catch (e) {
