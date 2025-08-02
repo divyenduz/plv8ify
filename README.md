@@ -255,6 +255,61 @@ Deploy an output folder to a Postgres database (defined by env var `DATABASE_URL
 | --output-folder        | String | Specify an output folder                                                | `plv8ify-dist` |
 | --deploy-concurrency   | Number | Specify the maximum allowed deployment tasks to run in parallel         | 10             |
 
+## Development Setup
+
+### Local Development
+
+This project uses [Lefthook](https://github.com/evilmartians/lefthook) for Git hooks to ensure code quality and maintain consistency.
+
+#### Initial Setup
+
+1. Clone the repository
+2. Install dependencies: `bun install`
+3. Lefthook will be automatically installed via the `prepare` script
+
+#### Git Hooks
+
+The following hooks are configured:
+
+- **pre-commit**: Automatically updates `bun.lock` when `package.json` changes
+- **post-checkout/post-merge**: Automatically runs `bun install` when `package.json` changes after switching branches or merging
+
+#### Running Checks Manually
+
+You can run CI checks locally before pushing:
+
+```bash
+# Run all CI checks (typecheck, tests, lockfile verification)
+bun run lefthook run pre-push
+
+# Run specific checks
+bun run lefthook run pre-push --commands typecheck
+bun run lefthook run pre-push --commands tests
+```
+
+### CI Setup
+
+The project uses GitHub Actions for continuous integration. Lefthook runs the following checks in CI:
+
+1. **TypeScript type checking**: Ensures no type errors
+2. **Tests**: Runs all test suites
+3. **Lockfile verification**: Ensures `bun.lock` is in sync with `package.json`
+
+To add Lefthook to your CI workflow, add this step:
+
+```yaml
+- name: Run Lefthook CI Checks
+  run: bun run lefthook run pre-push --no-tty
+```
+
+### Troubleshooting
+
+If hooks aren't working:
+
+1. Reinstall hooks: `bun run lefthook install`
+2. Check hook status: `bun run lefthook run pre-commit --verbose`
+3. Skip hooks temporarily: `LEFTHOOK_SKIP=1 git commit -m "message"`
+
 ## Caveats
 
 - Very early, only a small number of types supported

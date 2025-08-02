@@ -1,0 +1,75 @@
+# Lefthook configuration
+# Run locally: lefthook install
+# Run in CI: lefthook run pre-push
+
+# Skip hooks in CI environment
+skip_in_env:
+  - LEFTHOOK_SKIP
+
+# Local git hooks
+pre-commit:
+  parallel: true
+  commands:
+    update-bun-lock:
+      glob: "package.json"
+      run: |
+        if git diff --cached --name-only | grep -q "package.json"; then
+          echo "📦 package.json changed, updating bun.lock..."
+          bun install
+          git add bun.lock
+        fi
+
+# CI checks (can be run locally with: lefthook run pre-push)
+pre-push:
+  parallel: true
+  commands:
+    typecheck:
+      run: bun x tsc --noEmit
+      tags:
+        - ci
+        - typecheck
+    
+    tests:
+      run: bun test
+      tags:
+        - ci
+        - test
+    
+    lint-lockfile:
+      run: |
+        if [ -f "package.json" ] && [ ! -f "bun.lock" ]; then
+          echo "❌ Error: bun.lock is missing!"
+          echo "Please run 'bun install' to generate the lockfile"
+          exit 1
+        fi
+        
+        # Check if bun.lock is out of sync
+        bun install --frozen-lockfile || {
+          echo "❌ Error: bun.lock is out of sync with package.json!"
+          echo "Please run 'bun install' and commit the updated lockfile"
+          exit 1
+        }
+      tags:
+        - ci
+        - lockfile
+
+# Additional hooks for local development
+post-checkout:
+  commands:
+    install-deps:
+      run: |
+        # Only run if package.json changed
+        if git diff HEAD@{1} --name-only | grep -q "package.json"; then
+          echo "📦 package.json changed, running bun install..."
+          bun install
+        fi
+
+post-merge:
+  commands:
+    install-deps:
+      run: |
+        # Only run if package.json changed
+        if git diff HEAD@{1} --name-only | grep -q "package.json"; then
+          echo "📦 package.json changed, running bun install..."
+          bun install
+        fi

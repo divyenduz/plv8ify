@@ -28,6 +28,7 @@
     "@types/node": "18.11.7",
     "bun-types": "1.0.1",
     "chalk": "5.3.0",
+    "lefthook": "^1.12.2",
     "mathjs": "11.6.0",
     "object-hash": "3.0.0",
     "prettier": "2.5.1",
@@ -61,6 +62,7 @@
     "examples": "bun example:hello; bun example:hello-start_proc; bun example:hello-bundle; bun example:turf-js; bun example:turf-js-distance; bun example:mathjs; bun example:react-js; bun example:object-hash; bun example:turf-js-distance; bun example:common-types; bun example:hello-custom-type; bun example:trigger",
     "changeset": "bun x changeset",
     "release": "bun run build && bun x changeset publish",
-    "version": "bun x changeset version"
+    "version": "bun x changeset version",
+    "prepare": "lefthook install"
   }
 }
