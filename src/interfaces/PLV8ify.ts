@@ -1,4 +1,5 @@
 export type Volatility = 'VOLATILE' | 'STABLE' | 'IMMUTABLE'
+export type Parallel = 'SAFE' | 'UNSAFE' | 'RESTRICTED'
 export type Mode = 'inline' | 'start_proc' | 'bundle'
 
 export interface BuildArgs {
