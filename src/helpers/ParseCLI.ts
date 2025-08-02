@@ -211,8 +211,9 @@ export class ParseCLI {
     })
 
     return buildApplication(routeMap, {
+      name: 'plv8ify',
       scanner: {
-        caseStyle: 'kebab-case',
+        caseStyle: 'original',
       },
     })
   }
