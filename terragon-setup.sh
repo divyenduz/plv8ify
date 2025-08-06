@@ -6,20 +6,6 @@ export XATA_DATABASENAME=app
 # Install dependencies
 bun install
 
-# Install jq if not present
-if ! command -v jq &> /dev/null; then
-    echo "jq not found, installing..."
-    if command -v apt-get &> /dev/null; then
-        apt-get update && apt-get install -y jq
-    elif command -v yum &> /dev/null; then
-        yum install -y jq
-    elif command -v brew &> /dev/null; then
-        brew install jq
-    else
-        echo "Error: Could not install jq. Please install it manually."
-        exit 1
-    fi
-fi
 
 # Install Xata CLI
 curl -fsSL https://xata.io/install.sh | bash
