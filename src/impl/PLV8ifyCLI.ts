@@ -75,9 +75,10 @@ export class PLV8ifyCLI implements PLV8ify {
     return bundledJs.replace(/export\s*{[^}]*};/gs, '')
   }
 
-  async build({ mode, inputFile, scopePrefix }: BuildArgs) {
+  async build({ mode, inputFile, scopePrefix, esbuildDefine }: BuildArgs) {
     const bundledJsR = await this._bundler.bundle({
       inputFile,
+      define: esbuildDefine,
     })
     const bundledJs = this.removeExportBlock(bundledJsR)
     const modeAdjustedBundledJs = match(mode)

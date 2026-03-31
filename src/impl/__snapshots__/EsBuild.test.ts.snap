@@ -38,3 +38,25 @@ export {
 };
 "
 `;
+
+exports[`EsBuild tests getBundleJs - esbuild-define with ENABLE_FEATURE=false eliminates feature branch 1`] = `
+"// src/test-fixtures/define.fixture.ts
+function test_define_flag(input) {
+  return input;
+}
+export {
+  test_define_flag
+};
+"
+`;
+
+exports[`EsBuild tests getBundleJs - esbuild-define with ENABLE_FEATURE=true eliminates early return 1`] = `
+"// src/test-fixtures/define.fixture.ts
+function test_define_flag(input) {
+  return "feature active: " + input;
+}
+export {
+  test_define_flag
+};
+"
+`;
