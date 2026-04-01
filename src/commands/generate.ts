@@ -19,6 +19,7 @@ export async function generateCommand(CLI: {
     mode,
     defaultVolatility,
     typesFilePath,
+    esbuildDefine,
   } = CLI.config
 
   // Runtime check
@@ -41,6 +42,7 @@ export async function generateCommand(CLI: {
     mode,
     inputFile: inputFilePath,
     scopePrefix,
+    esbuildDefine,
   })
 
   // Optionally, write ESBuild output file

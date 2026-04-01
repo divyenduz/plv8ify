@@ -219,6 +219,55 @@ $plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;
 | set the TS->SQL type mapping for the return type | `/** @plv8ify_returns {<SQL TYPE>} */` | `/** @plv8ify_returns {setof my_table} */` |
 | designate the function is a TRIGGER | `/** @plv8ify_trigger */` | `/** @plv8ify_trigger */` |
 
+## Dead Code Elimination with `--esbuild-define`
+
+The `--esbuild-define` flag lets you pass compile-time constants to esbuild, which are then used to eliminate dead code branches from the generated output. This is useful for including optional infrastructure code (e.g. snapshot capture, debug logging) that should have zero cost in production.
+
+When `--esbuild-define` is provided, `minifySyntax` is automatically enabled so esbuild removes unreachable branches entirely — without mangling names or collapsing whitespace, keeping the output readable.
+
+**Input:**
+
+```typescript
+declare const ENABLE_SNAPSHOT_CAPTURE: boolean;
+
+export function my_function(input: MyRow): MyRow {
+  if (!ENABLE_SNAPSHOT_CAPTURE) return input;
+  const snapshot = new SnapshotCapture(/* ... */);
+  snapshot.capture(input);
+  return input;
+}
+```
+
+**Production build** — snapshot code eliminated:
+
+```bash
+plv8ify generate --input-file input.ts --esbuild-define '{"ENABLE_SNAPSHOT_CAPTURE":"false"}'
+```
+
+```javascript
+// output
+function my_function(input) {
+  return input;
+}
+```
+
+**Dev build** — snapshot code included:
+
+```bash
+plv8ify generate --input-file input.ts --esbuild-define '{"ENABLE_SNAPSHOT_CAPTURE":"true"}'
+```
+
+```javascript
+// output
+function my_function(input) {
+  const snapshot = new SnapshotCapture();
+  snapshot.capture(input);
+  return input;
+}
+```
+
+Multiple defines are supported in a single flag: `--esbuild-define '{"FLAG_A":"true","FLAG_B":"false"}'`
+
 ## CLI Usage
 
 ### Version
@@ -245,6 +294,7 @@ Generate PLV8 functions for an input typescript file
 | --mode                  | 'inline', 'bundle' or 'start_proc'    | 'inline' will bundle the library in each function, both 'bundle' and 'start_proc' creates a `{prefix}_init` function that loads the library. 'bundle' adds a check to each function to call 'init' if required, whereas 'start_proc' is designed to be used with plv8.start_proc        | `inline`       |
 | --volatility            | 'IMMUTABLE' or 'STABLE' or 'VOLATILE' | Change the volatility of all the generated functions. To change volatility of a specific function use the jsdoc `/** @plv8ify_volatility STABLE` in the input typescript file (see `examples/turf-js/input.ts`).                                                                        | `IMMUTABLE`    |
 | --types-config-file     | String                                | Specify a custom types config file                                                                                                                                                                                                                                                      | types.ts       |
+| --esbuild-define        | JSON string                           | Pass compile-time constants to esbuild's `define` option as a JSON object of string key-value pairs. When provided, `minifySyntax` is also enabled so dead branches are eliminated from the output. Example: `--esbuild-define '{"DEBUG":"false"}'`                                     | _(none)_       |
 
 ### Deploy
 

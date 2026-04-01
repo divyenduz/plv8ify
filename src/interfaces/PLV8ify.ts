@@ -6,6 +6,7 @@ export interface BuildArgs {
   mode: Mode
   inputFile: string
   scopePrefix: string
+  esbuildDefine?: Record<string, string>
 }
 
 export interface GetPLV8SQLFunctionsArgs {
