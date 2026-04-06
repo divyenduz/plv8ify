@@ -4,6 +4,10 @@
   "type": "module",
   "main": "dist/src/index.js",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/divyenduz/plv8ify.git"
+  },
   "bin": {
     "plv8ify": "dist/src/index.js"
   },
