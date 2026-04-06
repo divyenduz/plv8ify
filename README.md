@@ -305,6 +305,10 @@ Deploy an output folder to a Postgres database (defined by env var `DATABASE_URL
 | --output-folder        | String | Specify an output folder                                                | `plv8ify-dist` |
 | --deploy-concurrency   | Number | Specify the maximum allowed deployment tasks to run in parallel         | 10             |
 
+## Releasing
+
+This project uses [Changesets](https://github.com/changesets/changesets) for automated versioning and npm publishing via GitHub Actions. See [RELEASE.md](RELEASE.md) for the full release process.
+
 ## Caveats
 
 - Very early, only a small number of types supported
