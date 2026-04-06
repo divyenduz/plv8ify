@@ -1,5 +1,11 @@
 # plv8ify
 
+## 0.0.67
+
+### Patch Changes
+
+- 1f0eb62: fix the release CI via OIDC approach, trigger release of other features
+
 ## 0.0.66
 
 ### Patch Changes
