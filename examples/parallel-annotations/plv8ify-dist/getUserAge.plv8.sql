@@ -14,7 +14,6 @@ function multiply(x, y) {
   return x * y;
 }
 
-
 return getUserAge(userId)
 
 $plv8ify$ LANGUAGE plv8 STABLE PARALLEL RESTRICTED STRICT;

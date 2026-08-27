@@ -14,7 +14,6 @@ function multiply(x, y) {
   return x * y;
 }
 
-
 return logMessage(message)
 
 $plv8ify$ LANGUAGE plv8 VOLATILE PARALLEL UNSAFE STRICT;

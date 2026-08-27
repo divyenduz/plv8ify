@@ -13,6 +13,7 @@ import {
   TSFunction,
   TSFunctionParameter,
 } from 'src/interfaces/TSCompiler.js'
+import { Project } from 'ts-morph'
 import { match } from 'ts-pattern'
 
 import { BunBuild } from './BunBuild.js'
@@ -45,6 +46,7 @@ export class PLV8ifyCLI implements PLV8ify {
   private _bundler: Bundler
   private _tsCompiler: TSCompiler
   private bundleId: string | number
+  private _exportMap: Record<string, string> = {}
 
   private _typeMap: Record<string, string> = {
     number: 'float8',
@@ -78,8 +80,35 @@ export class PLV8ifyCLI implements PLV8ify {
     }
   }
 
-  private removeExportBlock(bundledJs: string) {
-    return bundledJs.replace(/export\s*{[^}]*};/gs, '')
+  private extractExports(bundledJs: string): {
+    exportMap: Record<string, string>
+    cleanJs: string
+  } {
+    const project = new Project({ useInMemoryFileSystem: true })
+    const sourceFile = project.createSourceFile('bundle.js', bundledJs)
+    const exportMap: Record<string, string> = {}
+
+    for (const exportDecl of sourceFile.getExportDeclarations()) {
+      for (const namedExport of exportDecl.getNamedExports()) {
+        const alias = namedExport.getAliasNode()
+        if (alias) {
+          let aliasText = alias.getText()
+          if (
+            (aliasText.startsWith('"') && aliasText.endsWith('"')) ||
+            (aliasText.startsWith("'") && aliasText.endsWith("'"))
+          ) {
+            aliasText = aliasText.slice(1, -1)
+          }
+          exportMap[aliasText] = namedExport.getName()
+        } else {
+          exportMap[namedExport.getName()] = namedExport.getName()
+        }
+      }
+      exportDecl.remove()
+    }
+
+    const cleanJs = sourceFile.getFullText()
+    return { exportMap, cleanJs }
   }
 
   async build({ mode, inputFile, scopePrefix, esbuildDefine }: BuildArgs) {
@@ -87,7 +116,8 @@ export class PLV8ifyCLI implements PLV8ify {
       inputFile,
       define: esbuildDefine,
     })
-    const bundledJs = this.removeExportBlock(bundledJsR)
+    const { exportMap, cleanJs: bundledJs } = this.extractExports(bundledJsR)
+    this._exportMap = exportMap
     const modeAdjustedBundledJs = match(mode)
       .with('inline', () => bundledJs)
       .with('start_proc', () =>
@@ -156,6 +186,12 @@ export class PLV8ifyCLI implements PLV8ify {
     defaultVolatility,
     outputFolder,
   }: GetPLV8SQLFunctionsArgs) {
+    if (bundledJs.includes('export')) {
+      const { exportMap, cleanJs } = this.extractExports(bundledJs)
+      this._exportMap = { ...this._exportMap, ...exportMap }
+      bundledJs = cleanJs
+    }
+
     const fns = this.getExportedFunctions()
     const sqls = fns.map((fn) => {
       return {
@@ -183,14 +219,17 @@ export class PLV8ifyCLI implements PLV8ify {
         jsdocTags: [],
       }
 
-      if (mode === 'bundle') {
+      if (mode === 'bundle' || mode === 'start_proc') {
         // make the function declarations available in the global scope
         for (const fn of fns) {
-          bundledJs += `globalThis.${fn.name} = ${fn.name};\n`
+          const localBinding = this._exportMap[fn.name] || fn.name
+          bundledJs += `globalThis.${fn.name} = ${localBinding};\n`
         }
 
         // set a global symbol so that we can check if the init function has been called
-        bundledJs += `globalThis[Symbol.for('${scopePrefix}_initialized')] = ${this.getBundleIdLiteral()};\n`
+        if (mode === 'bundle') {
+          bundledJs += `globalThis[Symbol.for('${scopePrefix}_initialized')] = ${this.getBundleIdLiteral()};\n`
+        }
       }
 
       const initFunction = this.getPLV8SQLFunction({
@@ -316,6 +355,9 @@ export class PLV8ifyCLI implements PLV8ify {
     const scopedName =
       (customSchema ? customSchema + '.' : '') + scopePrefix + fn.name
 
+    const localFnName = this._exportMap[fn.name] || fn.name
+    const targetCallName = mode === 'inline' ? localFnName : fn.name
+
     return [
       `DROP FUNCTION IF EXISTS ${scopedName}(${sqlParametersString});`,
       `CREATE OR REPLACE FUNCTION ${scopedName}(${sqlParametersString}) RETURNS ${sqlReturnType} AS ${pgFunctionDelimiter}`,
@@ -329,7 +371,7 @@ export class PLV8ifyCLI implements PLV8ify {
         .otherwise(() => ''),
       match(sqlReturnType.toLowerCase())
         .with('void', () => '')
-        .otherwise(() => `return ${fn.name}(${jsParametersString})`),
+        .otherwise(() => `return ${targetCallName}(${jsParametersString})`),
       '',
       `${pgFunctionDelimiter} LANGUAGE plv8 ${volatility}${parallel ? ` PARALLEL ${parallel}` : ''} STRICT;`,
     ].join('\n')

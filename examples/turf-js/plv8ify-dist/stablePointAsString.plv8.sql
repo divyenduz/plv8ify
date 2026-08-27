@@ -389,7 +389,6 @@ function stablePointAsString(lat, long) {
   return pt;
 }
 
-
 return stablePointAsString(lat,long)
 
 $plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;

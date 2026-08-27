@@ -14,7 +14,6 @@ function multiply(x, y) {
   return x * y;
 }
 
-
 return calculateSum(a,b)
 
 $plv8ify$ LANGUAGE plv8 IMMUTABLE PARALLEL SAFE STRICT;

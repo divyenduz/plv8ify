@@ -8,7 +8,6 @@ function hello(test) {
   };
 }
 
-
 return hello(test)
 
 $plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;

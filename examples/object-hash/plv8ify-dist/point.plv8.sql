@@ -832,7 +832,6 @@ function point(lat, long) {
   return (0, import_object_hash.default)([lat, long]);
 }
 
-
 return point(lat,long)
 
 $plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;

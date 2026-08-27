@@ -7,7 +7,8 @@ function hello() {
 function world() {
   return "hello";
 }
-
+globalThis.hello = hello;
+globalThis.world = world;
 
 
 

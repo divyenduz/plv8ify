@@ -5,7 +5,6 @@ function hello() {
   return "world";
 }
 
-
 return hello()
 
 $plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;

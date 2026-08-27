@@ -95,7 +95,6 @@ function distance2(lat, long) {
 }
 console.log(distance2([13.408976, 52.543672], [13.409018, 52.543605]));
 
-
-return distance(lat,long)
+return distance2(lat,long)
 
 $plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;
