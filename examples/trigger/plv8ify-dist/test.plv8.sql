@@ -17,7 +17,6 @@ function test(NEW, OLD) {
   return NEW;
 }
 
-
 return test(NEW,OLD)
 
 $plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;

@@ -9065,6 +9065,6 @@ fraction.js/fraction.js:
    **)
 */
 
-return atan2(one,two)
+return atan23(one,two)
 
 $plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;

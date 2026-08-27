@@ -158,6 +158,157 @@ function test() {
     expect(fns[0].sql).toMatchSnapshot()
   })
 
+  it('executes inline mode correctly when exported function collides with dependency (mathjs atan2)', async () => {
+    const plv8ify = new PLV8ifyCLI('esbuild')
+    plv8ify.init('./examples/mathjs/input.ts')
+    const bundledJs = await plv8ify.build({
+      mode: 'inline',
+      inputFile: './examples/mathjs/input.ts',
+      scopePrefix: '',
+    })
+    const fns = plv8ify.getPLV8SQLFunctions({
+      mode: 'inline',
+      scopePrefix: '',
+      fallbackReturnType: 'float8',
+      defaultVolatility: 'IMMUTABLE',
+      bundledJs,
+      pgFunctionDelimiter: '$plv8ify$',
+      outputFolder: 'plv8ify-dist',
+    })
+    expect(fns.length).toEqual(1)
+    expect(fns[0].filename).toEqual('plv8ify-dist/atan2.plv8.sql')
+
+    // Behavioral test: extract the generated JS body between delimiters and execute it
+    const jsBody = fns[0].sql.split('$plv8ify$')[1]
+    const fn = new Function('one', 'two', jsBody)
+    const result = fn(1, 1)
+    expect(result).toBeCloseTo(Math.atan2(1, 1), 10)
+  })
+
+  it('executes bundle mode correctly when exported function collides with dependency (mathjs atan2)', async () => {
+    const plv8ify = new PLV8ifyCLI('esbuild')
+    plv8ify.init('./examples/mathjs/input.ts')
+    const bundledJs = await plv8ify.build({
+      mode: 'bundle',
+      inputFile: './examples/mathjs/input.ts',
+      scopePrefix: 'myScope',
+    })
+    const fns = plv8ify.getPLV8SQLFunctions({
+      mode: 'bundle',
+      scopePrefix: 'myScope',
+      fallbackReturnType: 'float8',
+      defaultVolatility: 'IMMUTABLE',
+      bundledJs,
+      pgFunctionDelimiter: '$plv8ify$',
+      outputFolder: 'plv8ify-dist',
+    })
+
+    const initSql = fns.find((f) => f.filename.endsWith('_init.plv8.sql'))!.sql
+    const funcSql = fns.find((f) => f.filename.endsWith('myScopeatan2.plv8.sql'))!.sql
+
+    const initBody = initSql.split('$$')[1]
+    const funcBody = funcSql.split('$plv8ify$')[1]
+
+    const mockGlobal: Record<string, any> = { Symbol: globalThis.Symbol }
+    const mockPlv8 = {
+      execute: (cmd: string) => {
+        if (cmd === 'SELECT myScope_init();') {
+          new Function('globalThis', `with(globalThis) { ${initBody} }`)(mockGlobal)
+        }
+      },
+    }
+
+    const bundleFn = new Function('globalThis', 'plv8', 'one', 'two', `with(globalThis) { ${funcBody} }`)
+    const result = bundleFn(mockGlobal, mockPlv8, 1, 1)
+    expect(result).toBeCloseTo(Math.atan2(1, 1), 10)
+  })
+
+  it('executes start_proc mode correctly when exported function collides with dependency (mathjs atan2)', async () => {
+    const plv8ify = new PLV8ifyCLI('esbuild')
+    plv8ify.init('./examples/mathjs/input.ts')
+    const bundledJs = await plv8ify.build({
+      mode: 'start_proc',
+      inputFile: './examples/mathjs/input.ts',
+      scopePrefix: 'myScope',
+    })
+    const fns = plv8ify.getPLV8SQLFunctions({
+      mode: 'start_proc',
+      scopePrefix: 'myScope',
+      fallbackReturnType: 'float8',
+      defaultVolatility: 'IMMUTABLE',
+      bundledJs,
+      pgFunctionDelimiter: '$plv8ify$',
+      outputFolder: 'plv8ify-dist',
+    })
+
+    const initSql = fns.find((f) => f.filename.endsWith('_init.plv8.sql'))!.sql
+    const funcSql = fns.find((f) => f.filename.endsWith('myScopeatan2.plv8.sql'))!.sql
+
+    const initBody = initSql.split('$$')[1]
+    const funcBody = funcSql.split('$plv8ify$')[1]
+
+    const mockGlobal: Record<string, any> = { Symbol: globalThis.Symbol }
+    new Function('globalThis', `with(globalThis) { ${initBody} }`)(mockGlobal)
+
+    const spFn = new Function('globalThis', 'one', 'two', `with(globalThis) { ${funcBody} }`)
+    const result = spFn(mockGlobal, 1, 1)
+    expect(result).toBeCloseTo(Math.atan2(1, 1), 10)
+  })
+
+  it('handles multiple exports with and without collisions', async () => {
+    const plv8ify = new PLV8ifyCLI('esbuild')
+    plv8ify.init('./src/test-fixtures/collision.fixture.ts')
+    const bundledJs = await plv8ify.build({
+      mode: 'inline',
+      inputFile: './src/test-fixtures/collision.fixture.ts',
+      scopePrefix: '',
+    })
+    const fns = plv8ify.getPLV8SQLFunctions({
+      mode: 'inline',
+      scopePrefix: '',
+      fallbackReturnType: 'float8',
+      defaultVolatility: 'IMMUTABLE',
+      bundledJs,
+      pgFunctionDelimiter: '$plv8ify$',
+      outputFolder: 'plv8ify-dist',
+    })
+
+    expect(fns.length).toEqual(2)
+
+    const atan2Sql = fns.find((f) => f.filename.endsWith('atan2.plv8.sql'))!.sql
+    const addSql = fns.find((f) => f.filename.endsWith('add.plv8.sql'))!.sql
+
+    const atan2Fn = new Function('one', 'two', atan2Sql.split('$plv8ify$')[1])
+    expect(atan2Fn(1, 1)).toBeCloseTo(Math.atan2(1, 1), 10)
+
+    const addFn = new Function('a', 'b', addSql.split('$plv8ify$')[1])
+    expect(addFn(3, 7)).toEqual(10)
+  })
+
+  it('works with bun bundler when collision occurs', async () => {
+    const plv8ify = new PLV8ifyCLI('bun')
+    plv8ify.init('./examples/mathjs/input.ts')
+    const bundledJs = await plv8ify.build({
+      mode: 'inline',
+      inputFile: './examples/mathjs/input.ts',
+      scopePrefix: '',
+    })
+    const fns = plv8ify.getPLV8SQLFunctions({
+      mode: 'inline',
+      scopePrefix: '',
+      fallbackReturnType: 'float8',
+      defaultVolatility: 'IMMUTABLE',
+      bundledJs,
+      pgFunctionDelimiter: '$plv8ify$',
+      outputFolder: 'plv8ify-dist',
+    })
+
+    expect(fns.length).toEqual(1)
+    const jsBody = fns[0].sql.split('$plv8ify$')[1]
+    const fn = new Function('one', 'two', jsBody)
+    expect(fn(1, 1)).toBeCloseTo(Math.atan2(1, 1), 10)
+  })
+
   it('supports custom deterministic bundleId / build number', async () => {
     const plv8ify = new PLV8ifyCLI('esbuild', 123456789)
     plv8ify.init('./src/test-fixtures/input.fixture.ts')

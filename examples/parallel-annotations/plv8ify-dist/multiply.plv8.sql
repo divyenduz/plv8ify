@@ -14,7 +14,6 @@ function multiply(x, y) {
   return x * y;
 }
 
-
 return multiply(x,y)
 
 $plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;

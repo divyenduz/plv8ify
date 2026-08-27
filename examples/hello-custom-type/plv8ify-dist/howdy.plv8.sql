@@ -11,7 +11,6 @@ function howdy(first_name, last_name) {
   return `Howdy ${first_name} ${last_name}`;
 }
 
-
 return howdy(first_name,last_name)
 
 $plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;
