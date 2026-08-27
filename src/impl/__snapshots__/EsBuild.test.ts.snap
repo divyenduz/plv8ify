@@ -60,3 +60,18 @@ export {
 };
 "
 `;
+
+exports[`EsBuild tests getBundleJs - handles satisfies keyword 1`] = `
+"// src/test-fixtures/satisfies.fixture.ts
+var config = {
+  endpoint: "https://api.example.com",
+  retries: 3
+};
+function getEndpoint() {
+  return config.endpoint;
+}
+export {
+  getEndpoint
+};
+"
+`;

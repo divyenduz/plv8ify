@@ -72,4 +72,13 @@ describe('EsBuild tests', () => {
     })
     expect(withoutDefine).toEqual(withEmptyDefine)
   })
+
+  it('getBundleJs - handles satisfies keyword', async () => {
+    const esbuild = new EsBuild()
+    const js = await esbuild.bundle({
+      inputFile: './src/test-fixtures/satisfies.fixture.ts',
+    })
+    expect(js).toContain('https://api.example.com')
+    expect(js).toMatchSnapshot()
+  })
 })

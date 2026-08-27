@@ -6,28 +6,36 @@ var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __markAsModule = (target) => __defProp(target, "__esModule", { value: true });
 var __commonJS = (cb, mod2) => function __require() {
-  return mod2 || (0, cb[__getOwnPropNames(cb)[0]])((mod2 = { exports: {} }).exports, mod2), mod2.exports;
-};
-var __reExport = (target, module, copyDefault, desc) => {
-  if (module && typeof module === "object" || typeof module === "function") {
-    for (let key of __getOwnPropNames(module))
-      if (!__hasOwnProp.call(target, key) && (copyDefault || key !== "default"))
-        __defProp(target, key, { get: () => module[key], enumerable: !(desc = __getOwnPropDesc(module, key)) || desc.enumerable });
+  try {
+    return mod2 || (0, cb[__getOwnPropNames(cb)[0]])((mod2 = { exports: {} }).exports, mod2), mod2.exports;
+  } catch (e) {
+    throw mod2 = 0, e;
   }
-  return target;
 };
-var __toESM = (module, isNodeMode) => {
-  return __reExport(__markAsModule(__defProp(module != null ? __create(__getProtoOf(module)) : {}, "default", !isNodeMode && module && module.__esModule ? { get: () => module.default, enumerable: true } : { value: module, enumerable: true })), module);
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
 };
+var __toESM = (mod2, isNodeMode, target) => (target = mod2 != null ? __create(__getProtoOf(mod2)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod2 || !mod2.__esModule ? __defProp(target, "default", { value: mod2, enumerable: true }) : target,
+  mod2
+));
 
 // node_modules/typed-function/lib/umd/typed-function.js
 var require_typed_function = __commonJS({
   "node_modules/typed-function/lib/umd/typed-function.js"(exports, module) {
     (function(global, factory2) {
       typeof exports === "object" && typeof module !== "undefined" ? module.exports = factory2() : typeof define === "function" && define.amd ? define(factory2) : (global = typeof globalThis !== "undefined" ? globalThis : global || self, global["'typed'"] = factory2());
-    })(exports, function() {
+    })(exports, (function() {
       "use strict";
       function ok() {
         return true;
@@ -136,6 +144,7 @@ var require_typed_function = __commonJS({
               isAny: types[i].isAny,
               index: beforeIndex + i,
               conversionsTo: []
+              // Newly added type can't have any conversions to it
             });
           }
           const affectedTypes = typeList.slice(beforeIndex);
@@ -215,8 +224,7 @@ var require_typed_function = __commonJS({
               filteredSignatures.push(possibility);
             }
             remainingSignatures = filteredSignatures;
-            if (remainingSignatures.length === 0)
-              break;
+            if (remainingSignatures.length === 0) break;
           }
           let candidate;
           for (candidate of remainingSignatures) {
@@ -271,6 +279,7 @@ var require_typed_function = __commonJS({
           return {
             types: exactTypes,
             name: paramName.slice(0, -1),
+            // remove trailing '|' from above
             hasAny,
             hasConversion: false,
             restParam
@@ -577,18 +586,14 @@ var require_typed_function = __commonJS({
           let conv1 = 0;
           let par;
           for (par of pars1) {
-            if (par.hasAny)
-              ++any1;
-            if (par.hasConversion)
-              ++conv1;
+            if (par.hasAny) ++any1;
+            if (par.hasConversion) ++conv1;
           }
           let any2 = 0;
           let conv2 = 0;
           for (par of pars2) {
-            if (par.hasAny)
-              ++any2;
-            if (par.hasConversion)
-              ++conv2;
+            if (par.hasAny) ++any2;
+            if (par.hasConversion) ++conv2;
           }
           if (any1 !== any2) {
             return any1 - any2;
@@ -827,8 +832,7 @@ var require_typed_function = __commonJS({
             leftUnresolved = false;
             let nothingResolved = true;
             for (let i = 0; i < resolvedFunctions.length; ++i) {
-              if (isResolved[i])
-                continue;
+              if (isResolved[i]) continue;
               const fn = resolvedFunctions[i];
               if (isReferToSelf(fn)) {
                 resolvedFunctions[i] = fn.referToSelf.callback(self2);
@@ -880,8 +884,7 @@ var require_typed_function = __commonJS({
               continue;
             }
             const params = parseSignature(signature);
-            if (!params)
-              continue;
+            if (!params) continue;
             parsedParams.forEach(function(pp) {
               if (conflicting(pp, params)) {
                 throw new TypeError('Conflicting signatures "' + stringifyParams(pp) + '" and "' + stringifyParams(params) + '".');
@@ -1226,7 +1229,7 @@ var require_typed_function = __commonJS({
       }
       var typedFunction2 = create();
       return typedFunction2;
-    });
+    }));
   }
 });
 
@@ -1235,8 +1238,7 @@ function _extends() {
   return _extends = Object.assign ? Object.assign.bind() : function(n) {
     for (var e = 1; e < arguments.length; e++) {
       var t = arguments[e];
-      for (var r in t)
-        ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]);
+      for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]);
     }
     return n;
   }, _extends.apply(null, arguments);
@@ -1244,11 +1246,22 @@ function _extends() {
 
 // node_modules/mathjs/lib/esm/core/config.js
 var DEFAULT_CONFIG = {
+  // minimum relative difference between two compared values,
+  // used by all comparison functions
   epsilon: 1e-12,
+  // type of default matrix output. Choose 'matrix' (default) or 'array'
   matrix: "Matrix",
+  // type of default number output. Choose 'number' (default) 'BigNumber', or 'Fraction
   number: "number",
+  // number of significant digits in BigNumbers
   precision: 64,
+  // predictable output type of functions. When true, output type depends only
+  // on the input types. When false (default), output type can vary depending
+  // on input values. For example `math.sqrt(-4)` returns `complex('2i')` when
+  // predictable is false, and returns `NaN` when true.
   predictable: false,
+  // random seed for seeded pseudo random number generation
+  // null = randomly seed
   randomSeed: null
 };
 
@@ -1380,12 +1393,9 @@ function isChain(x) {
 function typeOf(x) {
   var t = typeof x;
   if (t === "object") {
-    if (x === null)
-      return "null";
-    if (isBigNumber(x))
-      return "BigNumber";
-    if (x.constructor && x.constructor.name)
-      return x.constructor.name;
+    if (x === null) return "null";
+    if (isBigNumber(x)) return "BigNumber";
+    if (x.constructor && x.constructor.name) return x.constructor.name;
     return "Object";
   }
   return t;
@@ -1405,12 +1415,9 @@ function clone(x) {
       return clone(value);
     });
   }
-  if (x instanceof Date)
-    return new Date(x.valueOf());
-  if (isBigNumber(x))
-    return x;
-  if (x instanceof RegExp)
-    throw new TypeError("Cannot clone " + x);
+  if (x instanceof Date) return new Date(x.valueOf());
+  if (isBigNumber(x)) return x;
+  if (x instanceof RegExp) throw new TypeError("Cannot clone " + x);
   return mapObject(x, clone);
 }
 function mapObject(object, callback) {
@@ -1848,8 +1855,7 @@ function format2(value, options) {
     case "auto": {
       var lowerExp = options && options.lowerExp !== void 0 ? options.lowerExp : -3;
       var upperExp = options && options.upperExp !== void 0 ? options.upperExp : 5;
-      if (value.isZero())
-        return "0";
+      if (value.isZero()) return "0";
       var str;
       var rounded = value.toSignificantDigits(precision);
       var exp2 = rounded.e;
@@ -2378,6 +2384,10 @@ var createTyped = /* @__PURE__ */ factory("typed", dependencies, function create
       name: "Unit",
       test: isUnit
     },
+    // The following type matches a valid variable name, i.e., an alphanumeric
+    // string starting with an alphabetic character. It is used (at least)
+    // in the definition of the derivative() function, as the argument telling
+    // what to differentiate over must (currently) be a variable.
     {
       name: "identifier",
       test: (s) => isString && /^(?:[A-Za-z\xAA\xB5\xBA\xC0-\xD6\xD8-\xF6\xF8-\u02C1\u02C6-\u02D1\u02E0-\u02E4\u02EC\u02EE\u0370-\u0374\u0376\u0377\u037A-\u037D\u037F\u0386\u0388-\u038A\u038C\u038E-\u03A1\u03A3-\u03F5\u03F7-\u0481\u048A-\u052F\u0531-\u0556\u0559\u0560-\u0588\u05D0-\u05EA\u05EF-\u05F2\u0620-\u064A\u066E\u066F\u0671-\u06D3\u06D5\u06E5\u06E6\u06EE\u06EF\u06FA-\u06FC\u06FF\u0710\u0712-\u072F\u074D-\u07A5\u07B1\u07CA-\u07EA\u07F4\u07F5\u07FA\u0800-\u0815\u081A\u0824\u0828\u0840-\u0858\u0860-\u086A\u0870-\u0887\u0889-\u088E\u08A0-\u08C9\u0904-\u0939\u093D\u0950\u0958-\u0961\u0971-\u0980\u0985-\u098C\u098F\u0990\u0993-\u09A8\u09AA-\u09B0\u09B2\u09B6-\u09B9\u09BD\u09CE\u09DC\u09DD\u09DF-\u09E1\u09F0\u09F1\u09FC\u0A05-\u0A0A\u0A0F\u0A10\u0A13-\u0A28\u0A2A-\u0A30\u0A32\u0A33\u0A35\u0A36\u0A38\u0A39\u0A59-\u0A5C\u0A5E\u0A72-\u0A74\u0A85-\u0A8D\u0A8F-\u0A91\u0A93-\u0AA8\u0AAA-\u0AB0\u0AB2\u0AB3\u0AB5-\u0AB9\u0ABD\u0AD0\u0AE0\u0AE1\u0AF9\u0B05-\u0B0C\u0B0F\u0B10\u0B13-\u0B28\u0B2A-\u0B30\u0B32\u0B33\u0B35-\u0B39\u0B3D\u0B5C\u0B5D\u0B5F-\u0B61\u0B71\u0B83\u0B85-\u0B8A\u0B8E-\u0B90\u0B92-\u0B95\u0B99\u0B9A\u0B9C\u0B9E\u0B9F\u0BA3\u0BA4\u0BA8-\u0BAA\u0BAE-\u0BB9\u0BD0\u0C05-\u0C0C\u0C0E-\u0C10\u0C12-\u0C28\u0C2A-\u0C39\u0C3D\u0C58-\u0C5A\u0C5D\u0C60\u0C61\u0C80\u0C85-\u0C8C\u0C8E-\u0C90\u0C92-\u0CA8\u0CAA-\u0CB3\u0CB5-\u0CB9\u0CBD\u0CDD\u0CDE\u0CE0\u0CE1\u0CF1\u0CF2\u0D04-\u0D0C\u0D0E-\u0D10\u0D12-\u0D3A\u0D3D\u0D4E\u0D54-\u0D56\u0D5F-\u0D61\u0D7A-\u0D7F\u0D85-\u0D96\u0D9A-\u0DB1\u0DB3-\u0DBB\u0DBD\u0DC0-\u0DC6\u0E01-\u0E30\u0E32\u0E33\u0E40-\u0E46\u0E81\u0E82\u0E84\u0E86-\u0E8A\u0E8C-\u0EA3\u0EA5\u0EA7-\u0EB0\u0EB2\u0EB3\u0EBD\u0EC0-\u0EC4\u0EC6\u0EDC-\u0EDF\u0F00\u0F40-\u0F47\u0F49-\u0F6C\u0F88-\u0F8C\u1000-\u102A\u103F\u1050-\u1055\u105A-\u105D\u1061\u1065\u1066\u106E-\u1070\u1075-\u1081\u108E\u10A0-\u10C5\u10C7\u10CD\u10D0-\u10FA\u10FC-\u1248\u124A-\u124D\u1250-\u1256\u1258\u125A-\u125D\u1260-\u1288\u128A-\u128D\u1290-\u12B0\u12B2-\u12B5\u12B8-\u12BE\u12C0\u12C2-\u12C5\u12C8-\u12D6\u12D8-\u1310\u1312-\u1315\u1318-\u135A\u1380-\u138F\u13A0-\u13F5\u13F8-\u13FD\u1401-\u166C\u166F-\u167F\u1681-\u169A\u16A0-\u16EA\u16F1-\u16F8\u1700-\u1711\u171F-\u1731\u1740-\u1751\u1760-\u176C\u176E-\u1770\u1780-\u17B3\u17D7\u17DC\u1820-\u1878\u1880-\u1884\u1887-\u18A8\u18AA\u18B0-\u18F5\u1900-\u191E\u1950-\u196D\u1970-\u1974\u1980-\u19AB\u19B0-\u19C9\u1A00-\u1A16\u1A20-\u1A54\u1AA7\u1B05-\u1B33\u1B45-\u1B4C\u1B83-\u1BA0\u1BAE\u1BAF\u1BBA-\u1BE5\u1C00-\u1C23\u1C4D-\u1C4F\u1C5A-\u1C7D\u1C80-\u1C88\u1C90-\u1CBA\u1CBD-\u1CBF\u1CE9-\u1CEC\u1CEE-\u1CF3\u1CF5\u1CF6\u1CFA\u1D00-\u1DBF\u1E00-\u1F15\u1F18-\u1F1D\u1F20-\u1F45\u1F48-\u1F4D\u1F50-\u1F57\u1F59\u1F5B\u1F5D\u1F5F-\u1F7D\u1F80-\u1FB4\u1FB6-\u1FBC\u1FBE\u1FC2-\u1FC4\u1FC6-\u1FCC\u1FD0-\u1FD3\u1FD6-\u1FDB\u1FE0-\u1FEC\u1FF2-\u1FF4\u1FF6-\u1FFC\u2071\u207F\u2090-\u209C\u2102\u2107\u210A-\u2113\u2115\u2119-\u211D\u2124\u2126\u2128\u212A-\u212D\u212F-\u2139\u213C-\u213F\u2145-\u2149\u214E\u2183\u2184\u2C00-\u2CE4\u2CEB-\u2CEE\u2CF2\u2CF3\u2D00-\u2D25\u2D27\u2D2D\u2D30-\u2D67\u2D6F\u2D80-\u2D96\u2DA0-\u2DA6\u2DA8-\u2DAE\u2DB0-\u2DB6\u2DB8-\u2DBE\u2DC0-\u2DC6\u2DC8-\u2DCE\u2DD0-\u2DD6\u2DD8-\u2DDE\u2E2F\u3005\u3006\u3031-\u3035\u303B\u303C\u3041-\u3096\u309D-\u309F\u30A1-\u30FA\u30FC-\u30FF\u3105-\u312F\u3131-\u318E\u31A0-\u31BF\u31F0-\u31FF\u3400-\u4DBF\u4E00-\uA48C\uA4D0-\uA4FD\uA500-\uA60C\uA610-\uA61F\uA62A\uA62B\uA640-\uA66E\uA67F-\uA69D\uA6A0-\uA6E5\uA717-\uA71F\uA722-\uA788\uA78B-\uA7CA\uA7D0\uA7D1\uA7D3\uA7D5-\uA7D9\uA7F2-\uA801\uA803-\uA805\uA807-\uA80A\uA80C-\uA822\uA840-\uA873\uA882-\uA8B3\uA8F2-\uA8F7\uA8FB\uA8FD\uA8FE\uA90A-\uA925\uA930-\uA946\uA960-\uA97C\uA984-\uA9B2\uA9CF\uA9E0-\uA9E4\uA9E6-\uA9EF\uA9FA-\uA9FE\uAA00-\uAA28\uAA40-\uAA42\uAA44-\uAA4B\uAA60-\uAA76\uAA7A\uAA7E-\uAAAF\uAAB1\uAAB5\uAAB6\uAAB9-\uAABD\uAAC0\uAAC2\uAADB-\uAADD\uAAE0-\uAAEA\uAAF2-\uAAF4\uAB01-\uAB06\uAB09-\uAB0E\uAB11-\uAB16\uAB20-\uAB26\uAB28-\uAB2E\uAB30-\uAB5A\uAB5C-\uAB69\uAB70-\uABE2\uAC00-\uD7A3\uD7B0-\uD7C6\uD7CB-\uD7FB\uF900-\uFA6D\uFA70-\uFAD9\uFB00-\uFB06\uFB13-\uFB17\uFB1D\uFB1F-\uFB28\uFB2A-\uFB36\uFB38-\uFB3C\uFB3E\uFB40\uFB41\uFB43\uFB44\uFB46-\uFBB1\uFBD3-\uFD3D\uFD50-\uFD8F\uFD92-\uFDC7\uFDF0-\uFDFB\uFE70-\uFE74\uFE76-\uFEFC\uFF21-\uFF3A\uFF41-\uFF5A\uFF66-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC]|\uD800[\uDC00-\uDC0B\uDC0D-\uDC26\uDC28-\uDC3A\uDC3C\uDC3D\uDC3F-\uDC4D\uDC50-\uDC5D\uDC80-\uDCFA\uDE80-\uDE9C\uDEA0-\uDED0\uDF00-\uDF1F\uDF2D-\uDF40\uDF42-\uDF49\uDF50-\uDF75\uDF80-\uDF9D\uDFA0-\uDFC3\uDFC8-\uDFCF]|\uD801[\uDC00-\uDC9D\uDCB0-\uDCD3\uDCD8-\uDCFB\uDD00-\uDD27\uDD30-\uDD63\uDD70-\uDD7A\uDD7C-\uDD8A\uDD8C-\uDD92\uDD94\uDD95\uDD97-\uDDA1\uDDA3-\uDDB1\uDDB3-\uDDB9\uDDBB\uDDBC\uDE00-\uDF36\uDF40-\uDF55\uDF60-\uDF67\uDF80-\uDF85\uDF87-\uDFB0\uDFB2-\uDFBA]|\uD802[\uDC00-\uDC05\uDC08\uDC0A-\uDC35\uDC37\uDC38\uDC3C\uDC3F-\uDC55\uDC60-\uDC76\uDC80-\uDC9E\uDCE0-\uDCF2\uDCF4\uDCF5\uDD00-\uDD15\uDD20-\uDD39\uDD80-\uDDB7\uDDBE\uDDBF\uDE00\uDE10-\uDE13\uDE15-\uDE17\uDE19-\uDE35\uDE60-\uDE7C\uDE80-\uDE9C\uDEC0-\uDEC7\uDEC9-\uDEE4\uDF00-\uDF35\uDF40-\uDF55\uDF60-\uDF72\uDF80-\uDF91]|\uD803[\uDC00-\uDC48\uDC80-\uDCB2\uDCC0-\uDCF2\uDD00-\uDD23\uDE80-\uDEA9\uDEB0\uDEB1\uDF00-\uDF1C\uDF27\uDF30-\uDF45\uDF70-\uDF81\uDFB0-\uDFC4\uDFE0-\uDFF6]|\uD804[\uDC03-\uDC37\uDC71\uDC72\uDC75\uDC83-\uDCAF\uDCD0-\uDCE8\uDD03-\uDD26\uDD44\uDD47\uDD50-\uDD72\uDD76\uDD83-\uDDB2\uDDC1-\uDDC4\uDDDA\uDDDC\uDE00-\uDE11\uDE13-\uDE2B\uDE80-\uDE86\uDE88\uDE8A-\uDE8D\uDE8F-\uDE9D\uDE9F-\uDEA8\uDEB0-\uDEDE\uDF05-\uDF0C\uDF0F\uDF10\uDF13-\uDF28\uDF2A-\uDF30\uDF32\uDF33\uDF35-\uDF39\uDF3D\uDF50\uDF5D-\uDF61]|\uD805[\uDC00-\uDC34\uDC47-\uDC4A\uDC5F-\uDC61\uDC80-\uDCAF\uDCC4\uDCC5\uDCC7\uDD80-\uDDAE\uDDD8-\uDDDB\uDE00-\uDE2F\uDE44\uDE80-\uDEAA\uDEB8\uDF00-\uDF1A\uDF40-\uDF46]|\uD806[\uDC00-\uDC2B\uDCA0-\uDCDF\uDCFF-\uDD06\uDD09\uDD0C-\uDD13\uDD15\uDD16\uDD18-\uDD2F\uDD3F\uDD41\uDDA0-\uDDA7\uDDAA-\uDDD0\uDDE1\uDDE3\uDE00\uDE0B-\uDE32\uDE3A\uDE50\uDE5C-\uDE89\uDE9D\uDEB0-\uDEF8]|\uD807[\uDC00-\uDC08\uDC0A-\uDC2E\uDC40\uDC72-\uDC8F\uDD00-\uDD06\uDD08\uDD09\uDD0B-\uDD30\uDD46\uDD60-\uDD65\uDD67\uDD68\uDD6A-\uDD89\uDD98\uDEE0-\uDEF2\uDFB0]|\uD808[\uDC00-\uDF99]|\uD809[\uDC80-\uDD43]|\uD80B[\uDF90-\uDFF0]|[\uD80C\uD81C-\uD820\uD822\uD840-\uD868\uD86A-\uD86C\uD86F-\uD872\uD874-\uD879\uD880-\uD883][\uDC00-\uDFFF]|\uD80D[\uDC00-\uDC2E]|\uD811[\uDC00-\uDE46]|\uD81A[\uDC00-\uDE38\uDE40-\uDE5E\uDE70-\uDEBE\uDED0-\uDEED\uDF00-\uDF2F\uDF40-\uDF43\uDF63-\uDF77\uDF7D-\uDF8F]|\uD81B[\uDE40-\uDE7F\uDF00-\uDF4A\uDF50\uDF93-\uDF9F\uDFE0\uDFE1\uDFE3]|\uD821[\uDC00-\uDFF7]|\uD823[\uDC00-\uDCD5\uDD00-\uDD08]|\uD82B[\uDFF0-\uDFF3\uDFF5-\uDFFB\uDFFD\uDFFE]|\uD82C[\uDC00-\uDD22\uDD50-\uDD52\uDD64-\uDD67\uDD70-\uDEFB]|\uD82F[\uDC00-\uDC6A\uDC70-\uDC7C\uDC80-\uDC88\uDC90-\uDC99]|\uD835[\uDC00-\uDC54\uDC56-\uDC9C\uDC9E\uDC9F\uDCA2\uDCA5\uDCA6\uDCA9-\uDCAC\uDCAE-\uDCB9\uDCBB\uDCBD-\uDCC3\uDCC5-\uDD05\uDD07-\uDD0A\uDD0D-\uDD14\uDD16-\uDD1C\uDD1E-\uDD39\uDD3B-\uDD3E\uDD40-\uDD44\uDD46\uDD4A-\uDD50\uDD52-\uDEA5\uDEA8-\uDEC0\uDEC2-\uDEDA\uDEDC-\uDEFA\uDEFC-\uDF14\uDF16-\uDF34\uDF36-\uDF4E\uDF50-\uDF6E\uDF70-\uDF88\uDF8A-\uDFA8\uDFAA-\uDFC2\uDFC4-\uDFCB]|\uD837[\uDF00-\uDF1E]|\uD838[\uDD00-\uDD2C\uDD37-\uDD3D\uDD4E\uDE90-\uDEAD\uDEC0-\uDEEB]|\uD839[\uDFE0-\uDFE6\uDFE8-\uDFEB\uDFED\uDFEE\uDFF0-\uDFFE]|\uD83A[\uDC00-\uDCC4\uDD00-\uDD43\uDD4B]|\uD83B[\uDE00-\uDE03\uDE05-\uDE1F\uDE21\uDE22\uDE24\uDE27\uDE29-\uDE32\uDE34-\uDE37\uDE39\uDE3B\uDE42\uDE47\uDE49\uDE4B\uDE4D-\uDE4F\uDE51\uDE52\uDE54\uDE57\uDE59\uDE5B\uDE5D\uDE5F\uDE61\uDE62\uDE64\uDE67-\uDE6A\uDE6C-\uDE72\uDE74-\uDE77\uDE79-\uDE7C\uDE7E\uDE80-\uDE89\uDE8B-\uDE9B\uDEA1-\uDEA3\uDEA5-\uDEA9\uDEAB-\uDEBB]|\uD869[\uDC00-\uDEDF\uDF00-\uDFFF]|\uD86D[\uDC00-\uDF38\uDF40-\uDFFF]|\uD86E[\uDC00-\uDC1D\uDC20-\uDFFF]|\uD873[\uDC00-\uDEA1\uDEB0-\uDFFF]|\uD87A[\uDC00-\uDFE0]|\uD87E[\uDC00-\uDE1D]|\uD884[\uDC00-\uDF4A])(?:[0-9A-Za-z\xAA\xB5\xBA\xC0-\xD6\xD8-\xF6\xF8-\u02C1\u02C6-\u02D1\u02E0-\u02E4\u02EC\u02EE\u0370-\u0374\u0376\u0377\u037A-\u037D\u037F\u0386\u0388-\u038A\u038C\u038E-\u03A1\u03A3-\u03F5\u03F7-\u0481\u048A-\u052F\u0531-\u0556\u0559\u0560-\u0588\u05D0-\u05EA\u05EF-\u05F2\u0620-\u064A\u066E\u066F\u0671-\u06D3\u06D5\u06E5\u06E6\u06EE\u06EF\u06FA-\u06FC\u06FF\u0710\u0712-\u072F\u074D-\u07A5\u07B1\u07CA-\u07EA\u07F4\u07F5\u07FA\u0800-\u0815\u081A\u0824\u0828\u0840-\u0858\u0860-\u086A\u0870-\u0887\u0889-\u088E\u08A0-\u08C9\u0904-\u0939\u093D\u0950\u0958-\u0961\u0971-\u0980\u0985-\u098C\u098F\u0990\u0993-\u09A8\u09AA-\u09B0\u09B2\u09B6-\u09B9\u09BD\u09CE\u09DC\u09DD\u09DF-\u09E1\u09F0\u09F1\u09FC\u0A05-\u0A0A\u0A0F\u0A10\u0A13-\u0A28\u0A2A-\u0A30\u0A32\u0A33\u0A35\u0A36\u0A38\u0A39\u0A59-\u0A5C\u0A5E\u0A72-\u0A74\u0A85-\u0A8D\u0A8F-\u0A91\u0A93-\u0AA8\u0AAA-\u0AB0\u0AB2\u0AB3\u0AB5-\u0AB9\u0ABD\u0AD0\u0AE0\u0AE1\u0AF9\u0B05-\u0B0C\u0B0F\u0B10\u0B13-\u0B28\u0B2A-\u0B30\u0B32\u0B33\u0B35-\u0B39\u0B3D\u0B5C\u0B5D\u0B5F-\u0B61\u0B71\u0B83\u0B85-\u0B8A\u0B8E-\u0B90\u0B92-\u0B95\u0B99\u0B9A\u0B9C\u0B9E\u0B9F\u0BA3\u0BA4\u0BA8-\u0BAA\u0BAE-\u0BB9\u0BD0\u0C05-\u0C0C\u0C0E-\u0C10\u0C12-\u0C28\u0C2A-\u0C39\u0C3D\u0C58-\u0C5A\u0C5D\u0C60\u0C61\u0C80\u0C85-\u0C8C\u0C8E-\u0C90\u0C92-\u0CA8\u0CAA-\u0CB3\u0CB5-\u0CB9\u0CBD\u0CDD\u0CDE\u0CE0\u0CE1\u0CF1\u0CF2\u0D04-\u0D0C\u0D0E-\u0D10\u0D12-\u0D3A\u0D3D\u0D4E\u0D54-\u0D56\u0D5F-\u0D61\u0D7A-\u0D7F\u0D85-\u0D96\u0D9A-\u0DB1\u0DB3-\u0DBB\u0DBD\u0DC0-\u0DC6\u0E01-\u0E30\u0E32\u0E33\u0E40-\u0E46\u0E81\u0E82\u0E84\u0E86-\u0E8A\u0E8C-\u0EA3\u0EA5\u0EA7-\u0EB0\u0EB2\u0EB3\u0EBD\u0EC0-\u0EC4\u0EC6\u0EDC-\u0EDF\u0F00\u0F40-\u0F47\u0F49-\u0F6C\u0F88-\u0F8C\u1000-\u102A\u103F\u1050-\u1055\u105A-\u105D\u1061\u1065\u1066\u106E-\u1070\u1075-\u1081\u108E\u10A0-\u10C5\u10C7\u10CD\u10D0-\u10FA\u10FC-\u1248\u124A-\u124D\u1250-\u1256\u1258\u125A-\u125D\u1260-\u1288\u128A-\u128D\u1290-\u12B0\u12B2-\u12B5\u12B8-\u12BE\u12C0\u12C2-\u12C5\u12C8-\u12D6\u12D8-\u1310\u1312-\u1315\u1318-\u135A\u1380-\u138F\u13A0-\u13F5\u13F8-\u13FD\u1401-\u166C\u166F-\u167F\u1681-\u169A\u16A0-\u16EA\u16F1-\u16F8\u1700-\u1711\u171F-\u1731\u1740-\u1751\u1760-\u176C\u176E-\u1770\u1780-\u17B3\u17D7\u17DC\u1820-\u1878\u1880-\u1884\u1887-\u18A8\u18AA\u18B0-\u18F5\u1900-\u191E\u1950-\u196D\u1970-\u1974\u1980-\u19AB\u19B0-\u19C9\u1A00-\u1A16\u1A20-\u1A54\u1AA7\u1B05-\u1B33\u1B45-\u1B4C\u1B83-\u1BA0\u1BAE\u1BAF\u1BBA-\u1BE5\u1C00-\u1C23\u1C4D-\u1C4F\u1C5A-\u1C7D\u1C80-\u1C88\u1C90-\u1CBA\u1CBD-\u1CBF\u1CE9-\u1CEC\u1CEE-\u1CF3\u1CF5\u1CF6\u1CFA\u1D00-\u1DBF\u1E00-\u1F15\u1F18-\u1F1D\u1F20-\u1F45\u1F48-\u1F4D\u1F50-\u1F57\u1F59\u1F5B\u1F5D\u1F5F-\u1F7D\u1F80-\u1FB4\u1FB6-\u1FBC\u1FBE\u1FC2-\u1FC4\u1FC6-\u1FCC\u1FD0-\u1FD3\u1FD6-\u1FDB\u1FE0-\u1FEC\u1FF2-\u1FF4\u1FF6-\u1FFC\u2071\u207F\u2090-\u209C\u2102\u2107\u210A-\u2113\u2115\u2119-\u211D\u2124\u2126\u2128\u212A-\u212D\u212F-\u2139\u213C-\u213F\u2145-\u2149\u214E\u2183\u2184\u2C00-\u2CE4\u2CEB-\u2CEE\u2CF2\u2CF3\u2D00-\u2D25\u2D27\u2D2D\u2D30-\u2D67\u2D6F\u2D80-\u2D96\u2DA0-\u2DA6\u2DA8-\u2DAE\u2DB0-\u2DB6\u2DB8-\u2DBE\u2DC0-\u2DC6\u2DC8-\u2DCE\u2DD0-\u2DD6\u2DD8-\u2DDE\u2E2F\u3005\u3006\u3031-\u3035\u303B\u303C\u3041-\u3096\u309D-\u309F\u30A1-\u30FA\u30FC-\u30FF\u3105-\u312F\u3131-\u318E\u31A0-\u31BF\u31F0-\u31FF\u3400-\u4DBF\u4E00-\uA48C\uA4D0-\uA4FD\uA500-\uA60C\uA610-\uA61F\uA62A\uA62B\uA640-\uA66E\uA67F-\uA69D\uA6A0-\uA6E5\uA717-\uA71F\uA722-\uA788\uA78B-\uA7CA\uA7D0\uA7D1\uA7D3\uA7D5-\uA7D9\uA7F2-\uA801\uA803-\uA805\uA807-\uA80A\uA80C-\uA822\uA840-\uA873\uA882-\uA8B3\uA8F2-\uA8F7\uA8FB\uA8FD\uA8FE\uA90A-\uA925\uA930-\uA946\uA960-\uA97C\uA984-\uA9B2\uA9CF\uA9E0-\uA9E4\uA9E6-\uA9EF\uA9FA-\uA9FE\uAA00-\uAA28\uAA40-\uAA42\uAA44-\uAA4B\uAA60-\uAA76\uAA7A\uAA7E-\uAAAF\uAAB1\uAAB5\uAAB6\uAAB9-\uAABD\uAAC0\uAAC2\uAADB-\uAADD\uAAE0-\uAAEA\uAAF2-\uAAF4\uAB01-\uAB06\uAB09-\uAB0E\uAB11-\uAB16\uAB20-\uAB26\uAB28-\uAB2E\uAB30-\uAB5A\uAB5C-\uAB69\uAB70-\uABE2\uAC00-\uD7A3\uD7B0-\uD7C6\uD7CB-\uD7FB\uF900-\uFA6D\uFA70-\uFAD9\uFB00-\uFB06\uFB13-\uFB17\uFB1D\uFB1F-\uFB28\uFB2A-\uFB36\uFB38-\uFB3C\uFB3E\uFB40\uFB41\uFB43\uFB44\uFB46-\uFBB1\uFBD3-\uFD3D\uFD50-\uFD8F\uFD92-\uFDC7\uFDF0-\uFDFB\uFE70-\uFE74\uFE76-\uFEFC\uFF21-\uFF3A\uFF41-\uFF5A\uFF66-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC]|\uD800[\uDC00-\uDC0B\uDC0D-\uDC26\uDC28-\uDC3A\uDC3C\uDC3D\uDC3F-\uDC4D\uDC50-\uDC5D\uDC80-\uDCFA\uDE80-\uDE9C\uDEA0-\uDED0\uDF00-\uDF1F\uDF2D-\uDF40\uDF42-\uDF49\uDF50-\uDF75\uDF80-\uDF9D\uDFA0-\uDFC3\uDFC8-\uDFCF]|\uD801[\uDC00-\uDC9D\uDCB0-\uDCD3\uDCD8-\uDCFB\uDD00-\uDD27\uDD30-\uDD63\uDD70-\uDD7A\uDD7C-\uDD8A\uDD8C-\uDD92\uDD94\uDD95\uDD97-\uDDA1\uDDA3-\uDDB1\uDDB3-\uDDB9\uDDBB\uDDBC\uDE00-\uDF36\uDF40-\uDF55\uDF60-\uDF67\uDF80-\uDF85\uDF87-\uDFB0\uDFB2-\uDFBA]|\uD802[\uDC00-\uDC05\uDC08\uDC0A-\uDC35\uDC37\uDC38\uDC3C\uDC3F-\uDC55\uDC60-\uDC76\uDC80-\uDC9E\uDCE0-\uDCF2\uDCF4\uDCF5\uDD00-\uDD15\uDD20-\uDD39\uDD80-\uDDB7\uDDBE\uDDBF\uDE00\uDE10-\uDE13\uDE15-\uDE17\uDE19-\uDE35\uDE60-\uDE7C\uDE80-\uDE9C\uDEC0-\uDEC7\uDEC9-\uDEE4\uDF00-\uDF35\uDF40-\uDF55\uDF60-\uDF72\uDF80-\uDF91]|\uD803[\uDC00-\uDC48\uDC80-\uDCB2\uDCC0-\uDCF2\uDD00-\uDD23\uDE80-\uDEA9\uDEB0\uDEB1\uDF00-\uDF1C\uDF27\uDF30-\uDF45\uDF70-\uDF81\uDFB0-\uDFC4\uDFE0-\uDFF6]|\uD804[\uDC03-\uDC37\uDC71\uDC72\uDC75\uDC83-\uDCAF\uDCD0-\uDCE8\uDD03-\uDD26\uDD44\uDD47\uDD50-\uDD72\uDD76\uDD83-\uDDB2\uDDC1-\uDDC4\uDDDA\uDDDC\uDE00-\uDE11\uDE13-\uDE2B\uDE80-\uDE86\uDE88\uDE8A-\uDE8D\uDE8F-\uDE9D\uDE9F-\uDEA8\uDEB0-\uDEDE\uDF05-\uDF0C\uDF0F\uDF10\uDF13-\uDF28\uDF2A-\uDF30\uDF32\uDF33\uDF35-\uDF39\uDF3D\uDF50\uDF5D-\uDF61]|\uD805[\uDC00-\uDC34\uDC47-\uDC4A\uDC5F-\uDC61\uDC80-\uDCAF\uDCC4\uDCC5\uDCC7\uDD80-\uDDAE\uDDD8-\uDDDB\uDE00-\uDE2F\uDE44\uDE80-\uDEAA\uDEB8\uDF00-\uDF1A\uDF40-\uDF46]|\uD806[\uDC00-\uDC2B\uDCA0-\uDCDF\uDCFF-\uDD06\uDD09\uDD0C-\uDD13\uDD15\uDD16\uDD18-\uDD2F\uDD3F\uDD41\uDDA0-\uDDA7\uDDAA-\uDDD0\uDDE1\uDDE3\uDE00\uDE0B-\uDE32\uDE3A\uDE50\uDE5C-\uDE89\uDE9D\uDEB0-\uDEF8]|\uD807[\uDC00-\uDC08\uDC0A-\uDC2E\uDC40\uDC72-\uDC8F\uDD00-\uDD06\uDD08\uDD09\uDD0B-\uDD30\uDD46\uDD60-\uDD65\uDD67\uDD68\uDD6A-\uDD89\uDD98\uDEE0-\uDEF2\uDFB0]|\uD808[\uDC00-\uDF99]|\uD809[\uDC80-\uDD43]|\uD80B[\uDF90-\uDFF0]|[\uD80C\uD81C-\uD820\uD822\uD840-\uD868\uD86A-\uD86C\uD86F-\uD872\uD874-\uD879\uD880-\uD883][\uDC00-\uDFFF]|\uD80D[\uDC00-\uDC2E]|\uD811[\uDC00-\uDE46]|\uD81A[\uDC00-\uDE38\uDE40-\uDE5E\uDE70-\uDEBE\uDED0-\uDEED\uDF00-\uDF2F\uDF40-\uDF43\uDF63-\uDF77\uDF7D-\uDF8F]|\uD81B[\uDE40-\uDE7F\uDF00-\uDF4A\uDF50\uDF93-\uDF9F\uDFE0\uDFE1\uDFE3]|\uD821[\uDC00-\uDFF7]|\uD823[\uDC00-\uDCD5\uDD00-\uDD08]|\uD82B[\uDFF0-\uDFF3\uDFF5-\uDFFB\uDFFD\uDFFE]|\uD82C[\uDC00-\uDD22\uDD50-\uDD52\uDD64-\uDD67\uDD70-\uDEFB]|\uD82F[\uDC00-\uDC6A\uDC70-\uDC7C\uDC80-\uDC88\uDC90-\uDC99]|\uD835[\uDC00-\uDC54\uDC56-\uDC9C\uDC9E\uDC9F\uDCA2\uDCA5\uDCA6\uDCA9-\uDCAC\uDCAE-\uDCB9\uDCBB\uDCBD-\uDCC3\uDCC5-\uDD05\uDD07-\uDD0A\uDD0D-\uDD14\uDD16-\uDD1C\uDD1E-\uDD39\uDD3B-\uDD3E\uDD40-\uDD44\uDD46\uDD4A-\uDD50\uDD52-\uDEA5\uDEA8-\uDEC0\uDEC2-\uDEDA\uDEDC-\uDEFA\uDEFC-\uDF14\uDF16-\uDF34\uDF36-\uDF4E\uDF50-\uDF6E\uDF70-\uDF88\uDF8A-\uDFA8\uDFAA-\uDFC2\uDFC4-\uDFCB]|\uD837[\uDF00-\uDF1E]|\uD838[\uDD00-\uDD2C\uDD37-\uDD3D\uDD4E\uDE90-\uDEAD\uDEC0-\uDEEB]|\uD839[\uDFE0-\uDFE6\uDFE8-\uDFEB\uDFED\uDFEE\uDFF0-\uDFFE]|\uD83A[\uDC00-\uDCC4\uDD00-\uDD43\uDD4B]|\uD83B[\uDE00-\uDE03\uDE05-\uDE1F\uDE21\uDE22\uDE24\uDE27\uDE29-\uDE32\uDE34-\uDE37\uDE39\uDE3B\uDE42\uDE47\uDE49\uDE4B\uDE4D-\uDE4F\uDE51\uDE52\uDE54\uDE57\uDE59\uDE5B\uDE5D\uDE5F\uDE61\uDE62\uDE64\uDE67-\uDE6A\uDE6C-\uDE72\uDE74-\uDE77\uDE79-\uDE7C\uDE7E\uDE80-\uDE89\uDE8B-\uDE9B\uDEA1-\uDEA3\uDEA5-\uDEA9\uDEAB-\uDEBB]|\uD869[\uDC00-\uDEDF\uDF00-\uDFFF]|\uD86D[\uDC00-\uDF38\uDF40-\uDFFF]|\uD86E[\uDC00-\uDC1D\uDC20-\uDFFF]|\uD873[\uDC00-\uDEA1\uDEB0-\uDFFF]|\uD87A[\uDC00-\uDFE0]|\uD87E[\uDC00-\uDE1D]|\uD884[\uDC00-\uDF4A])*$/.test(s)
@@ -2518,6 +2528,7 @@ var createTyped = /* @__PURE__ */ factory("typed", dependencies, function create
       name: "Object",
       test: isObject
     }
+    // order 'Object' last, it matches on other classes too
   ]);
   typed2.addConversions([{
     from: "number",
@@ -2578,6 +2589,13 @@ var createTyped = /* @__PURE__ */ factory("typed", dependencies, function create
       return f;
     }
   }, {
+    // FIXME: add conversion from Fraction to number, for example for `sqrt(fraction(1,3))`
+    //  from: 'Fraction',
+    //  to: 'number',
+    //  convert: function (x) {
+    //    return x.valueOf()
+    //  }
+    // }, {
     from: "string",
     to: "number",
     convert: function convert(x) {
@@ -2674,7 +2692,8 @@ var createTyped = /* @__PURE__ */ factory("typed", dependencies, function create
   }]);
   typed2.onMismatch = (name21, args, signatures) => {
     var usualError = typed2.createError(name21, args, signatures);
-    if (["wrongType", "mismatch"].includes(usualError.data.category) && args.length === 1 && isCollection(args[0]) && signatures.some((sig) => !sig.params.includes(","))) {
+    if (["wrongType", "mismatch"].includes(usualError.data.category) && args.length === 1 && isCollection(args[0]) && // check if the function can be unary:
+    signatures.some((sig) => !sig.params.includes(","))) {
       var err = new TypeError("Function '".concat(name21, "' doesn't apply to matrices. To call it ") + "elementwise on a matrix 'M', try 'map(M, ".concat(name21, ")'."));
       err.data = usualError.data;
       throw err;
@@ -2683,7 +2702,8 @@ var createTyped = /* @__PURE__ */ factory("typed", dependencies, function create
   };
   typed2.onMismatch = (name21, args, signatures) => {
     var usualError = typed2.createError(name21, args, signatures);
-    if (["wrongType", "mismatch"].includes(usualError.data.category) && args.length === 1 && isCollection(args[0]) && signatures.some((sig) => !sig.params.includes(","))) {
+    if (["wrongType", "mismatch"].includes(usualError.data.category) && args.length === 1 && isCollection(args[0]) && // check if the function can be unary:
+    signatures.some((sig) => !sig.params.includes(","))) {
       var err = new TypeError("Function '".concat(name21, "' doesn't apply to matrices. To call it ") + "elementwise on a matrix 'M', try 'map(M, ".concat(name21, ")'."));
       err.data = usualError.data;
       throw err;
@@ -2712,14 +2732,63 @@ var NUMERALS = "0123456789abcdef";
 var LN10 = "2.3025850929940456840179914546843642076011014886287729760333279009675726096773524802359972050895982983419677840422862486334095254650828067566662873690987816894829072083255546808437998948262331985283935053089653777326288461633662222876982198867465436674744042432743651550489343149393914796194044002221051017141748003688084012647080685567743216228355220114804663715659121373450747856947683463616792101806445070648000277502684916746550586856935673420670581136429224554405758925724208241314695689016758940256776311356919292033376587141660230105703089634572075440370847469940168269282808481184289314848524948644871927809676271275775397027668605952496716674183485704422507197965004714951050492214776567636938662976979522110718264549734772662425709429322582798502585509785265383207606726317164309505995087807523710333101197857547331541421808427543863591778117054309827482385045648019095610299291824318237525357709750539565187697510374970888692180205189339507238539205144634197265287286965110862571492198849978748873771345686209167058";
 var PI = "3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679821480865132823066470938446095505822317253594081284811174502841027019385211055596446229489549303819644288109756659334461284756482337867831652712019091456485669234603486104543266482133936072602491412737245870066063155881748815209209628292540917153643678925903600113305305488204665213841469519415116094330572703657595919530921861173819326117931051185480744623799627495673518857527248912279381830119491298336733624406566430860213949463952247371907021798609437027705392171762931767523846748184676694051320005681271452635608277857713427577896091736371787214684409012249534301465495853710507922796892589235420199561121290219608640344181598136297747713099605187072113499999983729780499510597317328160963185950244594553469083026425223082533446850352619311881710100031378387528865875332083814206171776691473035982534904287554687311595628638823537875937519577818577805321712268066130019278766111959092164201989380952572010654858632789";
 var DEFAULTS = {
+  // These values must be integers within the stated ranges (inclusive).
+  // Most of these values can be changed at run-time using the `Decimal.config` method.
+  // The maximum number of significant digits of the result of a calculation or base conversion.
+  // E.g. `Decimal.config({ precision: 20 });`
   precision: 20,
+  // 1 to MAX_DIGITS
+  // The rounding mode used when rounding to `precision`.
+  //
+  // ROUND_UP         0 Away from zero.
+  // ROUND_DOWN       1 Towards zero.
+  // ROUND_CEIL       2 Towards +Infinity.
+  // ROUND_FLOOR      3 Towards -Infinity.
+  // ROUND_HALF_UP    4 Towards nearest neighbour. If equidistant, up.
+  // ROUND_HALF_DOWN  5 Towards nearest neighbour. If equidistant, down.
+  // ROUND_HALF_EVEN  6 Towards nearest neighbour. If equidistant, towards even neighbour.
+  // ROUND_HALF_CEIL  7 Towards nearest neighbour. If equidistant, towards +Infinity.
+  // ROUND_HALF_FLOOR 8 Towards nearest neighbour. If equidistant, towards -Infinity.
+  //
+  // E.g.
+  // `Decimal.rounding = 4;`
+  // `Decimal.rounding = Decimal.ROUND_HALF_UP;`
   rounding: 4,
+  // 0 to 8
+  // The modulo mode used when calculating the modulus: a mod n.
+  // The quotient (q = a / n) is calculated according to the corresponding rounding mode.
+  // The remainder (r) is calculated as: r = a - n * q.
+  //
+  // UP         0 The remainder is positive if the dividend is negative, else is negative.
+  // DOWN       1 The remainder has the same sign as the dividend (JavaScript %).
+  // FLOOR      3 The remainder has the same sign as the divisor (Python %).
+  // HALF_EVEN  6 The IEEE 754 remainder function.
+  // EUCLID     9 Euclidian division. q = sign(n) * floor(a / abs(n)). Always positive.
+  //
+  // Truncated division (1), floored division (3), the IEEE 754 remainder (6), and Euclidian
+  // division (9) are commonly used for the modulus operation. The other rounding modes can also
+  // be used, but they may not give useful results.
   modulo: 1,
+  // 0 to 9
+  // The exponent value at and beneath which `toString` returns exponential notation.
+  // JavaScript numbers: -7
   toExpNeg: -7,
+  // 0 to -EXP_LIMIT
+  // The exponent value at and above which `toString` returns exponential notation.
+  // JavaScript numbers: 21
   toExpPos: 21,
+  // 0 to EXP_LIMIT
+  // The minimum exponent value, beneath which underflow to zero occurs.
+  // JavaScript numbers: -324  (5e-324)
   minE: -EXP_LIMIT,
+  // -1 to -EXP_LIMIT
+  // The maximum exponent value, above which overflow to Infinity occurs.
+  // JavaScript numbers: 308  (1.7976931348623157e+308)
   maxE: EXP_LIMIT,
+  // 1 to EXP_LIMIT
+  // Whether to use cryptographically-secure random number generation, if available.
   crypto: false
+  // true/false
 };
 var inexact;
 var quadrant;
@@ -2743,8 +2812,7 @@ var PI_PRECISION = PI.length - 1;
 var P = { toStringTag: tag };
 P.absoluteValue = P.abs = function() {
   var x = new this.constructor(this);
-  if (x.s < 0)
-    x.s = 1;
+  if (x.s < 0) x.s = 1;
   return finalise(x);
 };
 P.ceil = function() {
@@ -2754,10 +2822,8 @@ P.clampedTo = P.clamp = function(min2, max2) {
   var k, x = this, Ctor = x.constructor;
   min2 = new Ctor(min2);
   max2 = new Ctor(max2);
-  if (!min2.s || !max2.s)
-    return new Ctor(NaN);
-  if (min2.gt(max2))
-    throw Error(invalidArgument + max2);
+  if (!min2.s || !max2.s) return new Ctor(NaN);
+  if (min2.gt(max2)) throw Error(invalidArgument + max2);
   k = x.cmp(min2);
   return k < 0 ? min2 : x.cmp(max2) > 0 ? max2 : new Ctor(x);
 };
@@ -2766,26 +2832,20 @@ P.comparedTo = P.cmp = function(y) {
   if (!xd || !yd) {
     return !xs || !ys ? NaN : xs !== ys ? xs : xd === yd ? 0 : !xd ^ xs < 0 ? 1 : -1;
   }
-  if (!xd[0] || !yd[0])
-    return xd[0] ? xs : yd[0] ? -ys : 0;
-  if (xs !== ys)
-    return xs;
-  if (x.e !== y.e)
-    return x.e > y.e ^ xs < 0 ? 1 : -1;
+  if (!xd[0] || !yd[0]) return xd[0] ? xs : yd[0] ? -ys : 0;
+  if (xs !== ys) return xs;
+  if (x.e !== y.e) return x.e > y.e ^ xs < 0 ? 1 : -1;
   xdL = xd.length;
   ydL = yd.length;
   for (i = 0, j = xdL < ydL ? xdL : ydL; i < j; ++i) {
-    if (xd[i] !== yd[i])
-      return xd[i] > yd[i] ^ xs < 0 ? 1 : -1;
+    if (xd[i] !== yd[i]) return xd[i] > yd[i] ^ xs < 0 ? 1 : -1;
   }
   return xdL === ydL ? 0 : xdL > ydL ^ xs < 0 ? 1 : -1;
 };
 P.cosine = P.cos = function() {
   var pr, rm, x = this, Ctor = x.constructor;
-  if (!x.d)
-    return new Ctor(NaN);
-  if (!x.d[0])
-    return new Ctor(1);
+  if (!x.d) return new Ctor(NaN);
+  if (!x.d[0]) return new Ctor(1);
   pr = Ctor.precision;
   rm = Ctor.rounding;
   Ctor.precision = pr + Math.max(x.e, x.sd()) + LOG_BASE;
@@ -2797,15 +2857,13 @@ P.cosine = P.cos = function() {
 };
 P.cubeRoot = P.cbrt = function() {
   var e, m, n, r, rep, s, sd, t, t3, t3plusx, x = this, Ctor = x.constructor;
-  if (!x.isFinite() || x.isZero())
-    return new Ctor(x);
+  if (!x.isFinite() || x.isZero()) return new Ctor(x);
   external = false;
   s = x.s * mathpow(x.s * x, 1 / 3);
   if (!s || Math.abs(s) == 1 / 0) {
     n = digitsToString(x.d);
     e = x.e;
-    if (s = (e - n.length + 1) % 3)
-      n += s == 1 || s == -2 ? "0" : "00";
+    if (s = (e - n.length + 1) % 3) n += s == 1 || s == -2 ? "0" : "00";
     s = mathpow(n, 1 / 3);
     e = mathfloor((e + 1) / 3) - (e % 3 == (e < 0 ? -1 : 2));
     if (s == 1 / 0) {
@@ -2855,11 +2913,8 @@ P.decimalPlaces = P.dp = function() {
     w = d.length - 1;
     n = (w - mathfloor(this.e / LOG_BASE)) * LOG_BASE;
     w = d[w];
-    if (w)
-      for (; w % 10 == 0; w /= 10)
-        n--;
-    if (n < 0)
-      n = 0;
+    if (w) for (; w % 10 == 0; w /= 10) n--;
+    if (n < 0) n = 0;
   }
   return n;
 };
@@ -2885,10 +2940,8 @@ P.greaterThanOrEqualTo = P.gte = function(y) {
 };
 P.hyperbolicCosine = P.cosh = function() {
   var k, n, pr, rm, len, x = this, Ctor = x.constructor, one = new Ctor(1);
-  if (!x.isFinite())
-    return new Ctor(x.s ? 1 / 0 : NaN);
-  if (x.isZero())
-    return one;
+  if (!x.isFinite()) return new Ctor(x.s ? 1 / 0 : NaN);
+  if (x.isZero()) return one;
   pr = Ctor.precision;
   rm = Ctor.rounding;
   Ctor.precision = pr + Math.max(x.e, x.sd()) + 4;
@@ -2911,8 +2964,7 @@ P.hyperbolicCosine = P.cosh = function() {
 };
 P.hyperbolicSine = P.sinh = function() {
   var k, pr, rm, len, x = this, Ctor = x.constructor;
-  if (!x.isFinite() || x.isZero())
-    return new Ctor(x);
+  if (!x.isFinite() || x.isZero()) return new Ctor(x);
   pr = Ctor.precision;
   rm = Ctor.rounding;
   Ctor.precision = pr + Math.max(x.e, x.sd()) + 4;
@@ -2937,10 +2989,8 @@ P.hyperbolicSine = P.sinh = function() {
 };
 P.hyperbolicTangent = P.tanh = function() {
   var pr, rm, x = this, Ctor = x.constructor;
-  if (!x.isFinite())
-    return new Ctor(x.s);
-  if (x.isZero())
-    return new Ctor(x);
+  if (!x.isFinite()) return new Ctor(x.s);
+  if (x.isZero()) return new Ctor(x);
   pr = Ctor.precision;
   rm = Ctor.rounding;
   Ctor.precision = pr + 7;
@@ -2952,8 +3002,7 @@ P.inverseCosine = P.acos = function() {
   if (k !== -1) {
     return k === 0 ? x.isNeg() ? getPi(Ctor, pr, rm) : new Ctor(0) : new Ctor(NaN);
   }
-  if (x.isZero())
-    return getPi(Ctor, pr + 4, rm).times(0.5);
+  if (x.isZero()) return getPi(Ctor, pr + 4, rm).times(0.5);
   Ctor.precision = pr + 6;
   Ctor.rounding = 1;
   x = new Ctor(1).minus(x).div(x.plus(1)).sqrt().atan();
@@ -2963,10 +3012,8 @@ P.inverseCosine = P.acos = function() {
 };
 P.inverseHyperbolicCosine = P.acosh = function() {
   var pr, rm, x = this, Ctor = x.constructor;
-  if (x.lte(1))
-    return new Ctor(x.eq(1) ? 0 : NaN);
-  if (!x.isFinite())
-    return new Ctor(x);
+  if (x.lte(1)) return new Ctor(x.eq(1) ? 0 : NaN);
+  if (!x.isFinite()) return new Ctor(x);
   pr = Ctor.precision;
   rm = Ctor.rounding;
   Ctor.precision = pr + Math.max(Math.abs(x.e), x.sd()) + 4;
@@ -2980,8 +3027,7 @@ P.inverseHyperbolicCosine = P.acosh = function() {
 };
 P.inverseHyperbolicSine = P.asinh = function() {
   var pr, rm, x = this, Ctor = x.constructor;
-  if (!x.isFinite() || x.isZero())
-    return new Ctor(x);
+  if (!x.isFinite() || x.isZero()) return new Ctor(x);
   pr = Ctor.precision;
   rm = Ctor.rounding;
   Ctor.precision = pr + 2 * Math.max(Math.abs(x.e), x.sd()) + 6;
@@ -2995,15 +3041,12 @@ P.inverseHyperbolicSine = P.asinh = function() {
 };
 P.inverseHyperbolicTangent = P.atanh = function() {
   var pr, rm, wpr, xsd, x = this, Ctor = x.constructor;
-  if (!x.isFinite())
-    return new Ctor(NaN);
-  if (x.e >= 0)
-    return new Ctor(x.abs().eq(1) ? x.s / 0 : x.isZero() ? x : NaN);
+  if (!x.isFinite()) return new Ctor(NaN);
+  if (x.e >= 0) return new Ctor(x.abs().eq(1) ? x.s / 0 : x.isZero() ? x : NaN);
   pr = Ctor.precision;
   rm = Ctor.rounding;
   xsd = x.sd();
-  if (Math.max(xsd, pr) < 2 * -x.e - 1)
-    return finalise(new Ctor(x), pr, rm, true);
+  if (Math.max(xsd, pr) < 2 * -x.e - 1) return finalise(new Ctor(x), pr, rm, true);
   Ctor.precision = wpr = xsd - x.e;
   x = divide(x.plus(1), new Ctor(1).minus(x), wpr + pr, 1);
   Ctor.precision = pr + 4;
@@ -3015,8 +3058,7 @@ P.inverseHyperbolicTangent = P.atanh = function() {
 };
 P.inverseSine = P.asin = function() {
   var halfPi, k, pr, rm, x = this, Ctor = x.constructor;
-  if (x.isZero())
-    return new Ctor(x);
+  if (x.isZero()) return new Ctor(x);
   k = x.abs().cmp(1);
   pr = Ctor.precision;
   rm = Ctor.rounding;
@@ -3038,8 +3080,7 @@ P.inverseSine = P.asin = function() {
 P.inverseTangent = P.atan = function() {
   var i, j, k, n, px, t, r, wpr, x2, x = this, Ctor = x.constructor, pr = Ctor.precision, rm = Ctor.rounding;
   if (!x.isFinite()) {
-    if (!x.s)
-      return new Ctor(NaN);
+    if (!x.s) return new Ctor(NaN);
     if (pr + 4 <= PI_PRECISION) {
       r = getPi(Ctor, pr + 4, rm).times(0.5);
       r.s = x.s;
@@ -3055,8 +3096,7 @@ P.inverseTangent = P.atan = function() {
   Ctor.precision = wpr = pr + 10;
   Ctor.rounding = 1;
   k = Math.min(28, wpr / LOG_BASE + 2 | 0);
-  for (i = k; i; --i)
-    x = x.div(x.times(x).plus(1).sqrt().plus(1));
+  for (i = k; i; --i) x = x.div(x.times(x).plus(1).sqrt().plus(1));
   external = false;
   j = Math.ceil(wpr / LOG_BASE);
   n = 1;
@@ -3068,12 +3108,9 @@ P.inverseTangent = P.atan = function() {
     t = r.minus(px.div(n += 2));
     px = px.times(x2);
     r = t.plus(px.div(n += 2));
-    if (r.d[j] !== void 0)
-      for (i = j; r.d[i] === t.d[i] && i--; )
-        ;
+    if (r.d[j] !== void 0) for (i = j; r.d[i] === t.d[i] && i--; ) ;
   }
-  if (k)
-    r = r.times(2 << k - 1);
+  if (k) r = r.times(2 << k - 1);
   external = true;
   return finalise(r, Ctor.precision = pr, Ctor.rounding = rm, true);
 };
@@ -3109,8 +3146,7 @@ P.logarithm = P.log = function(base) {
   } else {
     base = new Ctor(base);
     d = base.d;
-    if (base.s < 0 || !d || !d[0] || base.eq(1))
-      return new Ctor(NaN);
+    if (base.s < 0 || !d || !d[0] || base.eq(1)) return new Ctor(NaN);
     isBase10 = base.eq(10);
   }
   d = arg.d;
@@ -3121,8 +3157,7 @@ P.logarithm = P.log = function(base) {
     if (d.length > 1) {
       inf = true;
     } else {
-      for (k = d[0]; k % 10 === 0; )
-        k /= 10;
+      for (k = d[0]; k % 10 === 0; ) k /= 10;
       inf = k !== 1;
     }
   }
@@ -3152,12 +3187,9 @@ P.minus = P.sub = function(y) {
   var d, e, i, j, k, len, pr, rm, xd, xe, xLTy, yd, x = this, Ctor = x.constructor;
   y = new Ctor(y);
   if (!x.d || !y.d) {
-    if (!x.s || !y.s)
-      y = new Ctor(NaN);
-    else if (x.d)
-      y.s = -y.s;
-    else
-      y = new Ctor(y.d || x.s !== y.s ? x : NaN);
+    if (!x.s || !y.s) y = new Ctor(NaN);
+    else if (x.d) y.s = -y.s;
+    else y = new Ctor(y.d || x.s !== y.s ? x : NaN);
     return y;
   }
   if (x.s != y.s) {
@@ -3169,12 +3201,9 @@ P.minus = P.sub = function(y) {
   pr = Ctor.precision;
   rm = Ctor.rounding;
   if (!xd[0] || !yd[0]) {
-    if (yd[0])
-      y.s = -y.s;
-    else if (xd[0])
-      y = new Ctor(x);
-    else
-      return new Ctor(rm === 3 ? -0 : 0);
+    if (yd[0]) y.s = -y.s;
+    else if (xd[0]) y = new Ctor(x);
+    else return new Ctor(rm === 3 ? -0 : 0);
     return external ? finalise(y, pr, rm) : y;
   }
   e = mathfloor(y.e / LOG_BASE);
@@ -3198,15 +3227,13 @@ P.minus = P.sub = function(y) {
       d.length = 1;
     }
     d.reverse();
-    for (i = k; i--; )
-      d.push(0);
+    for (i = k; i--; ) d.push(0);
     d.reverse();
   } else {
     i = xd.length;
     len = yd.length;
     xLTy = i < len;
-    if (xLTy)
-      len = i;
+    if (xLTy) len = i;
     for (i = 0; i < len; i++) {
       if (xd[i] != yd[i]) {
         xLTy = xd[i] < yd[i];
@@ -3222,23 +3249,18 @@ P.minus = P.sub = function(y) {
     y.s = -y.s;
   }
   len = xd.length;
-  for (i = yd.length - len; i > 0; --i)
-    xd[len++] = 0;
+  for (i = yd.length - len; i > 0; --i) xd[len++] = 0;
   for (i = yd.length; i > k; ) {
     if (xd[--i] < yd[i]) {
-      for (j = i; j && xd[--j] === 0; )
-        xd[j] = BASE - 1;
+      for (j = i; j && xd[--j] === 0; ) xd[j] = BASE - 1;
       --xd[j];
       xd[i] += BASE;
     }
     xd[i] -= yd[i];
   }
-  for (; xd[--len] === 0; )
-    xd.pop();
-  for (; xd[0] === 0; xd.shift())
-    --e;
-  if (!xd[0])
-    return new Ctor(rm === 3 ? -0 : 0);
+  for (; xd[--len] === 0; ) xd.pop();
+  for (; xd[0] === 0; xd.shift()) --e;
+  if (!xd[0]) return new Ctor(rm === 3 ? -0 : 0);
   y.d = xd;
   y.e = getBase10Exponent(xd, e);
   return external ? finalise(y, pr, rm) : y;
@@ -3246,8 +3268,7 @@ P.minus = P.sub = function(y) {
 P.modulo = P.mod = function(y) {
   var q, x = this, Ctor = x.constructor;
   y = new Ctor(y);
-  if (!x.d || !y.s || y.d && !y.d[0])
-    return new Ctor(NaN);
+  if (!x.d || !y.s || y.d && !y.d[0]) return new Ctor(NaN);
   if (!y.d || x.d && !x.d[0]) {
     return finalise(new Ctor(x), Ctor.precision, Ctor.rounding);
   }
@@ -3277,10 +3298,8 @@ P.plus = P.add = function(y) {
   var carry, d, e, i, k, len, pr, rm, xd, yd, x = this, Ctor = x.constructor;
   y = new Ctor(y);
   if (!x.d || !y.d) {
-    if (!x.s || !y.s)
-      y = new Ctor(NaN);
-    else if (!x.d)
-      y = new Ctor(y.d || x.s === y.s ? x : NaN);
+    if (!x.s || !y.s) y = new Ctor(NaN);
+    else if (!x.d) y = new Ctor(y.d || x.s === y.s ? x : NaN);
     return y;
   }
   if (x.s != y.s) {
@@ -3292,8 +3311,7 @@ P.plus = P.add = function(y) {
   pr = Ctor.precision;
   rm = Ctor.rounding;
   if (!xd[0] || !yd[0]) {
-    if (!yd[0])
-      y = new Ctor(x);
+    if (!yd[0]) y = new Ctor(x);
     return external ? finalise(y, pr, rm) : y;
   }
   k = mathfloor(x.e / LOG_BASE);
@@ -3317,8 +3335,7 @@ P.plus = P.add = function(y) {
       d.length = 1;
     }
     d.reverse();
-    for (; i--; )
-      d.push(0);
+    for (; i--; ) d.push(0);
     d.reverse();
   }
   len = xd.length;
@@ -3337,20 +3354,17 @@ P.plus = P.add = function(y) {
     xd.unshift(carry);
     ++e;
   }
-  for (len = xd.length; xd[--len] == 0; )
-    xd.pop();
+  for (len = xd.length; xd[--len] == 0; ) xd.pop();
   y.d = xd;
   y.e = getBase10Exponent(xd, e);
   return external ? finalise(y, pr, rm) : y;
 };
 P.precision = P.sd = function(z) {
   var k, x = this;
-  if (z !== void 0 && z !== !!z && z !== 1 && z !== 0)
-    throw Error(invalidArgument + z);
+  if (z !== void 0 && z !== !!z && z !== 1 && z !== 0) throw Error(invalidArgument + z);
   if (x.d) {
     k = getPrecision(x.d);
-    if (z && x.e + 1 > k)
-      k = x.e + 1;
+    if (z && x.e + 1 > k) k = x.e + 1;
   } else {
     k = NaN;
   }
@@ -3362,10 +3376,8 @@ P.round = function() {
 };
 P.sine = P.sin = function() {
   var pr, rm, x = this, Ctor = x.constructor;
-  if (!x.isFinite())
-    return new Ctor(NaN);
-  if (x.isZero())
-    return new Ctor(x);
+  if (!x.isFinite()) return new Ctor(NaN);
+  if (x.isZero()) return new Ctor(x);
   pr = Ctor.precision;
   rm = Ctor.rounding;
   Ctor.precision = pr + Math.max(x.e, x.sd()) + LOG_BASE;
@@ -3384,8 +3396,7 @@ P.squareRoot = P.sqrt = function() {
   s = Math.sqrt(+x);
   if (s == 0 || s == 1 / 0) {
     n = digitsToString(d);
-    if ((n.length + e) % 2 == 0)
-      n += "0";
+    if ((n.length + e) % 2 == 0) n += "0";
     s = Math.sqrt(n);
     e = mathfloor((e + 1) / 2) - (e < 0 || e % 2);
     if (s == 1 / 0) {
@@ -3428,10 +3439,8 @@ P.squareRoot = P.sqrt = function() {
 };
 P.tangent = P.tan = function() {
   var pr, rm, x = this, Ctor = x.constructor;
-  if (!x.isFinite())
-    return new Ctor(NaN);
-  if (x.isZero())
-    return new Ctor(x);
+  if (!x.isFinite()) return new Ctor(NaN);
+  if (x.isZero()) return new Ctor(x);
   pr = Ctor.precision;
   rm = Ctor.rounding;
   Ctor.precision = pr + 10;
@@ -3462,8 +3471,7 @@ P.times = P.mul = function(y) {
   }
   r = [];
   rL = xdL + ydL;
-  for (i = rL; i--; )
-    r.push(0);
+  for (i = rL; i--; ) r.push(0);
   for (i = ydL; --i >= 0; ) {
     carry = 0;
     for (k = xdL + i; k > i; ) {
@@ -3473,12 +3481,9 @@ P.times = P.mul = function(y) {
     }
     r[k] = (r[k] + carry) % BASE | 0;
   }
-  for (; !r[--rL]; )
-    r.pop();
-  if (carry)
-    ++e;
-  else
-    r.shift();
+  for (; !r[--rL]; ) r.pop();
+  if (carry) ++e;
+  else r.shift();
   y.d = r;
   y.e = getBase10Exponent(r, e);
   return external ? finalise(y, Ctor.precision, Ctor.rounding) : y;
@@ -3489,13 +3494,10 @@ P.toBinary = function(sd, rm) {
 P.toDecimalPlaces = P.toDP = function(dp, rm) {
   var x = this, Ctor = x.constructor;
   x = new Ctor(x);
-  if (dp === void 0)
-    return x;
+  if (dp === void 0) return x;
   checkInt32(dp, 0, MAX_DIGITS);
-  if (rm === void 0)
-    rm = Ctor.rounding;
-  else
-    checkInt32(rm, 0, 8);
+  if (rm === void 0) rm = Ctor.rounding;
+  else checkInt32(rm, 0, 8);
   return finalise(x, dp + x.e + 1, rm);
 };
 P.toExponential = function(dp, rm) {
@@ -3504,10 +3506,8 @@ P.toExponential = function(dp, rm) {
     str = finiteToString(x, true);
   } else {
     checkInt32(dp, 0, MAX_DIGITS);
-    if (rm === void 0)
-      rm = Ctor.rounding;
-    else
-      checkInt32(rm, 0, 8);
+    if (rm === void 0) rm = Ctor.rounding;
+    else checkInt32(rm, 0, 8);
     x = finalise(new Ctor(x), dp + 1, rm);
     str = finiteToString(x, true, dp + 1);
   }
@@ -3519,10 +3519,8 @@ P.toFixed = function(dp, rm) {
     str = finiteToString(x);
   } else {
     checkInt32(dp, 0, MAX_DIGITS);
-    if (rm === void 0)
-      rm = Ctor.rounding;
-    else
-      checkInt32(rm, 0, 8);
+    if (rm === void 0) rm = Ctor.rounding;
+    else checkInt32(rm, 0, 8);
     y = finalise(new Ctor(x), dp + x.e + 1, rm);
     str = finiteToString(y, false, dp + y.e + 1);
   }
@@ -3530,8 +3528,7 @@ P.toFixed = function(dp, rm) {
 };
 P.toFraction = function(maxD) {
   var d, d0, d1, d2, e, k, n, n0, n1, pr, q, r, x = this, xd = x.d, Ctor = x.constructor;
-  if (!xd)
-    return new Ctor(x);
+  if (!xd) return new Ctor(x);
   n1 = d0 = new Ctor(1);
   d1 = n0 = new Ctor(0);
   d = new Ctor(d1);
@@ -3542,8 +3539,7 @@ P.toFraction = function(maxD) {
     maxD = e > 0 ? d : n1;
   } else {
     n = new Ctor(maxD);
-    if (!n.isInt() || n.lt(n1))
-      throw Error(invalidArgument + n);
+    if (!n.isInt() || n.lt(n1)) throw Error(invalidArgument + n);
     maxD = n.gt(d) ? e > 0 ? d : n1 : n;
   }
   external = false;
@@ -3553,8 +3549,7 @@ P.toFraction = function(maxD) {
   for (; ; ) {
     q = divide(n, d, 0, 1, 1);
     d2 = d0.plus(q.times(d1));
-    if (d2.cmp(maxD) == 1)
-      break;
+    if (d2.cmp(maxD) == 1) break;
     d0 = d1;
     d1 = d2;
     d2 = n1;
@@ -3580,8 +3575,7 @@ P.toNearest = function(y, rm) {
   var x = this, Ctor = x.constructor;
   x = new Ctor(x);
   if (y == null) {
-    if (!x.d)
-      return x;
+    if (!x.d) return x;
     y = new Ctor(1);
     rm = Ctor.rounding;
   } else {
@@ -3591,11 +3585,9 @@ P.toNearest = function(y, rm) {
     } else {
       checkInt32(rm, 0, 8);
     }
-    if (!x.d)
-      return y.s ? x : y;
+    if (!x.d) return y.s ? x : y;
     if (!y.d) {
-      if (y.s)
-        y.s = x.s;
+      if (y.s) y.s = x.s;
       return y;
     }
   }
@@ -3618,15 +3610,12 @@ P.toOctal = function(sd, rm) {
 };
 P.toPower = P.pow = function(y) {
   var e, k, pr, r, rm, s, x = this, Ctor = x.constructor, yn = +(y = new Ctor(y));
-  if (!x.d || !y.d || !x.d[0] || !y.d[0])
-    return new Ctor(mathpow(+x, yn));
+  if (!x.d || !y.d || !x.d[0] || !y.d[0]) return new Ctor(mathpow(+x, yn));
   x = new Ctor(x);
-  if (x.eq(1))
-    return x;
+  if (x.eq(1)) return x;
   pr = Ctor.precision;
   rm = Ctor.rounding;
-  if (y.eq(1))
-    return finalise(x, pr, rm);
+  if (y.eq(1)) return finalise(x, pr, rm);
   e = mathfloor(y.e / LOG_BASE);
   if (e >= y.d.length - 1 && (k = yn < 0 ? -yn : yn) <= MAX_SAFE_INTEGER) {
     r = intPow(Ctor, x, k, pr);
@@ -3634,10 +3623,8 @@ P.toPower = P.pow = function(y) {
   }
   s = x.s;
   if (s < 0) {
-    if (e < y.d.length - 1)
-      return new Ctor(NaN);
-    if ((y.d[e] & 1) == 0)
-      s = 1;
+    if (e < y.d.length - 1) return new Ctor(NaN);
+    if ((y.d[e] & 1) == 0) s = 1;
     if (x.e == 0 && x.d[0] == 1 && x.d.length == 1) {
       x.s = s;
       return x;
@@ -3645,8 +3632,7 @@ P.toPower = P.pow = function(y) {
   }
   k = mathpow(+x, yn);
   e = k == 0 || !isFinite(k) ? mathfloor(yn * (Math.log("0." + digitsToString(x.d)) / Math.LN10 + x.e + 1)) : new Ctor(k + "").e;
-  if (e > Ctor.maxE + 1 || e < Ctor.minE - 1)
-    return new Ctor(e > 0 ? s / 0 : 0);
+  if (e > Ctor.maxE + 1 || e < Ctor.minE - 1) return new Ctor(e > 0 ? s / 0 : 0);
   external = false;
   Ctor.rounding = x.s = 1;
   k = Math.min(12, (e + "").length);
@@ -3672,10 +3658,8 @@ P.toPrecision = function(sd, rm) {
     str = finiteToString(x, x.e <= Ctor.toExpNeg || x.e >= Ctor.toExpPos);
   } else {
     checkInt32(sd, 1, MAX_DIGITS);
-    if (rm === void 0)
-      rm = Ctor.rounding;
-    else
-      checkInt32(rm, 0, 8);
+    if (rm === void 0) rm = Ctor.rounding;
+    else checkInt32(rm, 0, 8);
     x = finalise(new Ctor(x), sd, rm);
     str = finiteToString(x, sd <= x.e || x.e <= Ctor.toExpNeg, sd);
   }
@@ -3688,10 +3672,8 @@ P.toSignificantDigits = P.toSD = function(sd, rm) {
     rm = Ctor.rounding;
   } else {
     checkInt32(sd, 1, MAX_DIGITS);
-    if (rm === void 0)
-      rm = Ctor.rounding;
-    else
-      checkInt32(rm, 0, 8);
+    if (rm === void 0) rm = Ctor.rounding;
+    else checkInt32(rm, 0, 8);
   }
   return finalise(new Ctor(x), sd, rm);
 };
@@ -3713,20 +3695,17 @@ function digitsToString(d) {
     for (i = 1; i < indexOfLastWord; i++) {
       ws = d[i] + "";
       k = LOG_BASE - ws.length;
-      if (k)
-        str += getZeroString(k);
+      if (k) str += getZeroString(k);
       str += ws;
     }
     w = d[i];
     ws = w + "";
     k = LOG_BASE - ws.length;
-    if (k)
-      str += getZeroString(k);
+    if (k) str += getZeroString(k);
   } else if (w === 0) {
     return "0";
   }
-  for (; w % 10 === 0; )
-    w /= 10;
+  for (; w % 10 === 0; ) w /= 10;
   return str + w;
 }
 function checkInt32(i, min2, max2) {
@@ -3736,8 +3715,7 @@ function checkInt32(i, min2, max2) {
 }
 function checkRoundingDigits(d, i, rm, repeating) {
   var di, k, r, rd;
-  for (k = d[0]; k >= 10; k /= 10)
-    --i;
+  for (k = d[0]; k >= 10; k /= 10) --i;
   if (--i < 0) {
     i += LOG_BASE;
     di = 0;
@@ -3749,22 +3727,17 @@ function checkRoundingDigits(d, i, rm, repeating) {
   rd = d[di] % k | 0;
   if (repeating == null) {
     if (i < 3) {
-      if (i == 0)
-        rd = rd / 100 | 0;
-      else if (i == 1)
-        rd = rd / 10 | 0;
+      if (i == 0) rd = rd / 100 | 0;
+      else if (i == 1) rd = rd / 10 | 0;
       r = rm < 4 && rd == 99999 || rm > 3 && rd == 49999 || rd == 5e4 || rd == 0;
     } else {
       r = (rm < 4 && rd + 1 == k || rm > 3 && rd + 1 == k / 2) && (d[di + 1] / k / 100 | 0) == mathpow(10, i - 2) - 1 || (rd == k / 2 || rd == 0) && (d[di + 1] / k / 100 | 0) == 0;
     }
   } else {
     if (i < 4) {
-      if (i == 0)
-        rd = rd / 1e3 | 0;
-      else if (i == 1)
-        rd = rd / 100 | 0;
-      else if (i == 2)
-        rd = rd / 10 | 0;
+      if (i == 0) rd = rd / 1e3 | 0;
+      else if (i == 1) rd = rd / 100 | 0;
+      else if (i == 2) rd = rd / 10 | 0;
       r = (repeating || rm < 4) && rd == 9999 || !repeating && rm > 3 && rd == 4999;
     } else {
       r = ((repeating || rm < 4) && rd + 1 == k || !repeating && rm > 3 && rd + 1 == k / 2) && (d[di + 1] / k / 1e3 | 0) == mathpow(10, i - 3) - 1;
@@ -3775,13 +3748,11 @@ function checkRoundingDigits(d, i, rm, repeating) {
 function convertBase(str, baseIn, baseOut) {
   var j, arr = [0], arrL, i = 0, strL = str.length;
   for (; i < strL; ) {
-    for (arrL = arr.length; arrL--; )
-      arr[arrL] *= baseIn;
+    for (arrL = arr.length; arrL--; ) arr[arrL] *= baseIn;
     arr[0] += NUMERALS.indexOf(str.charAt(i++));
     for (j = 0; j < arr.length; j++) {
       if (arr[j] > baseOut - 1) {
-        if (arr[j + 1] === void 0)
-          arr[j + 1] = 0;
+        if (arr[j + 1] === void 0) arr[j + 1] = 0;
         arr[j + 1] += arr[j] / baseOut | 0;
         arr[j] %= baseOut;
       }
@@ -3791,8 +3762,7 @@ function convertBase(str, baseIn, baseOut) {
 }
 function cosine(Ctor, x) {
   var k, len, y;
-  if (x.isZero())
-    return x;
+  if (x.isZero()) return x;
   len = x.d.length;
   if (len < 32) {
     k = Math.ceil(len / 3);
@@ -3810,7 +3780,7 @@ function cosine(Ctor, x) {
   Ctor.precision -= k;
   return x;
 }
-var divide = function() {
+var divide = /* @__PURE__ */ (function() {
   function multiplyInteger(x, k, base) {
     var temp, carry = 0, i = x.length;
     for (x = x.slice(); i--; ) {
@@ -3818,8 +3788,7 @@ var divide = function() {
       x[i] = temp % base | 0;
       carry = temp / base | 0;
     }
-    if (carry)
-      x.unshift(carry);
+    if (carry) x.unshift(carry);
     return x;
   }
   function compare(a, b, aL, bL) {
@@ -3843,13 +3812,18 @@ var divide = function() {
       i = a[aL] < b[aL] ? 1 : 0;
       a[aL] = i * base + a[aL] - b[aL];
     }
-    for (; !a[0] && a.length > 1; )
-      a.shift();
+    for (; !a[0] && a.length > 1; ) a.shift();
   }
   return function(x, y, pr, rm, dp, base) {
     var cmp, e, i, k, logBase, more, prod, prodL, q, qd, rem, remL, rem0, sd, t, xi, xL, yd0, yL, yz, Ctor = x.constructor, sign2 = x.s == y.s ? 1 : -1, xd = x.d, yd = y.d;
     if (!xd || !xd[0] || !yd || !yd[0]) {
-      return new Ctor(!x.s || !y.s || (xd ? yd && xd[0] == yd[0] : !yd) ? NaN : xd && xd[0] == 0 || !yd ? sign2 * 0 : sign2 / 0);
+      return new Ctor(
+        // Return NaN if either NaN, or both Infinity or 0.
+        !x.s || !y.s || (xd ? yd && xd[0] == yd[0] : !yd) ? NaN : (
+          // Return ±0 if x is 0 or y is ±Infinity, or return ±Infinity as y is 0.
+          xd && xd[0] == 0 || !yd ? sign2 * 0 : sign2 / 0
+        )
+      );
     }
     if (base) {
       logBase = 1;
@@ -3863,10 +3837,8 @@ var divide = function() {
     xL = xd.length;
     q = new Ctor(sign2);
     qd = q.d = [];
-    for (i = 0; yd[i] == (xd[i] || 0); i++)
-      ;
-    if (yd[i] > (xd[i] || 0))
-      e--;
+    for (i = 0; yd[i] == (xd[i] || 0); i++) ;
+    if (yd[i] > (xd[i] || 0)) e--;
     if (pr == null) {
       sd = pr = Ctor.precision;
       rm = Ctor.rounding;
@@ -3902,24 +3874,20 @@ var divide = function() {
         xi = yL;
         rem = xd.slice(0, yL);
         remL = rem.length;
-        for (; remL < yL; )
-          rem[remL++] = 0;
+        for (; remL < yL; ) rem[remL++] = 0;
         yz = yd.slice();
         yz.unshift(0);
         yd0 = yd[0];
-        if (yd[1] >= base / 2)
-          ++yd0;
+        if (yd[1] >= base / 2) ++yd0;
         do {
           k = 0;
           cmp = compare(yd, rem, yL, remL);
           if (cmp < 0) {
             rem0 = rem[0];
-            if (yL != remL)
-              rem0 = rem0 * base + (rem[1] || 0);
+            if (yL != remL) rem0 = rem0 * base + (rem[1] || 0);
             k = rem0 / yd0 | 0;
             if (k > 1) {
-              if (k >= base)
-                k = base - 1;
+              if (k >= base) k = base - 1;
               prod = multiplyInteger(yd, k, base);
               prodL = prod.length;
               remL = rem.length;
@@ -3929,13 +3897,11 @@ var divide = function() {
                 subtract(prod, yL < prodL ? yz : yd, prodL, base);
               }
             } else {
-              if (k == 0)
-                cmp = k = 1;
+              if (k == 0) cmp = k = 1;
               prod = yd.slice();
             }
             prodL = prod.length;
-            if (prodL < remL)
-              prod.unshift(0);
+            if (prodL < remL) prod.unshift(0);
             subtract(rem, prod, remL, base);
             if (cmp == -1) {
               remL = rem.length;
@@ -3960,107 +3926,96 @@ var divide = function() {
         } while ((xi++ < xL || rem[0] !== void 0) && sd--);
         more = rem[0] !== void 0;
       }
-      if (!qd[0])
-        qd.shift();
+      if (!qd[0]) qd.shift();
     }
     if (logBase == 1) {
       q.e = e;
       inexact = more;
     } else {
-      for (i = 1, k = qd[0]; k >= 10; k /= 10)
-        i++;
+      for (i = 1, k = qd[0]; k >= 10; k /= 10) i++;
       q.e = i + e * logBase - 1;
       finalise(q, dp ? pr + q.e + 1 : pr, rm, more);
     }
     return q;
   };
-}();
+})();
 function finalise(x, sd, rm, isTruncated) {
   var digits2, i, j, k, rd, roundUp, w, xd, xdi, Ctor = x.constructor;
-  out:
-    if (sd != null) {
-      xd = x.d;
-      if (!xd)
-        return x;
-      for (digits2 = 1, k = xd[0]; k >= 10; k /= 10)
-        digits2++;
-      i = sd - digits2;
-      if (i < 0) {
-        i += LOG_BASE;
-        j = sd;
-        w = xd[xdi = 0];
-        rd = w / mathpow(10, digits2 - j - 1) % 10 | 0;
-      } else {
-        xdi = Math.ceil((i + 1) / LOG_BASE);
-        k = xd.length;
-        if (xdi >= k) {
-          if (isTruncated) {
-            for (; k++ <= xdi; )
-              xd.push(0);
-            w = rd = 0;
-            digits2 = 1;
-            i %= LOG_BASE;
-            j = i - LOG_BASE + 1;
-          } else {
-            break out;
-          }
-        } else {
-          w = k = xd[xdi];
-          for (digits2 = 1; k >= 10; k /= 10)
-            digits2++;
+  out: if (sd != null) {
+    xd = x.d;
+    if (!xd) return x;
+    for (digits2 = 1, k = xd[0]; k >= 10; k /= 10) digits2++;
+    i = sd - digits2;
+    if (i < 0) {
+      i += LOG_BASE;
+      j = sd;
+      w = xd[xdi = 0];
+      rd = w / mathpow(10, digits2 - j - 1) % 10 | 0;
+    } else {
+      xdi = Math.ceil((i + 1) / LOG_BASE);
+      k = xd.length;
+      if (xdi >= k) {
+        if (isTruncated) {
+          for (; k++ <= xdi; ) xd.push(0);
+          w = rd = 0;
+          digits2 = 1;
           i %= LOG_BASE;
-          j = i - LOG_BASE + digits2;
-          rd = j < 0 ? 0 : w / mathpow(10, digits2 - j - 1) % 10 | 0;
-        }
-      }
-      isTruncated = isTruncated || sd < 0 || xd[xdi + 1] !== void 0 || (j < 0 ? w : w % mathpow(10, digits2 - j - 1));
-      roundUp = rm < 4 ? (rd || isTruncated) && (rm == 0 || rm == (x.s < 0 ? 3 : 2)) : rd > 5 || rd == 5 && (rm == 4 || isTruncated || rm == 6 && (i > 0 ? j > 0 ? w / mathpow(10, digits2 - j) : 0 : xd[xdi - 1]) % 10 & 1 || rm == (x.s < 0 ? 8 : 7));
-      if (sd < 1 || !xd[0]) {
-        xd.length = 0;
-        if (roundUp) {
-          sd -= x.e + 1;
-          xd[0] = mathpow(10, (LOG_BASE - sd % LOG_BASE) % LOG_BASE);
-          x.e = -sd || 0;
+          j = i - LOG_BASE + 1;
         } else {
-          xd[0] = x.e = 0;
+          break out;
         }
-        return x;
-      }
-      if (i == 0) {
-        xd.length = xdi;
-        k = 1;
-        xdi--;
       } else {
-        xd.length = xdi + 1;
-        k = mathpow(10, LOG_BASE - i);
-        xd[xdi] = j > 0 ? (w / mathpow(10, digits2 - j) % mathpow(10, j) | 0) * k : 0;
+        w = k = xd[xdi];
+        for (digits2 = 1; k >= 10; k /= 10) digits2++;
+        i %= LOG_BASE;
+        j = i - LOG_BASE + digits2;
+        rd = j < 0 ? 0 : w / mathpow(10, digits2 - j - 1) % 10 | 0;
       }
+    }
+    isTruncated = isTruncated || sd < 0 || xd[xdi + 1] !== void 0 || (j < 0 ? w : w % mathpow(10, digits2 - j - 1));
+    roundUp = rm < 4 ? (rd || isTruncated) && (rm == 0 || rm == (x.s < 0 ? 3 : 2)) : rd > 5 || rd == 5 && (rm == 4 || isTruncated || rm == 6 && // Check whether the digit to the left of the rounding digit is odd.
+    (i > 0 ? j > 0 ? w / mathpow(10, digits2 - j) : 0 : xd[xdi - 1]) % 10 & 1 || rm == (x.s < 0 ? 8 : 7));
+    if (sd < 1 || !xd[0]) {
+      xd.length = 0;
       if (roundUp) {
-        for (; ; ) {
-          if (xdi == 0) {
-            for (i = 1, j = xd[0]; j >= 10; j /= 10)
-              i++;
-            j = xd[0] += k;
-            for (k = 1; j >= 10; j /= 10)
-              k++;
-            if (i != k) {
-              x.e++;
-              if (xd[0] == BASE)
-                xd[0] = 1;
-            }
-            break;
-          } else {
-            xd[xdi] += k;
-            if (xd[xdi] != BASE)
-              break;
-            xd[xdi--] = 0;
-            k = 1;
+        sd -= x.e + 1;
+        xd[0] = mathpow(10, (LOG_BASE - sd % LOG_BASE) % LOG_BASE);
+        x.e = -sd || 0;
+      } else {
+        xd[0] = x.e = 0;
+      }
+      return x;
+    }
+    if (i == 0) {
+      xd.length = xdi;
+      k = 1;
+      xdi--;
+    } else {
+      xd.length = xdi + 1;
+      k = mathpow(10, LOG_BASE - i);
+      xd[xdi] = j > 0 ? (w / mathpow(10, digits2 - j) % mathpow(10, j) | 0) * k : 0;
+    }
+    if (roundUp) {
+      for (; ; ) {
+        if (xdi == 0) {
+          for (i = 1, j = xd[0]; j >= 10; j /= 10) i++;
+          j = xd[0] += k;
+          for (k = 1; j >= 10; j /= 10) k++;
+          if (i != k) {
+            x.e++;
+            if (xd[0] == BASE) xd[0] = 1;
           }
+          break;
+        } else {
+          xd[xdi] += k;
+          if (xd[xdi] != BASE) break;
+          xd[xdi--] = 0;
+          k = 1;
         }
       }
-      for (i = xd.length; xd[--i] === 0; )
-        xd.pop();
     }
+    for (i = xd.length; xd[--i] === 0; ) xd.pop();
+  }
   if (external) {
     if (x.e > Ctor.maxE) {
       x.d = null;
@@ -4073,8 +4028,7 @@ function finalise(x, sd, rm, isTruncated) {
   return x;
 }
 function finiteToString(x, isExp, sd) {
-  if (!x.isFinite())
-    return nonFiniteToString(x);
+  if (!x.isFinite()) return nonFiniteToString(x);
   var k, e = x.e, str = digitsToString(x.d), len = str.length;
   if (isExp) {
     if (sd && (k = sd - len) > 0) {
@@ -4085,18 +4039,14 @@ function finiteToString(x, isExp, sd) {
     str = str + (x.e < 0 ? "e" : "e+") + x.e;
   } else if (e < 0) {
     str = "0." + getZeroString(-e - 1) + str;
-    if (sd && (k = sd - len) > 0)
-      str += getZeroString(k);
+    if (sd && (k = sd - len) > 0) str += getZeroString(k);
   } else if (e >= len) {
     str += getZeroString(e + 1 - len);
-    if (sd && (k = sd - e - 1) > 0)
-      str = str + "." + getZeroString(k);
+    if (sd && (k = sd - e - 1) > 0) str = str + "." + getZeroString(k);
   } else {
-    if ((k = e + 1) < len)
-      str = str.slice(0, k) + "." + str.slice(k);
+    if ((k = e + 1) < len) str = str.slice(0, k) + "." + str.slice(k);
     if (sd && (k = sd - len) > 0) {
-      if (e + 1 === len)
-        str += ".";
+      if (e + 1 === len) str += ".";
       str += getZeroString(k);
     }
   }
@@ -4104,39 +4054,33 @@ function finiteToString(x, isExp, sd) {
 }
 function getBase10Exponent(digits2, e) {
   var w = digits2[0];
-  for (e *= LOG_BASE; w >= 10; w /= 10)
-    e++;
+  for (e *= LOG_BASE; w >= 10; w /= 10) e++;
   return e;
 }
 function getLn10(Ctor, sd, pr) {
   if (sd > LN10_PRECISION) {
     external = true;
-    if (pr)
-      Ctor.precision = pr;
+    if (pr) Ctor.precision = pr;
     throw Error(precisionLimitExceeded);
   }
   return finalise(new Ctor(LN10), sd, 1, true);
 }
 function getPi(Ctor, sd, rm) {
-  if (sd > PI_PRECISION)
-    throw Error(precisionLimitExceeded);
+  if (sd > PI_PRECISION) throw Error(precisionLimitExceeded);
   return finalise(new Ctor(PI), sd, rm, true);
 }
 function getPrecision(digits2) {
   var w = digits2.length - 1, len = w * LOG_BASE + 1;
   w = digits2[w];
   if (w) {
-    for (; w % 10 == 0; w /= 10)
-      len--;
-    for (w = digits2[0]; w >= 10; w /= 10)
-      len++;
+    for (; w % 10 == 0; w /= 10) len--;
+    for (w = digits2[0]; w >= 10; w /= 10) len++;
   }
   return len;
 }
 function getZeroString(k) {
   var zs = "";
-  for (; k--; )
-    zs += "0";
+  for (; k--; ) zs += "0";
   return zs;
 }
 function intPow(Ctor, x, n, pr) {
@@ -4145,14 +4089,12 @@ function intPow(Ctor, x, n, pr) {
   for (; ; ) {
     if (n % 2) {
       r = r.times(x);
-      if (truncate(r.d, k))
-        isTruncated = true;
+      if (truncate(r.d, k)) isTruncated = true;
     }
     n = mathfloor(n / 2);
     if (n === 0) {
       n = r.d.length - 1;
-      if (isTruncated && r.d[n] === 0)
-        ++r.d[n];
+      if (isTruncated && r.d[n] === 0) ++r.d[n];
       break;
     }
     x = x.times(x);
@@ -4205,8 +4147,7 @@ function naturalExponential(x, sd) {
     t = sum2.plus(divide(pow2, denominator, wpr, 1));
     if (digitsToString(t.d).slice(0, wpr) === digitsToString(sum2.d).slice(0, wpr)) {
       j = k;
-      while (j--)
-        sum2 = finalise(sum2.times(sum2), wpr, 1);
+      while (j--) sum2 = finalise(sum2.times(sum2), wpr, 1);
       if (sd == null) {
         if (rep < 3 && checkRoundingDigits(sum2.d, wpr - guard, rm, rep)) {
           Ctor.precision = wpr += 10;
@@ -4267,8 +4208,7 @@ function naturalLogarithm(y, sd) {
     t = sum2.plus(divide(numerator, new Ctor(denominator), wpr, 1));
     if (digitsToString(t.d).slice(0, wpr) === digitsToString(sum2.d).slice(0, wpr)) {
       sum2 = sum2.times(2);
-      if (e !== 0)
-        sum2 = sum2.plus(getLn10(Ctor, wpr + 2, pr).times(e + ""));
+      if (e !== 0) sum2 = sum2.plus(getLn10(Ctor, wpr + 2, pr).times(e + ""));
       sum2 = divide(sum2, new Ctor(n), wpr, 1);
       if (sd == null) {
         if (checkRoundingDigits(sum2.d, wpr - guard, rm, rep)) {
@@ -4293,40 +4233,32 @@ function nonFiniteToString(x) {
 }
 function parseDecimal(x, str) {
   var e, i, len;
-  if ((e = str.indexOf(".")) > -1)
-    str = str.replace(".", "");
+  if ((e = str.indexOf(".")) > -1) str = str.replace(".", "");
   if ((i = str.search(/e/i)) > 0) {
-    if (e < 0)
-      e = i;
+    if (e < 0) e = i;
     e += +str.slice(i + 1);
     str = str.substring(0, i);
   } else if (e < 0) {
     e = str.length;
   }
-  for (i = 0; str.charCodeAt(i) === 48; i++)
-    ;
-  for (len = str.length; str.charCodeAt(len - 1) === 48; --len)
-    ;
+  for (i = 0; str.charCodeAt(i) === 48; i++) ;
+  for (len = str.length; str.charCodeAt(len - 1) === 48; --len) ;
   str = str.slice(i, len);
   if (str) {
     len -= i;
     x.e = e = e - i - 1;
     x.d = [];
     i = (e + 1) % LOG_BASE;
-    if (e < 0)
-      i += LOG_BASE;
+    if (e < 0) i += LOG_BASE;
     if (i < len) {
-      if (i)
-        x.d.push(+str.slice(0, i));
-      for (len -= LOG_BASE; i < len; )
-        x.d.push(+str.slice(i, i += LOG_BASE));
+      if (i) x.d.push(+str.slice(0, i));
+      for (len -= LOG_BASE; i < len; ) x.d.push(+str.slice(i, i += LOG_BASE));
       str = str.slice(i);
       i = LOG_BASE - str.length;
     } else {
       i -= len;
     }
-    for (; i--; )
-      str += "0";
+    for (; i--; ) str += "0";
     x.d.push(+str);
     if (external) {
       if (x.e > x.constructor.maxE) {
@@ -4347,11 +4279,9 @@ function parseOther(x, str) {
   var base, Ctor, divisor, i, isFloat, len, p, xd, xe;
   if (str.indexOf("_") > -1) {
     str = str.replace(/(\d)_(?=\d)/g, "$1");
-    if (isDecimal.test(str))
-      return parseDecimal(x, str);
+    if (isDecimal.test(str)) return parseDecimal(x, str);
   } else if (str === "Infinity" || str === "NaN") {
-    if (!+str)
-      x.s = NaN;
+    if (!+str) x.s = NaN;
     x.e = NaN;
     x.d = null;
     return x;
@@ -4384,17 +4314,13 @@ function parseOther(x, str) {
   }
   xd = convertBase(str, base, BASE);
   xe = xd.length - 1;
-  for (i = xe; xd[i] === 0; --i)
-    xd.pop();
-  if (i < 0)
-    return new Ctor(x.s * 0);
+  for (i = xe; xd[i] === 0; --i) xd.pop();
+  if (i < 0) return new Ctor(x.s * 0);
   x.e = getBase10Exponent(xd, xe);
   x.d = xd;
   external = false;
-  if (isFloat)
-    x = divide(x, divisor, len * 4);
-  if (p)
-    x = x.times(Math.abs(p) < 54 ? mathpow(2, p) : Decimal.pow(2, p));
+  if (isFloat) x = divide(x, divisor, len * 4);
+  if (p) x = x.times(Math.abs(p) < 54 ? mathpow(2, p) : Decimal.pow(2, p));
   external = true;
   return x;
 }
@@ -4425,10 +4351,8 @@ function taylorSeries(Ctor, n, x, y, isHyperbolic) {
     y = divide(t.times(x2), new Ctor(n++ * n++), pr, 1);
     t = u.plus(y);
     if (t.d[k] !== void 0) {
-      for (j = k; t.d[j] === u.d[j] && j--; )
-        ;
-      if (j == -1)
-        break;
+      for (j = k; t.d[j] === u.d[j] && j--; ) ;
+      if (j == -1) break;
     }
     j = u;
     u = y;
@@ -4442,8 +4366,7 @@ function taylorSeries(Ctor, n, x, y, isHyperbolic) {
 }
 function tinyPow(b, e) {
   var n = b;
-  while (--e)
-    n *= b;
+  while (--e) n *= b;
   return n;
 }
 function toLessThanHalfPi(Ctor, x) {
@@ -4470,10 +4393,8 @@ function toStringBinary(x, baseOut, sd, rm) {
   var base, e, i, k, len, roundUp, str, xd, y, Ctor = x.constructor, isExp = sd !== void 0;
   if (isExp) {
     checkInt32(sd, 1, MAX_DIGITS);
-    if (rm === void 0)
-      rm = Ctor.rounding;
-    else
-      checkInt32(rm, 0, 8);
+    if (rm === void 0) rm = Ctor.rounding;
+    else checkInt32(rm, 0, 8);
   } else {
     sd = Ctor.precision;
     rm = Ctor.rounding;
@@ -4502,8 +4423,7 @@ function toStringBinary(x, baseOut, sd, rm) {
     }
     xd = convertBase(str, 10, base);
     e = len = xd.length;
-    for (; xd[--len] == 0; )
-      xd.pop();
+    for (; xd[--len] == 0; ) xd.pop();
     if (!xd[0]) {
       str = isExp ? "0p+0" : "0";
     } else {
@@ -4532,36 +4452,27 @@ function toStringBinary(x, baseOut, sd, rm) {
           }
         }
       }
-      for (len = xd.length; !xd[len - 1]; --len)
-        ;
-      for (i = 0, str = ""; i < len; i++)
-        str += NUMERALS.charAt(xd[i]);
+      for (len = xd.length; !xd[len - 1]; --len) ;
+      for (i = 0, str = ""; i < len; i++) str += NUMERALS.charAt(xd[i]);
       if (isExp) {
         if (len > 1) {
           if (baseOut == 16 || baseOut == 8) {
             i = baseOut == 16 ? 4 : 3;
-            for (--len; len % i; len++)
-              str += "0";
+            for (--len; len % i; len++) str += "0";
             xd = convertBase(str, base, baseOut);
-            for (len = xd.length; !xd[len - 1]; --len)
-              ;
-            for (i = 1, str = "1."; i < len; i++)
-              str += NUMERALS.charAt(xd[i]);
+            for (len = xd.length; !xd[len - 1]; --len) ;
+            for (i = 1, str = "1."; i < len; i++) str += NUMERALS.charAt(xd[i]);
           } else {
             str = str.charAt(0) + "." + str.slice(1);
           }
         }
         str = str + (e < 0 ? "p" : "p+") + e;
       } else if (e < 0) {
-        for (; ++e; )
-          str = "0" + str;
+        for (; ++e; ) str = "0" + str;
         str = "0." + str;
       } else {
-        if (++e > len)
-          for (e -= len; e--; )
-            str += "0";
-        else if (e < len)
-          str = str.slice(0, e) + "." + str.slice(e);
+        if (++e > len) for (e -= len; e--; ) str += "0";
+        else if (e < len) str = str.slice(0, e) + "." + str.slice(e);
       }
     }
     str = (baseOut == 16 ? "0x" : baseOut == 2 ? "0b" : baseOut == 8 ? "0o" : "") + str;
@@ -4636,8 +4547,7 @@ function clamp(x, min2, max2) {
   return new this(x).clamp(min2, max2);
 }
 function config3(obj) {
-  if (!obj || typeof obj !== "object")
-    throw Error(decimalError + "Object expected");
+  if (!obj || typeof obj !== "object") throw Error(decimalError + "Object expected");
   var i, p, v, useDefaults = obj.defaults === true, ps = [
     "precision",
     1,
@@ -4662,17 +4572,13 @@ function config3(obj) {
     9
   ];
   for (i = 0; i < ps.length; i += 3) {
-    if (p = ps[i], useDefaults)
-      this[p] = DEFAULTS[p];
+    if (p = ps[i], useDefaults) this[p] = DEFAULTS[p];
     if ((v = obj[p]) !== void 0) {
-      if (mathfloor(v) === v && v >= ps[i + 1] && v <= ps[i + 2])
-        this[p] = v;
-      else
-        throw Error(invalidArgument + p + ": " + v);
+      if (mathfloor(v) === v && v >= ps[i + 1] && v <= ps[i + 2]) this[p] = v;
+      else throw Error(invalidArgument + p + ": " + v);
     }
   }
-  if (p = "crypto", useDefaults)
-    this[p] = DEFAULTS[p];
+  if (p = "crypto", useDefaults) this[p] = DEFAULTS[p];
   if ((v = obj[p]) !== void 0) {
     if (v === true || v === false || v === 0 || v === 1) {
       if (v) {
@@ -4700,8 +4606,7 @@ function clone2(obj) {
   var i, p, ps;
   function Decimal2(v) {
     var e, i2, t, x = this;
-    if (!(x instanceof Decimal2))
-      return new Decimal2(v);
+    if (!(x instanceof Decimal2)) return new Decimal2(v);
     x.constructor = Decimal2;
     if (isDecimalInstance(v)) {
       x.s = v.s;
@@ -4737,8 +4642,7 @@ function clone2(obj) {
         x.s = 1;
       }
       if (v === ~~v && v < 1e7) {
-        for (e = 0, i2 = v; i2 >= 10; i2 /= 10)
-          e++;
+        for (e = 0, i2 = v; i2 >= 10; i2 /= 10) e++;
         if (external) {
           if (e > Decimal2.maxE) {
             x.e = NaN;
@@ -4757,8 +4661,7 @@ function clone2(obj) {
         return;
       }
       if (v * 0 !== 0) {
-        if (!v)
-          x.s = NaN;
+        if (!v) x.s = NaN;
         x.e = NaN;
         x.d = null;
         return;
@@ -4770,8 +4673,7 @@ function clone2(obj) {
         v = v.slice(1);
         x.s = -1;
       } else {
-        if (i2 === 43)
-          v = v.slice(1);
+        if (i2 === 43) v = v.slice(1);
         x.s = 1;
       }
       return isDecimal.test(v) ? parseDecimal(x, v) : parseOther(x, v);
@@ -4839,14 +4741,11 @@ function clone2(obj) {
   Decimal2.tan = tan;
   Decimal2.tanh = tanh;
   Decimal2.trunc = trunc;
-  if (obj === void 0)
-    obj = {};
+  if (obj === void 0) obj = {};
   if (obj) {
     if (obj.defaults !== true) {
       ps = ["precision", "rounding", "toExpNeg", "toExpPos", "maxE", "minE", "modulo", "crypto"];
-      for (i = 0; i < ps.length; )
-        if (!obj.hasOwnProperty(p = ps[i++]))
-          obj[p] = this[p];
+      for (i = 0; i < ps.length; ) if (!obj.hasOwnProperty(p = ps[i++])) obj[p] = this[p];
     }
   }
   Decimal2.config(obj);
@@ -4911,14 +4810,11 @@ function pow(x, y) {
 }
 function random(sd) {
   var d, e, k, n, i = 0, r = new this(1), rd = [];
-  if (sd === void 0)
-    sd = this.precision;
-  else
-    checkInt32(sd, 1, MAX_DIGITS);
+  if (sd === void 0) sd = this.precision;
+  else checkInt32(sd, 1, MAX_DIGITS);
   k = Math.ceil(sd / LOG_BASE);
   if (!this.crypto) {
-    for (; i < k; )
-      rd[i++] = Math.random() * 1e7 | 0;
+    for (; i < k; ) rd[i++] = Math.random() * 1e7 | 0;
   } else if (crypto.getRandomValues) {
     d = crypto.getRandomValues(new Uint32Array(k));
     for (; i < k; ) {
@@ -4950,19 +4846,15 @@ function random(sd) {
     n = mathpow(10, LOG_BASE - sd);
     rd[i] = (k / n | 0) * n;
   }
-  for (; rd[i] === 0; i--)
-    rd.pop();
+  for (; rd[i] === 0; i--) rd.pop();
   if (i < 0) {
     e = 0;
     rd = [0];
   } else {
     e = -1;
-    for (; rd[0] === 0; e -= LOG_BASE)
-      rd.shift();
-    for (k = 1, n = rd[0]; n >= 10; n /= 10)
-      k++;
-    if (k < LOG_BASE)
-      e -= LOG_BASE - k;
+    for (; rd[0] === 0; e -= LOG_BASE) rd.shift();
+    for (k = 1, n = rd[0]; n >= 10; n /= 10) k++;
+    if (k < LOG_BASE) e -= LOG_BASE - k;
   }
   r.e = e;
   r.d = rd;
@@ -4990,8 +4882,7 @@ function sub(x, y) {
 function sum() {
   var i = 0, args = arguments, x = new this(args[i]);
   external = false;
-  for (; x.s && ++i < args.length; )
-    x = x.plus(args[i]);
+  for (; x.s && ++i < args.length; ) x = x.plus(args[i]);
   external = true;
   return finalise(x, this.precision, this.rounding);
 }
@@ -5004,7 +4895,7 @@ function tanh(x) {
 function trunc(x) {
   return finalise(x = new this(x), x.e + 1, 1);
 }
-P[Symbol.for("nodejs.util.inspect.custom")] = P.toString;
+P[/* @__PURE__ */ Symbol.for("nodejs.util.inspect.custom")] = P.toString;
 P[Symbol.toStringTag] = "Decimal";
 var Decimal = P.constructor = clone2(DEFAULTS);
 LN10 = new Decimal(LN10);
@@ -5067,10 +4958,8 @@ var cosm1 = function(x) {
 var hypot2 = function(x, y) {
   x = Math.abs(x);
   y = Math.abs(y);
-  if (x < y)
-    [x, y] = [y, x];
-  if (x < 1e8)
-    return Math.sqrt(x * x + y * y);
+  if (x < y) [x, y] = [y, x];
+  if (x < 1e8) return Math.sqrt(x * x + y * y);
   y /= x;
   return x * Math.sqrt(1 + y * y);
 };
@@ -5127,7 +5016,8 @@ var parse = function(a, b) {
         }
         break;
       case "string":
-        z["im"] = z["re"] = 0;
+        z["im"] = /* void */
+        z["re"] = 0;
         const tokens = a.replace(/_/g, "").match(/\d+\.?\d*e[+-]?\d+|\d+\.?\d*|\.\d+|./g);
         let plus = 1;
         let minus = 0;
@@ -5191,10 +5081,23 @@ function Complex(a, b) {
 Complex.prototype = {
   "re": 0,
   "im": 0,
+  /**
+   * Calculates the sign of a complex number, which is a normalized complex
+   *
+   * @returns {Complex}
+   */
   "sign": function() {
     const abs2 = hypot2(this["re"], this["im"]);
-    return new Complex(this["re"] / abs2, this["im"] / abs2);
+    return new Complex(
+      this["re"] / abs2,
+      this["im"] / abs2
+    );
   },
+  /**
+   * Adds two complex numbers
+   *
+   * @returns {Complex}
+   */
   "add": function(a, b) {
     const z = parse(a, b);
     const tInfin = this["isInfinite"]();
@@ -5205,8 +5108,16 @@ Complex.prototype = {
       }
       return Complex["INFINITY"];
     }
-    return new Complex(this["re"] + z["re"], this["im"] + z["im"]);
+    return new Complex(
+      this["re"] + z["re"],
+      this["im"] + z["im"]
+    );
   },
+  /**
+   * Subtracts two complex numbers
+   *
+   * @returns {Complex}
+   */
   "sub": function(a, b) {
     const z = parse(a, b);
     const tInfin = this["isInfinite"]();
@@ -5217,8 +5128,16 @@ Complex.prototype = {
       }
       return Complex["INFINITY"];
     }
-    return new Complex(this["re"] - z["re"], this["im"] - z["im"]);
+    return new Complex(
+      this["re"] - z["re"],
+      this["im"] - z["im"]
+    );
   },
+  /**
+   * Multiplies two complex numbers
+   *
+   * @returns {Complex}
+   */
   "mul": function(a, b) {
     const z = parse(a, b);
     const tInfin = this["isInfinite"]();
@@ -5234,8 +5153,16 @@ Complex.prototype = {
     if (z["im"] === 0 && this["im"] === 0) {
       return new Complex(this["re"] * z["re"], 0);
     }
-    return new Complex(this["re"] * z["re"] - this["im"] * z["im"], this["re"] * z["im"] + this["im"] * z["re"]);
+    return new Complex(
+      this["re"] * z["re"] - this["im"] * z["im"],
+      this["re"] * z["im"] + this["im"] * z["re"]
+    );
   },
+  /**
+   * Divides two complex numbers
+   *
+   * @returns {Complex}
+   */
   "div": function(a, b) {
     const z = parse(a, b);
     const tInfin = this["isInfinite"]();
@@ -5251,19 +5178,30 @@ Complex.prototype = {
     if (tIsZero || zInfin) {
       return Complex["ZERO"];
     }
-    if (z["im"] === 0) {
+    if (0 === z["im"]) {
       return new Complex(this["re"] / z["re"], this["im"] / z["re"]);
     }
     if (Math.abs(z["re"]) < Math.abs(z["im"])) {
       const x = z["re"] / z["im"];
       const t = z["re"] * x + z["im"];
-      return new Complex((this["re"] * x + this["im"]) / t, (this["im"] * x - this["re"]) / t);
+      return new Complex(
+        (this["re"] * x + this["im"]) / t,
+        (this["im"] * x - this["re"]) / t
+      );
     } else {
       const x = z["im"] / z["re"];
       const t = z["im"] * x + z["re"];
-      return new Complex((this["re"] + this["im"] * x) / t, (this["im"] - this["re"] * x) / t);
+      return new Complex(
+        (this["re"] + this["im"] * x) / t,
+        (this["im"] - this["re"] * x) / t
+      );
     }
   },
+  /**
+   * Calculate the power of two complex numbers
+   *
+   * @returns {Complex}
+   */
   "pow": function(a, b) {
     const z = parse(a, b);
     const tIsZero = this["re"] === 0 && this["im"] === 0;
@@ -5294,8 +5232,16 @@ Complex.prototype = {
     const loh = logHypot(this["re"], this["im"]);
     let re = Math.exp(z["re"] * loh - z["im"] * arg);
     let im = z["im"] * loh + z["re"] * arg;
-    return new Complex(re * Math.cos(im), re * Math.sin(im));
+    return new Complex(
+      re * Math.cos(im),
+      re * Math.sin(im)
+    );
   },
+  /**
+   * Calculate the complex square root
+   *
+   * @returns {Complex}
+   */
   "sqrt": function() {
     const a = this["re"];
     const b = this["im"];
@@ -5315,80 +5261,192 @@ Complex.prototype = {
       return new Complex(im, b < 0 ? -re : re);
     }
   },
+  /**
+   * Calculate the complex exponent
+   *
+   * @returns {Complex}
+   */
   "exp": function() {
     const er = Math.exp(this["re"]);
     if (this["im"] === 0) {
       return new Complex(er, 0);
     }
-    return new Complex(er * Math.cos(this["im"]), er * Math.sin(this["im"]));
+    return new Complex(
+      er * Math.cos(this["im"]),
+      er * Math.sin(this["im"])
+    );
   },
+  /**
+   * Calculate the complex exponent and subtracts one.
+   *
+   * This may be more accurate than `Complex(x).exp().sub(1)` if
+   * `x` is small.
+   *
+   * @returns {Complex}
+   */
   "expm1": function() {
     const a = this["re"];
     const b = this["im"];
-    return new Complex(Math.expm1(a) * Math.cos(b) + cosm1(b), Math.exp(a) * Math.sin(b));
+    return new Complex(
+      Math.expm1(a) * Math.cos(b) + cosm1(b),
+      Math.exp(a) * Math.sin(b)
+    );
   },
+  /**
+   * Calculate the natural log
+   *
+   * @returns {Complex}
+   */
   "log": function() {
     const a = this["re"];
     const b = this["im"];
     if (b === 0 && a > 0) {
       return new Complex(Math.log(a), 0);
     }
-    return new Complex(logHypot(a, b), Math.atan2(b, a));
+    return new Complex(
+      logHypot(a, b),
+      Math.atan2(b, a)
+    );
   },
+  /**
+   * Calculate the magnitude of the complex number
+   *
+   * @returns {number}
+   */
   "abs": function() {
     return hypot2(this["re"], this["im"]);
   },
+  /**
+   * Calculate the angle of the complex number
+   *
+   * @returns {number}
+   */
   "arg": function() {
     return Math.atan2(this["im"], this["re"]);
   },
+  /**
+   * Calculate the sine of the complex number
+   *
+   * @returns {Complex}
+   */
   "sin": function() {
     const a = this["re"];
     const b = this["im"];
-    return new Complex(Math.sin(a) * cosh2(b), Math.cos(a) * sinh2(b));
+    return new Complex(
+      Math.sin(a) * cosh2(b),
+      Math.cos(a) * sinh2(b)
+    );
   },
+  /**
+   * Calculate the cosine
+   *
+   * @returns {Complex}
+   */
   "cos": function() {
     const a = this["re"];
     const b = this["im"];
-    return new Complex(Math.cos(a) * cosh2(b), -Math.sin(a) * sinh2(b));
+    return new Complex(
+      Math.cos(a) * cosh2(b),
+      -Math.sin(a) * sinh2(b)
+    );
   },
+  /**
+   * Calculate the tangent
+   *
+   * @returns {Complex}
+   */
   "tan": function() {
     const a = 2 * this["re"];
     const b = 2 * this["im"];
     const d = Math.cos(a) + cosh2(b);
-    return new Complex(Math.sin(a) / d, sinh2(b) / d);
+    return new Complex(
+      Math.sin(a) / d,
+      sinh2(b) / d
+    );
   },
+  /**
+   * Calculate the cotangent
+   *
+   * @returns {Complex}
+   */
   "cot": function() {
     const a = 2 * this["re"];
     const b = 2 * this["im"];
     const d = Math.cos(a) - cosh2(b);
-    return new Complex(-Math.sin(a) / d, sinh2(b) / d);
+    return new Complex(
+      -Math.sin(a) / d,
+      sinh2(b) / d
+    );
   },
+  /**
+   * Calculate the secant
+   *
+   * @returns {Complex}
+   */
   "sec": function() {
     const a = this["re"];
     const b = this["im"];
     const d = 0.5 * cosh2(2 * b) + 0.5 * Math.cos(2 * a);
-    return new Complex(Math.cos(a) * cosh2(b) / d, Math.sin(a) * sinh2(b) / d);
+    return new Complex(
+      Math.cos(a) * cosh2(b) / d,
+      Math.sin(a) * sinh2(b) / d
+    );
   },
+  /**
+   * Calculate the cosecans
+   *
+   * @returns {Complex}
+   */
   "csc": function() {
     const a = this["re"];
     const b = this["im"];
     const d = 0.5 * cosh2(2 * b) - 0.5 * Math.cos(2 * a);
-    return new Complex(Math.sin(a) * cosh2(b) / d, -Math.cos(a) * sinh2(b) / d);
+    return new Complex(
+      Math.sin(a) * cosh2(b) / d,
+      -Math.cos(a) * sinh2(b) / d
+    );
   },
+  /**
+   * Calculate the complex arcus sinus
+   *
+   * @returns {Complex}
+   */
   "asin": function() {
     const a = this["re"];
     const b = this["im"];
-    const t1 = new Complex(b * b - a * a + 1, -2 * a * b)["sqrt"]();
-    const t2 = new Complex(t1["re"] - b, t1["im"] + a)["log"]();
+    const t1 = new Complex(
+      b * b - a * a + 1,
+      -2 * a * b
+    )["sqrt"]();
+    const t2 = new Complex(
+      t1["re"] - b,
+      t1["im"] + a
+    )["log"]();
     return new Complex(t2["im"], -t2["re"]);
   },
+  /**
+   * Calculate the complex arcus cosinus
+   *
+   * @returns {Complex}
+   */
   "acos": function() {
     const a = this["re"];
     const b = this["im"];
-    const t1 = new Complex(b * b - a * a + 1, -2 * a * b)["sqrt"]();
-    const t2 = new Complex(t1["re"] - b, t1["im"] + a)["log"]();
+    const t1 = new Complex(
+      b * b - a * a + 1,
+      -2 * a * b
+    )["sqrt"]();
+    const t2 = new Complex(
+      t1["re"] - b,
+      t1["im"] + a
+    )["log"]();
     return new Complex(Math.PI / 2 - t2["im"], t2["re"]);
   },
+  /**
+   * Calculate the complex arcus tangent
+   *
+   * @returns {Complex}
+   */
   "atan": function() {
     const a = this["re"];
     const b = this["im"];
@@ -5401,9 +5459,17 @@ Complex.prototype = {
       }
     }
     const d = a * a + (1 - b) * (1 - b);
-    const t1 = new Complex((1 - b * b - a * a) / d, -2 * a / d).log();
+    const t1 = new Complex(
+      (1 - b * b - a * a) / d,
+      -2 * a / d
+    ).log();
     return new Complex(-0.5 * t1["im"], 0.5 * t1["re"]);
   },
+  /**
+   * Calculate the complex arcus cotangent
+   *
+   * @returns {Complex}
+   */
   "acot": function() {
     const a = this["re"];
     const b = this["im"];
@@ -5411,8 +5477,19 @@ Complex.prototype = {
       return new Complex(Math.atan2(1, a), 0);
     }
     const d = a * a + b * b;
-    return d !== 0 ? new Complex(a / d, -b / d).atan() : new Complex(a !== 0 ? a / 0 : 0, b !== 0 ? -b / 0 : 0).atan();
+    return d !== 0 ? new Complex(
+      a / d,
+      -b / d
+    ).atan() : new Complex(
+      a !== 0 ? a / 0 : 0,
+      b !== 0 ? -b / 0 : 0
+    ).atan();
   },
+  /**
+   * Calculate the complex arcus secant
+   *
+   * @returns {Complex}
+   */
   "asec": function() {
     const a = this["re"];
     const b = this["im"];
@@ -5420,8 +5497,19 @@ Complex.prototype = {
       return new Complex(0, Infinity);
     }
     const d = a * a + b * b;
-    return d !== 0 ? new Complex(a / d, -b / d).acos() : new Complex(a !== 0 ? a / 0 : 0, b !== 0 ? -b / 0 : 0).acos();
+    return d !== 0 ? new Complex(
+      a / d,
+      -b / d
+    ).acos() : new Complex(
+      a !== 0 ? a / 0 : 0,
+      b !== 0 ? -b / 0 : 0
+    ).acos();
   },
+  /**
+   * Calculate the complex arcus cosecans
+   *
+   * @returns {Complex}
+   */
   "acsc": function() {
     const a = this["re"];
     const b = this["im"];
@@ -5429,42 +5517,101 @@ Complex.prototype = {
       return new Complex(Math.PI / 2, Infinity);
     }
     const d = a * a + b * b;
-    return d !== 0 ? new Complex(a / d, -b / d).asin() : new Complex(a !== 0 ? a / 0 : 0, b !== 0 ? -b / 0 : 0).asin();
+    return d !== 0 ? new Complex(
+      a / d,
+      -b / d
+    ).asin() : new Complex(
+      a !== 0 ? a / 0 : 0,
+      b !== 0 ? -b / 0 : 0
+    ).asin();
   },
+  /**
+   * Calculate the complex sinh
+   *
+   * @returns {Complex}
+   */
   "sinh": function() {
     const a = this["re"];
     const b = this["im"];
-    return new Complex(sinh2(a) * Math.cos(b), cosh2(a) * Math.sin(b));
+    return new Complex(
+      sinh2(a) * Math.cos(b),
+      cosh2(a) * Math.sin(b)
+    );
   },
+  /**
+   * Calculate the complex cosh
+   *
+   * @returns {Complex}
+   */
   "cosh": function() {
     const a = this["re"];
     const b = this["im"];
-    return new Complex(cosh2(a) * Math.cos(b), sinh2(a) * Math.sin(b));
+    return new Complex(
+      cosh2(a) * Math.cos(b),
+      sinh2(a) * Math.sin(b)
+    );
   },
+  /**
+   * Calculate the complex tanh
+   *
+   * @returns {Complex}
+   */
   "tanh": function() {
     const a = 2 * this["re"];
     const b = 2 * this["im"];
     const d = cosh2(a) + Math.cos(b);
-    return new Complex(sinh2(a) / d, Math.sin(b) / d);
+    return new Complex(
+      sinh2(a) / d,
+      Math.sin(b) / d
+    );
   },
+  /**
+   * Calculate the complex coth
+   *
+   * @returns {Complex}
+   */
   "coth": function() {
     const a = 2 * this["re"];
     const b = 2 * this["im"];
     const d = cosh2(a) - Math.cos(b);
-    return new Complex(sinh2(a) / d, -Math.sin(b) / d);
+    return new Complex(
+      sinh2(a) / d,
+      -Math.sin(b) / d
+    );
   },
+  /**
+   * Calculate the complex coth
+   *
+   * @returns {Complex}
+   */
   "csch": function() {
     const a = this["re"];
     const b = this["im"];
     const d = Math.cos(2 * b) - cosh2(2 * a);
-    return new Complex(-2 * sinh2(a) * Math.cos(b) / d, 2 * cosh2(a) * Math.sin(b) / d);
+    return new Complex(
+      -2 * sinh2(a) * Math.cos(b) / d,
+      2 * cosh2(a) * Math.sin(b) / d
+    );
   },
+  /**
+   * Calculate the complex sech
+   *
+   * @returns {Complex}
+   */
   "sech": function() {
     const a = this["re"];
     const b = this["im"];
     const d = Math.cos(2 * b) + cosh2(2 * a);
-    return new Complex(2 * cosh2(a) * Math.cos(b) / d, -2 * sinh2(a) * Math.sin(b) / d);
+    return new Complex(
+      2 * cosh2(a) * Math.cos(b) / d,
+      -2 * sinh2(a) * Math.sin(b) / d
+    );
   },
+  /**
+   * Calculate the complex asinh
+   *
+   * @returns {Complex}
+   */
   "asinh": function() {
     let tmp = this["im"];
     this["im"] = -this["re"];
@@ -5477,6 +5624,11 @@ Complex.prototype = {
     res["im"] = tmp;
     return res;
   },
+  /**
+   * Calculate the complex acosh
+   *
+   * @returns {Complex}
+   */
   "acosh": function() {
     const res = this["acos"]();
     if (res["im"] <= 0) {
@@ -5490,6 +5642,11 @@ Complex.prototype = {
     }
     return res;
   },
+  /**
+   * Calculate the complex atanh
+   *
+   * @returns {Complex}
+   */
   "atanh": function() {
     const a = this["re"];
     const b = this["im"];
@@ -5497,7 +5654,13 @@ Complex.prototype = {
     const oneMinus = 1 - a;
     const onePlus = 1 + a;
     const d = oneMinus * oneMinus + b * b;
-    const x = d !== 0 ? new Complex((onePlus * oneMinus - b * b) / d, (b * oneMinus + onePlus * b) / d) : new Complex(a !== -1 ? a / 0 : 0, b !== 0 ? b / 0 : 0);
+    const x = d !== 0 ? new Complex(
+      (onePlus * oneMinus - b * b) / d,
+      (b * oneMinus + onePlus * b) / d
+    ) : new Complex(
+      a !== -1 ? a / 0 : 0,
+      b !== 0 ? b / 0 : 0
+    );
     const temp = x["re"];
     x["re"] = logHypot(x["re"], x["im"]) / 2;
     x["im"] = Math.atan2(x["im"], temp) / 2;
@@ -5506,6 +5669,11 @@ Complex.prototype = {
     }
     return x;
   },
+  /**
+   * Calculate the complex acoth
+   *
+   * @returns {Complex}
+   */
   "acoth": function() {
     const a = this["re"];
     const b = this["im"];
@@ -5513,17 +5681,42 @@ Complex.prototype = {
       return new Complex(0, Math.PI / 2);
     }
     const d = a * a + b * b;
-    return d !== 0 ? new Complex(a / d, -b / d).atanh() : new Complex(a !== 0 ? a / 0 : 0, b !== 0 ? -b / 0 : 0).atanh();
+    return d !== 0 ? new Complex(
+      a / d,
+      -b / d
+    ).atanh() : new Complex(
+      a !== 0 ? a / 0 : 0,
+      b !== 0 ? -b / 0 : 0
+    ).atanh();
   },
+  /**
+   * Calculate the complex acsch
+   *
+   * @returns {Complex}
+   */
   "acsch": function() {
     const a = this["re"];
     const b = this["im"];
     if (b === 0) {
-      return new Complex(a !== 0 ? Math.log(a + Math.sqrt(a * a + 1)) : Infinity, 0);
+      return new Complex(
+        a !== 0 ? Math.log(a + Math.sqrt(a * a + 1)) : Infinity,
+        0
+      );
     }
     const d = a * a + b * b;
-    return d !== 0 ? new Complex(a / d, -b / d).asinh() : new Complex(a !== 0 ? a / 0 : 0, b !== 0 ? -b / 0 : 0).asinh();
+    return d !== 0 ? new Complex(
+      a / d,
+      -b / d
+    ).asinh() : new Complex(
+      a !== 0 ? a / 0 : 0,
+      b !== 0 ? -b / 0 : 0
+    ).asinh();
   },
+  /**
+   * Calculate the complex asech
+   *
+   * @returns {Complex}
+   */
   "asech": function() {
     const a = this["re"];
     const b = this["im"];
@@ -5531,8 +5724,19 @@ Complex.prototype = {
       return Complex["INFINITY"];
     }
     const d = a * a + b * b;
-    return d !== 0 ? new Complex(a / d, -b / d).acosh() : new Complex(a !== 0 ? a / 0 : 0, b !== 0 ? -b / 0 : 0).acosh();
+    return d !== 0 ? new Complex(
+      a / d,
+      -b / d
+    ).acosh() : new Complex(
+      a !== 0 ? a / 0 : 0,
+      b !== 0 ? -b / 0 : 0
+    ).acosh();
   },
+  /**
+   * Calculate the complex inverse 1/z
+   *
+   * @returns {Complex}
+   */
   "inverse": function() {
     if (this["isZero"]()) {
       return Complex["INFINITY"];
@@ -5545,31 +5749,82 @@ Complex.prototype = {
     const d = a * a + b * b;
     return new Complex(a / d, -b / d);
   },
+  /**
+   * Returns the complex conjugate
+   *
+   * @returns {Complex}
+   */
   "conjugate": function() {
     return new Complex(this["re"], -this["im"]);
   },
+  /**
+   * Gets the negated complex number
+   *
+   * @returns {Complex}
+   */
   "neg": function() {
     return new Complex(-this["re"], -this["im"]);
   },
+  /**
+   * Ceils the actual complex number
+   *
+   * @returns {Complex}
+   */
   "ceil": function(places) {
     places = Math.pow(10, places || 0);
-    return new Complex(Math.ceil(this["re"] * places) / places, Math.ceil(this["im"] * places) / places);
+    return new Complex(
+      Math.ceil(this["re"] * places) / places,
+      Math.ceil(this["im"] * places) / places
+    );
   },
+  /**
+   * Floors the actual complex number
+   *
+   * @returns {Complex}
+   */
   "floor": function(places) {
     places = Math.pow(10, places || 0);
-    return new Complex(Math.floor(this["re"] * places) / places, Math.floor(this["im"] * places) / places);
+    return new Complex(
+      Math.floor(this["re"] * places) / places,
+      Math.floor(this["im"] * places) / places
+    );
   },
+  /**
+   * Ceils the actual complex number
+   *
+   * @returns {Complex}
+   */
   "round": function(places) {
     places = Math.pow(10, places || 0);
-    return new Complex(Math.round(this["re"] * places) / places, Math.round(this["im"] * places) / places);
+    return new Complex(
+      Math.round(this["re"] * places) / places,
+      Math.round(this["im"] * places) / places
+    );
   },
+  /**
+   * Compares two complex numbers
+   *
+   * **Note:** new Complex(Infinity).equals(Infinity) === false
+   *
+   * @returns {boolean}
+   */
   "equals": function(a, b) {
     const z = parse(a, b);
     return Math.abs(z["re"] - this["re"]) <= Complex["EPSILON"] && Math.abs(z["im"] - this["im"]) <= Complex["EPSILON"];
   },
+  /**
+   * Clones the actual object
+   *
+   * @returns {Complex}
+   */
   "clone": function() {
     return new Complex(this["re"], this["im"]);
   },
+  /**
+   * Gets a string of the actual complex number
+   *
+   * @returns {string}
+   */
   "toString": function() {
     let a = this["re"];
     let b = this["im"];
@@ -5603,29 +5858,62 @@ Complex.prototype = {
       b = -b;
       ret += "-";
     }
-    if (b !== 1) {
+    if (1 !== b) {
       ret += b;
     }
     return ret + "i";
   },
+  /**
+   * Returns the actual number as a vector
+   *
+   * @returns {Array}
+   */
   "toVector": function() {
     return [this["re"], this["im"]];
   },
+  /**
+   * Returns the actual real value of the current object
+   *
+   * @returns {number|null}
+   */
   "valueOf": function() {
     if (this["im"] === 0) {
       return this["re"];
     }
     return null;
   },
+  /**
+   * Determines whether a complex number is not on the Riemann sphere.
+   *
+   * @returns {boolean}
+   */
   "isNaN": function() {
     return isNaN(this["re"]) || isNaN(this["im"]);
   },
+  /**
+   * Determines whether or not a complex number is at the zero pole of the
+   * Riemann sphere.
+   *
+   * @returns {boolean}
+   */
   "isZero": function() {
     return this["im"] === 0 && this["re"] === 0;
   },
+  /**
+   * Determines whether a complex number is not at the infinity pole of the
+   * Riemann sphere.
+   *
+   * @returns {boolean}
+   */
   "isFinite": function() {
     return isFinite(this["re"]) && isFinite(this["im"]);
   },
+  /**
+   * Determines whether or not a complex number is at the infinity pole of the
+   * Riemann sphere.
+   *
+   * @returns {boolean}
+   */
   "isInfinite": function() {
     return !this["isFinite"]();
   }
@@ -5927,7 +6215,8 @@ var parse2 = function(p1, p2) {
         }
         if (B.length <= A) {
           d = y * z;
-          s = n = x + d * v + z * w;
+          s = /* void */
+          n = x + d * v + z * w;
           break;
         }
       }
@@ -6015,31 +6304,83 @@ Fraction.prototype = {
   "s": 1,
   "n": 0,
   "d": 1,
+  /**
+   * Calculates the absolute value
+   *
+   * Ex: new Fraction(-4).abs() => 4
+   **/
   "abs": function() {
     return newFraction(this["n"], this["d"]);
   },
+  /**
+   * Inverts the sign of the current fraction
+   *
+   * Ex: new Fraction(-4).neg() => 4
+   **/
   "neg": function() {
     return newFraction(-this["s"] * this["n"], this["d"]);
   },
+  /**
+   * Adds two rational numbers
+   *
+   * Ex: new Fraction({n: 2, d: 3}).add("14.9") => 467 / 30
+   **/
   "add": function(a, b) {
     parse2(a, b);
-    return newFraction(this["s"] * this["n"] * P3["d"] + P3["s"] * this["d"] * P3["n"], this["d"] * P3["d"]);
+    return newFraction(
+      this["s"] * this["n"] * P3["d"] + P3["s"] * this["d"] * P3["n"],
+      this["d"] * P3["d"]
+    );
   },
+  /**
+   * Subtracts two rational numbers
+   *
+   * Ex: new Fraction({n: 2, d: 3}).add("14.9") => -427 / 30
+   **/
   "sub": function(a, b) {
     parse2(a, b);
-    return newFraction(this["s"] * this["n"] * P3["d"] - P3["s"] * this["d"] * P3["n"], this["d"] * P3["d"]);
+    return newFraction(
+      this["s"] * this["n"] * P3["d"] - P3["s"] * this["d"] * P3["n"],
+      this["d"] * P3["d"]
+    );
   },
+  /**
+   * Multiplies two rational numbers
+   *
+   * Ex: new Fraction("-17.(345)").mul(3) => 5776 / 111
+   **/
   "mul": function(a, b) {
     parse2(a, b);
-    return newFraction(this["s"] * P3["s"] * this["n"] * P3["n"], this["d"] * P3["d"]);
+    return newFraction(
+      this["s"] * P3["s"] * this["n"] * P3["n"],
+      this["d"] * P3["d"]
+    );
   },
+  /**
+   * Divides two rational numbers
+   *
+   * Ex: new Fraction("-17.(345)").inverse().div(3)
+   **/
   "div": function(a, b) {
     parse2(a, b);
-    return newFraction(this["s"] * P3["s"] * this["n"] * P3["d"], this["d"] * P3["n"]);
+    return newFraction(
+      this["s"] * P3["s"] * this["n"] * P3["d"],
+      this["d"] * P3["n"]
+    );
   },
+  /**
+   * Clones the actual object
+   *
+   * Ex: new Fraction("-17.(345)").clone()
+   **/
   "clone": function() {
     return newFraction(this["s"] * this["n"], this["d"]);
   },
+  /**
+   * Calculates the modulo of two rational numbers - a more precise fmod
+   *
+   * Ex: new Fraction('4.(3)').mod([7, 8]) => (13/3) % (7/8) = (5/6)
+   **/
   "mod": function(a, b) {
     if (isNaN(this["n"]) || isNaN(this["d"])) {
       return new Fraction(NaN);
@@ -6048,15 +6389,28 @@ Fraction.prototype = {
       return newFraction(this["s"] * this["n"] % this["d"], 1);
     }
     parse2(a, b);
-    if (P3["n"] === 0 && this["d"] === 0) {
+    if (0 === P3["n"] && 0 === this["d"]) {
       throw DivisionByZero();
     }
-    return newFraction(this["s"] * (P3["d"] * this["n"]) % (P3["n"] * this["d"]), P3["d"] * this["d"]);
+    return newFraction(
+      this["s"] * (P3["d"] * this["n"]) % (P3["n"] * this["d"]),
+      P3["d"] * this["d"]
+    );
   },
+  /**
+   * Calculates the fractional gcd of two rational numbers
+   *
+   * Ex: new Fraction(5,8).gcd(3,7) => 1/56
+   */
   "gcd": function(a, b) {
     parse2(a, b);
     return newFraction(gcd(P3["n"], this["n"]) * gcd(P3["d"], this["d"]), P3["d"] * this["d"]);
   },
+  /**
+   * Calculates the fractional lcm of two rational numbers
+   *
+   * Ex: new Fraction(5,8).lcm(3,7) => 15
+   */
   "lcm": function(a, b) {
     parse2(a, b);
     if (P3["n"] === 0 && this["n"] === 0) {
@@ -6064,6 +6418,11 @@ Fraction.prototype = {
     }
     return newFraction(P3["n"] * this["n"], gcd(P3["n"], this["n"]) * gcd(P3["d"], this["d"]));
   },
+  /**
+   * Calculates the ceil of a rational number
+   *
+   * Ex: new Fraction('4.(3)').ceil() => (5 / 1)
+   **/
   "ceil": function(places) {
     places = Math.pow(10, places || 0);
     if (isNaN(this["n"]) || isNaN(this["d"])) {
@@ -6071,6 +6430,11 @@ Fraction.prototype = {
     }
     return newFraction(Math.ceil(places * this["s"] * this["n"] / this["d"]), places);
   },
+  /**
+   * Calculates the floor of a rational number
+   *
+   * Ex: new Fraction('4.(3)').floor() => (4 / 1)
+   **/
   "floor": function(places) {
     places = Math.pow(10, places || 0);
     if (isNaN(this["n"]) || isNaN(this["d"])) {
@@ -6078,6 +6442,11 @@ Fraction.prototype = {
     }
     return newFraction(Math.floor(places * this["s"] * this["n"] / this["d"]), places);
   },
+  /**
+   * Rounds a rational number
+   *
+   * Ex: new Fraction('4.(3)').round() => (4 / 1)
+   **/
   "round": function(places) {
     places = Math.pow(10, places || 0);
     if (isNaN(this["n"]) || isNaN(this["d"])) {
@@ -6085,13 +6454,28 @@ Fraction.prototype = {
     }
     return newFraction(Math.round(places * this["s"] * this["n"] / this["d"]), places);
   },
+  /**
+   * Rounds a rational number to a multiple of another rational number
+   *
+   * Ex: new Fraction('0.9').roundTo("1/8") => 7 / 8
+   **/
   "roundTo": function(a, b) {
     parse2(a, b);
     return newFraction(this["s"] * Math.round(this["n"] * P3["d"] / (this["d"] * P3["n"])) * P3["n"], P3["d"]);
   },
+  /**
+   * Gets the inverse of the fraction, means numerator and denominator are exchanged
+   *
+   * Ex: new Fraction([-3, 4]).inverse() => -4 / 3
+   **/
   "inverse": function() {
     return newFraction(this["s"] * this["d"], this["n"]);
   },
+  /**
+   * Calculates the fraction to some rational exponent, if possible
+   *
+   * Ex: new Fraction(-1,2).pow(-3) => -8
+   */
   "pow": function(a, b) {
     parse2(a, b);
     if (P3["d"] === 1) {
@@ -6101,15 +6485,13 @@ Fraction.prototype = {
         return newFraction(Math.pow(this["s"] * this["n"], P3["n"]), Math.pow(this["d"], P3["n"]));
       }
     }
-    if (this["s"] < 0)
-      return null;
+    if (this["s"] < 0) return null;
     var N = factorize(this["n"]);
     var D = factorize(this["d"]);
     var n = 1;
     var d = 1;
     for (var k in N) {
-      if (k === "1")
-        continue;
+      if (k === "1") continue;
       if (k === "0") {
         n = 0;
         break;
@@ -6117,18 +6499,15 @@ Fraction.prototype = {
       N[k] *= P3["n"];
       if (N[k] % P3["d"] === 0) {
         N[k] /= P3["d"];
-      } else
-        return null;
+      } else return null;
       n *= Math.pow(k, N[k]);
     }
     for (var k in D) {
-      if (k === "1")
-        continue;
+      if (k === "1") continue;
       D[k] *= P3["n"];
       if (D[k] % P3["d"] === 0) {
         D[k] /= P3["d"];
-      } else
-        return null;
+      } else return null;
       d *= Math.pow(k, D[k]);
     }
     if (P3["s"] < 0) {
@@ -6136,10 +6515,20 @@ Fraction.prototype = {
     }
     return newFraction(n, d);
   },
+  /**
+   * Check if two rational numbers are the same
+   *
+   * Ex: new Fraction(19.6).equals([98, 5]);
+   **/
   "equals": function(a, b) {
     parse2(a, b);
     return this["s"] * this["n"] * P3["d"] === P3["s"] * P3["n"] * this["d"];
   },
+  /**
+   * Check if two rational numbers are the same
+   *
+   * Ex: new Fraction(19.6).equals([98, 5]);
+   **/
   "compare": function(a, b) {
     parse2(a, b);
     var t = this["s"] * this["n"] * P3["d"] - P3["s"] * P3["n"] * this["d"];
@@ -6163,13 +6552,28 @@ Fraction.prototype = {
     }
     return this;
   },
+  /**
+   * Check if two rational numbers are divisible
+   *
+   * Ex: new Fraction(19.6).divisible(1.5);
+   */
   "divisible": function(a, b) {
     parse2(a, b);
     return !(!(P3["n"] * this["d"]) || this["n"] * P3["d"] % (P3["n"] * this["d"]));
   },
+  /**
+   * Returns a decimal representation of the fraction
+   *
+   * Ex: new Fraction("100.'91823'").valueOf() => 100.91823918239183
+   **/
   "valueOf": function() {
     return this["s"] * this["n"] / this["d"];
   },
+  /**
+   * Returns a string-fraction representation of a Fraction object
+   *
+   * Ex: new Fraction("1.'3'").toFraction(true) => "4 1/3"
+   **/
   "toFraction": function(excludeWhole) {
     var whole, str = "";
     var n = this["n"];
@@ -6191,6 +6595,11 @@ Fraction.prototype = {
     }
     return str;
   },
+  /**
+   * Returns a latex representation of a Fraction object
+   *
+   * Ex: new Fraction("1.'3'").toLatex() => "\frac{4}{3}"
+   **/
   "toLatex": function(excludeWhole) {
     var whole, str = "";
     var n = this["n"];
@@ -6213,6 +6622,11 @@ Fraction.prototype = {
     }
     return str;
   },
+  /**
+   * Returns an array of continued fraction elements
+   *
+   * Ex: new Fraction("7/8").toContinued() => [0,1,7]
+   */
   "toContinued": function() {
     var t;
     var a = this["n"];
@@ -6229,6 +6643,11 @@ Fraction.prototype = {
     } while (a !== 1);
     return res;
   },
+  /**
+   * Creates a string representation of a fraction with all digits
+   *
+   * Ex: new Fraction("100.'91823'").toString() => "100.(91823)"
+   **/
   "toString": function(dec) {
     var N = this["n"];
     var D = this["d"];
@@ -6436,6 +6855,7 @@ var createDenseMatrixClass = /* @__PURE__ */ factory(name5, dependencies6, (_ref
     switch (arguments.length) {
       case 1:
         return _get(this, index);
+      // intentional fall through
       case 2:
       case 3:
         return _set(this, index, replacement, defaultValue);
@@ -6888,6 +7308,7 @@ var createIsInteger = /* @__PURE__ */ factory(name6, dependencies7, (_ref) => {
   } = _ref;
   return typed2(name6, {
     number: isInteger,
+    // TODO: what to do with isInteger(add(0.1, 0.2))  ?
     BigNumber: function BigNumber2(x) {
       return x.isInt();
     },
@@ -7109,6 +7530,7 @@ var createSparseMatrixClass = /* @__PURE__ */ factory(name8, dependencies9, (_re
     switch (arguments.length) {
       case 1:
         return _getsubset(this, index);
+      // intentional fall through
       case 2:
       case 3:
         return _setsubset(this, index, replacement, defaultValue);
@@ -7472,10 +7894,8 @@ var createSparseMatrixClass = /* @__PURE__ */ factory(name8, dependencies9, (_re
     var columns = this._size[1];
     var args = maxArgumentCount(callback);
     var invoke = function invoke2(v, i, j) {
-      if (args === 1)
-        return callback(v);
-      if (args === 2)
-        return callback(v, [i, j]);
+      if (args === 1) return callback(v);
+      if (args === 2) return callback(v, [i, j]);
       return callback(v, [i, j], me);
     };
     return _map(this, 0, rows - 1, 0, columns - 1, invoke, skipZeros);
@@ -8452,6 +8872,7 @@ var createConcat = /* @__PURE__ */ factory(name19, dependencies19, (_ref) => {
     isInteger: isInteger3
   } = _ref;
   return typed2(name19, {
+    // TODO: change signature to '...Array | Matrix, dim?' when supported
     "...Array | Matrix | number | BigNumber": function ArrayMatrixNumberBigNumber(args) {
       var i;
       var len = args.length;
@@ -8554,6 +8975,10 @@ var createAtan2 = /* @__PURE__ */ factory(name20, dependencies20, (_ref) => {
   });
   return typed2(name20, {
     "number, number": Math.atan2,
+    // Complex numbers doesn't seem to have a reasonable implementation of
+    // atan2(). Even Matlab removed the support, after they only calculated
+    // the atan only on base of the real part of the numbers and ignored
+    // the imaginary.
     "BigNumber, BigNumber": (y, x) => BigNumber2.atan2(y, x)
   }, matrixAlgorithmSuite({
     scalar: "number | BigNumber",
@@ -8619,20 +9044,26 @@ function atan23(one, two) {
   return result;
 }
 
-/*!
- *  decimal.js v10.6.0
- *  An arbitrary-precision Decimal type for JavaScript.
- *  https://github.com/MikeMcl/decimal.js
- *  Copyright (c) 2025 Michael Mclaughlin <M8ch88l@gmail.com>
- *  MIT Licence
- */
-/**
- * @license Fraction.js v4.3.7 31/08/2023
- * https://www.xarg.org/2014/03/rational-numbers-in-javascript/
- *
- * Copyright (c) 2023, Robert Eisele (robert@raw.org)
- * Dual licensed under the MIT or GPL Version 2 licenses.
- **/
+/*! Bundled license information:
+
+decimal.js/decimal.mjs:
+  (*!
+   *  decimal.js v10.6.0
+   *  An arbitrary-precision Decimal type for JavaScript.
+   *  https://github.com/MikeMcl/decimal.js
+   *  Copyright (c) 2025 Michael Mclaughlin <M8ch88l@gmail.com>
+   *  MIT Licence
+   *)
+
+fraction.js/fraction.js:
+  (**
+   * @license Fraction.js v4.3.7 31/08/2023
+   * https://www.xarg.org/2014/03/rational-numbers-in-javascript/
+   *
+   * Copyright (c) 2023, Robert Eisele (robert@raw.org)
+   * Dual licensed under the MIT or GPL Version 2 licenses.
+   **)
+*/
 
 return atan2(one,two)
 
