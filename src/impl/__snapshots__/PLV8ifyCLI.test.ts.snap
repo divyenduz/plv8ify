@@ -66,3 +66,21 @@ return test(test)
 
 $plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;"
 `;
+
+exports[`PLV8ifyCLI tests build and getPLV8SQLFunctions with satisfies keyword fixture 1`] = `
+"DROP FUNCTION IF EXISTS getEndpoint();
+CREATE OR REPLACE FUNCTION getEndpoint() RETURNS text AS $plv8ify$
+// src/test-fixtures/satisfies.fixture.ts
+var config = {
+  endpoint: "https://api.example.com",
+  retries: 3
+};
+function getEndpoint() {
+  return config.endpoint;
+}
+
+
+return getEndpoint()
+
+$plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;"
+`;

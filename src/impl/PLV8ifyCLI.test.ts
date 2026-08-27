@@ -135,4 +135,26 @@ function test() {
     })
     expect(sql).toMatchSnapshot()
   })
+
+  it('build and getPLV8SQLFunctions with satisfies keyword fixture', async () => {
+    const plv8ify = new PLV8ifyCLI('esbuild')
+    plv8ify.init('./src/test-fixtures/satisfies.fixture.ts')
+    const bundledJs = await plv8ify.build({
+      mode: 'inline',
+      inputFile: './src/test-fixtures/satisfies.fixture.ts',
+      scopePrefix: '',
+    })
+    const fns = plv8ify.getPLV8SQLFunctions({
+      mode: 'inline',
+      scopePrefix: '',
+      fallbackReturnType: 'JSONB',
+      defaultVolatility: 'IMMUTABLE',
+      bundledJs,
+      pgFunctionDelimiter: '$plv8ify$',
+      outputFolder: 'plv8ify-dist',
+    })
+    expect(fns.length).toEqual(1)
+    expect(fns[0].filename).toEqual('plv8ify-dist/getEndpoint.plv8.sql')
+    expect(fns[0].sql).toMatchSnapshot()
+  })
 })

@@ -1,5 +1,4 @@
 import { BundleArgs, Bundler } from 'src/interfaces/Bundler.js'
-import nodeExternals from 'webpack-node-externals'
 
 class BundlerError extends Error {}
 
@@ -7,7 +6,6 @@ export class BunBuild implements Bundler {
   async bundle({ inputFile }: BundleArgs) {
     const bunBuildResult = await Bun.build({
       entrypoints: [inputFile],
-      external: [nodeExternals()],
       format: 'esm',
       target: 'browser',
       splitting: false,

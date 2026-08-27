@@ -2,7 +2,11 @@ DROP FUNCTION IF EXISTS point(lat float8,long float8);
 CREATE OR REPLACE FUNCTION point(lat float8,long float8) RETURNS JSONB AS $plv8ify$
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __commonJS = (cb, mod) => function __require() {
-  return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+  try {
+    return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+  } catch (e) {
+    throw mod = 0, e;
+  }
 };
 
 // node_modules/@turf/helpers/dist/js/index.js

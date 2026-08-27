@@ -1,6 +1,5 @@
 import { build } from 'esbuild'
 import { BundleArgs, Bundler } from 'src/interfaces/Bundler.js'
-import nodeExternals from 'webpack-node-externals'
 
 class BundlerError extends Error {}
 
@@ -9,7 +8,6 @@ export class EsBuild implements Bundler {
     const hasDefines = define && Object.keys(define).length > 0
     const esbuildResult = await build({
       entryPoints: [inputFile],
-      external: [nodeExternals()],
       format: 'esm',
       platform: 'browser',
       bundle: true,
