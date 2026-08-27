@@ -10,7 +10,7 @@ function world() {
 
 globalThis.hello = hello;
 globalThis.world = world;
-globalThis[Symbol.for('myScope_initialized')] = 1787834719826;
+globalThis[Symbol.for('myScope_initialized')] = "test-bundle-id-123";
 
 
 

@@ -20,6 +20,7 @@ export async function generateCommand(CLI: {
     defaultVolatility,
     typesFilePath,
     esbuildDefine,
+    bundleId,
   } = CLI.config
 
   // Runtime check
@@ -35,7 +36,7 @@ export async function generateCommand(CLI: {
 
   fs.mkdirSync(outputFolderPath, { recursive: true })
 
-  const plv8ify = new PLV8ifyCLI(bundler)
+  const plv8ify = new PLV8ifyCLI(bundler, bundleId)
   plv8ify.init(inputFilePath, typesFilePath)
 
   const bundledJs = await plv8ify.build({
