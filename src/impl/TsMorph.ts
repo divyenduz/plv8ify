@@ -4,7 +4,7 @@ import {
   TSFunction,
   TSFunctionParameter,
 } from 'src/interfaces/TSCompiler.js'
-import { FunctionDeclaration, Project, SourceFile } from 'ts-morph'
+import { FunctionDeclaration, Project, SourceFile, Type } from 'ts-morph'
 
 export class TsMorph implements TSCompiler {
   private sourceFile: SourceFile
@@ -14,8 +14,46 @@ export class TsMorph implements TSCompiler {
     this.sourceFile = project.addSourceFileAtPath(inputFilePath)
   }
 
+  private getTypeName(type: Type): string {
+    if (type.isArray()) {
+      const elemType = type.getArrayElementType()
+      return elemType ? `${this.getTypeName(elemType)}[]` : 'any[]'
+    }
+    if (type.isBoolean()) {
+      return 'boolean'
+    }
+    if (type.isUnion()) {
+      const unionTypes = type.getUnionTypes()
+      const hasTrue = unionTypes.some(
+        (t) => t.isBooleanLiteral() && t.getText() === 'true'
+      )
+      const hasFalse = unionTypes.some(
+        (t) => t.isBooleanLiteral() && t.getText() === 'false'
+      )
+      const hasBoolean = hasTrue && hasFalse
+
+      const nonBoolTypes = hasBoolean
+        ? unionTypes.filter((t) => !t.isBooleanLiteral())
+        : unionTypes
+
+      const resolved = nonBoolTypes.map((t) => this.getTypeName(t))
+      if (hasBoolean) {
+        resolved.push('boolean')
+      }
+      return resolved.join(' | ')
+    }
+    const symbol = type.getAliasSymbol() ?? type.getSymbol()
+    if (symbol) {
+      const name = symbol.getName()
+      if (name && !name.startsWith('__') && name !== 'Array') {
+        return name
+      }
+    }
+    return type.getText()
+  }
+
   private getFunctionReturnType(fn: FunctionDeclaration) {
-    return fn.getReturnType().getText()
+    return this.getTypeName(fn.getReturnType())
   }
 
   private getFunctionParameters(fn: FunctionDeclaration): TSFunctionParameter[] {
@@ -23,7 +61,7 @@ export class TsMorph implements TSCompiler {
     return params.map((p) => {
       return {
         name: p.getName(),
-        type: p.getType().getText(),
+        type: this.getTypeName(p.getType()),
       }
     })
   }
