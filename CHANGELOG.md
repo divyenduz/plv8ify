@@ -1,5 +1,11 @@
 # plv8ify
 
+## 0.0.68
+
+### Patch Changes
+
+- 011c4ce: Update esbuild to latest (`^0.28.2`) to support the TypeScript `satisfies` operator and remove invalid `webpack-node-externals` configuration.
+
 ## 0.0.67
 
 ### Patch Changes
