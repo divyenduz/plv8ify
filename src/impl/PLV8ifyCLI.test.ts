@@ -12,7 +12,6 @@ describe('PLV8ifyCLI tests', () => {
         isExported: true,
         parameters: [],
         returnType: 'void',
-        jsdocTags: []
       },
       scopePrefix: 'plv8ify_',
       mode: 'inline',
@@ -32,7 +31,6 @@ describe('PLV8ifyCLI tests', () => {
         isExported: true,
         parameters: [],
         returnType: 'void',
-        jsdocTags: [],
       },
       scopePrefix: 'plv8ify_',
       mode: 'inline',
@@ -56,9 +54,7 @@ describe('PLV8ifyCLI tests', () => {
           { name: 'OLD', type: 'testRow' },
         ],
         returnType: 'object',
-        jsdocTags: [
-          { name: 'plv8ify_trigger', commentText: '' },
-        ]
+        isTrigger: true,
       },
       scopePrefix: 'plv8ify_',
       mode: 'inline',
@@ -89,9 +85,7 @@ function test(NEW, OLD) {
         isExported: true,
         parameters: [],
         returnType: 'string',
-        jsdocTags: [
-          { name: 'plv8ify_schema_name', commentText: 'testschema' },
-        ]
+        customSchema: 'testschema',
       },
       scopePrefix: 'plv8ify_',
       mode: 'inline',
@@ -117,7 +111,6 @@ function test() {
         isExported: true,
         parameters: [{ name: 'test', type: 'test_type[]' }],
         returnType: 'object',
-        jsdocTags: []
       },
       scopePrefix: '',
       mode: 'inline',
@@ -332,5 +325,81 @@ function test() {
 
     expect(initSql).toContain("globalThis[Symbol.for('myScope_initialized')] = 123456789;")
     expect(funcSql).toContain("if (globalThis[Symbol.for('myScope_initialized')] !== 123456789)")
+  })
+
+  it('correctly parses JSDoc annotations from source files via TsMorph', async () => {
+    const plv8ify = new PLV8ifyCLI('esbuild')
+    plv8ify.init('./examples/hello-custom-type/input.ts')
+    const bundledJs = await plv8ify.build({
+      mode: 'inline',
+      inputFile: './examples/hello-custom-type/input.ts',
+      scopePrefix: '',
+    })
+    const fns = plv8ify.getPLV8SQLFunctions({
+      mode: 'inline',
+      scopePrefix: '',
+      fallbackReturnType: 'text',
+      defaultVolatility: 'IMMUTABLE',
+      bundledJs,
+      pgFunctionDelimiter: '$plv8ify$',
+      outputFolder: 'plv8ify-dist',
+    })
+
+    const howdyFn = fns.find((f) => f.filename.endsWith('howdy.plv8.sql'))
+    expect(howdyFn).toBeDefined()
+    expect(howdyFn!.sql).toContain('howdy(first_name varchar(255),last_name text) RETURNS char(255)')
+  })
+
+  it('correctly parses parallel and volatility annotations from source files', async () => {
+    const plv8ify = new PLV8ifyCLI('esbuild')
+    plv8ify.init('./examples/parallel-annotations/input.ts')
+    const bundledJs = await plv8ify.build({
+      mode: 'inline',
+      inputFile: './examples/parallel-annotations/input.ts',
+      scopePrefix: '',
+    })
+    const fns = plv8ify.getPLV8SQLFunctions({
+      mode: 'inline',
+      scopePrefix: '',
+      fallbackReturnType: 'float8',
+      defaultVolatility: 'IMMUTABLE',
+      bundledJs,
+      pgFunctionDelimiter: '$plv8ify$',
+      outputFolder: 'plv8ify-dist',
+    })
+
+    const sumFn = fns.find((f) => f.filename.endsWith('calculateSum.plv8.sql'))
+    const ageFn = fns.find((f) => f.filename.endsWith('getUserAge.plv8.sql'))
+    const logFn = fns.find((f) => f.filename.endsWith('logMessage.plv8.sql'))
+    const multFn = fns.find((f) => f.filename.endsWith('multiply.plv8.sql'))
+
+    expect(sumFn!.sql).toContain('LANGUAGE plv8 IMMUTABLE PARALLEL SAFE')
+    expect(ageFn!.sql).toContain('LANGUAGE plv8 STABLE PARALLEL RESTRICTED')
+    expect(logFn!.sql).toContain('LANGUAGE plv8 VOLATILE PARALLEL UNSAFE')
+    expect(multFn!.sql).toContain('LANGUAGE plv8 IMMUTABLE STRICT')
+    expect(multFn!.sql).not.toContain('PARALLEL')
+  })
+
+  it('correctly parses trigger annotations from source files', async () => {
+    const plv8ify = new PLV8ifyCLI('esbuild')
+    plv8ify.init('./examples/trigger/input.ts')
+    const bundledJs = await plv8ify.build({
+      mode: 'inline',
+      inputFile: './examples/trigger/input.ts',
+      scopePrefix: '',
+    })
+    const fns = plv8ify.getPLV8SQLFunctions({
+      mode: 'inline',
+      scopePrefix: '',
+      fallbackReturnType: 'JSONB',
+      defaultVolatility: 'IMMUTABLE',
+      bundledJs,
+      pgFunctionDelimiter: '$plv8ify$',
+      outputFolder: 'plv8ify-dist',
+    })
+
+    const triggerFn = fns.find((f) => f.filename.endsWith('test.plv8.sql'))
+    expect(triggerFn).toBeDefined()
+    expect(triggerFn!.sql).toContain('CREATE OR REPLACE FUNCTION test() RETURNS TRIGGER')
   })
 })
