@@ -157,4 +157,29 @@ function test() {
     expect(fns[0].filename).toEqual('plv8ify-dist/getEndpoint.plv8.sql')
     expect(fns[0].sql).toMatchSnapshot()
   })
+
+  it('supports custom deterministic bundleId / build number', async () => {
+    const plv8ify = new PLV8ifyCLI('esbuild', 123456789)
+    plv8ify.init('./src/test-fixtures/input.fixture.ts')
+    const bundledJs = await plv8ify.build({
+      mode: 'bundle',
+      inputFile: './src/test-fixtures/input.fixture.ts',
+      scopePrefix: 'myScope',
+    })
+    const fns = plv8ify.getPLV8SQLFunctions({
+      mode: 'bundle',
+      scopePrefix: 'myScope',
+      fallbackReturnType: 'text',
+      defaultVolatility: 'IMMUTABLE',
+      bundledJs,
+      pgFunctionDelimiter: '$plv8ify$',
+      outputFolder: 'plv8ify-dist',
+    })
+
+    const initSql = fns.find((f) => f.filename.endsWith('_init.plv8.sql'))!.sql
+    const funcSql = fns.find((f) => f.filename.endsWith('myScopesayHello.plv8.sql'))!.sql
+
+    expect(initSql).toContain("globalThis[Symbol.for('myScope_initialized')] = 123456789;")
+    expect(funcSql).toContain("if (globalThis[Symbol.for('myScope_initialized')] !== 123456789)")
+  })
 })

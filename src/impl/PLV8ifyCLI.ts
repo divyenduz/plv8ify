@@ -44,7 +44,7 @@ type FnSqlConfig = {
 export class PLV8ifyCLI implements PLV8ify {
   private _bundler: Bundler
   private _tsCompiler: TSCompiler
-  private bundleId = Date.now()
+  private bundleId: string | number
 
   private _typeMap: Record<string, string> = {
     number: 'float8',
@@ -52,13 +52,20 @@ export class PLV8ifyCLI implements PLV8ify {
     boolean: 'boolean',
   }
 
-  constructor(bundler: BundlerType = 'esbuild') {
+  constructor(bundler: BundlerType = 'esbuild', bundleId?: string | number) {
     this._bundler = match(bundler)
       .with('esbuild', () => new EsBuild())
       .with('bun', () => new BunBuild())
       .exhaustive()
 
     this._tsCompiler = new TsMorph()
+    this.bundleId = bundleId !== undefined ? bundleId : Date.now()
+  }
+
+  private getBundleIdLiteral(): string {
+    return typeof this.bundleId === 'string' && isNaN(Number(this.bundleId))
+      ? JSON.stringify(this.bundleId)
+      : String(this.bundleId)
   }
 
   init(inputFilePath: string, typesFilePath?: string) {
@@ -183,7 +190,7 @@ export class PLV8ifyCLI implements PLV8ify {
         }
 
         // set a global symbol so that we can check if the init function has been called
-        bundledJs += `globalThis[Symbol.for('${scopePrefix}_initialized')] = ${this.bundleId};\n`
+        bundledJs += `globalThis[Symbol.for('${scopePrefix}_initialized')] = ${this.getBundleIdLiteral()};\n`
       }
 
       const initFunction = this.getPLV8SQLFunction({
@@ -317,7 +324,7 @@ export class PLV8ifyCLI implements PLV8ify {
         .with(
           'bundle',
           () =>
-            `if (globalThis[Symbol.for('${scopePrefix}_initialized')] !== ${this.bundleId}) plv8.execute('SELECT ${scopePrefix}_init();');`
+            `if (globalThis[Symbol.for('${scopePrefix}_initialized')] !== ${this.getBundleIdLiteral()}) plv8.execute('SELECT ${scopePrefix}_init();');`
         )
         .otherwise(() => ''),
       match(sqlReturnType.toLowerCase())

@@ -17,6 +17,7 @@ export interface CLIConfig {
   typesFilePath: string
   deployConcurrency: number
   esbuildDefine?: Record<string, string>
+  bundleId?: string | number
 }
 
 export class ParseCLI {
@@ -123,6 +124,15 @@ export class ParseCLI {
             brief: 'esbuild define constants as JSON (enables dead code elimination)',
             optional: true,
           },
+          'bundle-id': {
+            kind: 'parsed',
+            parse: (input) => {
+              const num = Number(input)
+              return isNaN(num) ? input : num
+            },
+            brief: 'Custom bundle/build identifier for reproducible bundles',
+            optional: true,
+          },
         },
       },
       docs: {
@@ -144,6 +154,7 @@ export class ParseCLI {
           typesFilePath: flags['types-config-file'],
           deployConcurrency: 10, // Not used in generate command
           esbuildDefine: flags['esbuild-define'],
+          bundleId: flags['bundle-id'],
         }
         await mod.generateCommand({
           command: 'generate',

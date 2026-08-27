@@ -51,7 +51,7 @@
     "test:prod-node": "bun run build && yarn node dist/src/index.js generate --input-file examples/turf-js/input.ts --output-folder examples/turf-js/plv8ify-dist",
     "example:hello": "bun run --bun src/index.ts generate --input-file examples/hello/input.ts --output-folder examples/hello/plv8ify-dist",
     "example:hello-start_proc": "bun run --bun src/index.ts generate --input-file examples/hello-start_proc/input.ts --output-folder examples/hello-start_proc/plv8ify-dist --mode start_proc",
-    "example:hello-bundle": "bun run --bun src/index.ts generate --input-file examples/hello-bundle/input.ts --output-folder examples/hello-bundle/plv8ify-dist --mode bundle --scope-prefix myScope",
+    "example:hello-bundle": "bun run --bun src/index.ts generate --input-file examples/hello-bundle/input.ts --output-folder examples/hello-bundle/plv8ify-dist --mode bundle --scope-prefix myScope --bundle-id test-bundle-id-123",
     "example:turf-js": "bun run --bun src/index.ts generate --input-file examples/turf-js/input.ts --output-folder examples/turf-js/plv8ify-dist",
     "example:turf-js-distance": "bun run --bun src/index.ts generate --input-file examples/turf-js-distance/input.ts --output-folder examples/turf-js-distance/plv8ify-dist",
     "example:mathjs": "bun run --bun src/index.ts generate --input-file examples/mathjs/input.ts --output-folder examples/mathjs/plv8ify-dist",
