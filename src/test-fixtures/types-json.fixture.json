@@ -1,0 +1,4 @@
+{
+  "JsonType": "jsonb",
+  "JsonType[]": "jsonb[]"
+}

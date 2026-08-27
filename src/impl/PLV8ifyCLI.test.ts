@@ -129,6 +129,93 @@ function test() {
     expect(sql).toMatchSnapshot()
   })
 
+  it('getSQLFunction with custom type from named export', async () => {
+    const plv8ify = new PLV8ifyCLI()
+    plv8ify.init('', './src/test-fixtures/types-named-export.fixture.ts')
+
+    const sql = plv8ify.getPLV8SQLFunction({
+      fn: {
+        name: 'test',
+        isExported: true,
+        parameters: [{ name: 'point', type: 'CustomGeo' }],
+        returnType: 'CustomGeo',
+      },
+      scopePrefix: '',
+      mode: 'inline',
+      defaultVolatility: 'IMMUTABLE',
+      bundledJs: `function test(point) { return point; }`,
+      pgFunctionDelimiter: '$plv8ify$',
+      fallbackReturnType: 'JSONB',
+    })
+    expect(sql).toContain('CREATE OR REPLACE FUNCTION test(point geometry(Point, 4326)) RETURNS geometry(Point, 4326) AS $plv8ify$')
+  })
+
+  it('getSQLFunction with custom type from default export', async () => {
+    const plv8ify = new PLV8ifyCLI()
+    plv8ify.init('', './src/test-fixtures/types-default-export.fixture.ts')
+
+    const sql = plv8ify.getPLV8SQLFunction({
+      fn: {
+        name: 'test',
+        isExported: true,
+        parameters: [{ name: 'ids', type: 'UserId[]' }],
+        returnType: 'UserId',
+      },
+      scopePrefix: '',
+      mode: 'inline',
+      defaultVolatility: 'IMMUTABLE',
+      bundledJs: `function test(ids) { return ids[0]; }`,
+      pgFunctionDelimiter: '$plv8ify$',
+      fallbackReturnType: 'JSONB',
+    })
+    expect(sql).toContain('CREATE OR REPLACE FUNCTION test(ids uuid[]) RETURNS uuid AS $plv8ify$')
+  })
+
+  it('getSQLFunction with custom type from JSON config', async () => {
+    const plv8ify = new PLV8ifyCLI()
+    plv8ify.init('', './src/test-fixtures/types-json.fixture.json')
+
+    const sql = plv8ify.getPLV8SQLFunction({
+      fn: {
+        name: 'test',
+        isExported: true,
+        parameters: [{ name: 'data', type: 'JsonType' }],
+        returnType: 'JsonType',
+      },
+      scopePrefix: '',
+      mode: 'inline',
+      defaultVolatility: 'IMMUTABLE',
+      bundledJs: `function test(data) { return data; }`,
+      pgFunctionDelimiter: '$plv8ify$',
+      fallbackReturnType: 'JSONB',
+    })
+    expect(sql).toContain('CREATE OR REPLACE FUNCTION test(data jsonb) RETURNS jsonb AS $plv8ify$')
+  })
+
+  it('custom type mapping parses AST without evaluating executable code (no eval)', async () => {
+    delete (globalThis as any).__MALICIOUS_SIDE_EFFECT_EXECUTED__
+    const plv8ify = new PLV8ifyCLI()
+    plv8ify.init('', './src/test-fixtures/types-security.fixture.ts')
+
+    expect((globalThis as any).__MALICIOUS_SIDE_EFFECT_EXECUTED__).toBeUndefined()
+
+    const sql = plv8ify.getPLV8SQLFunction({
+      fn: {
+        name: 'test',
+        isExported: true,
+        parameters: [{ name: 'val', type: 'SecuredType' }],
+        returnType: 'SecuredType',
+      },
+      scopePrefix: '',
+      mode: 'inline',
+      defaultVolatility: 'IMMUTABLE',
+      bundledJs: `function test(val) { return val; }`,
+      pgFunctionDelimiter: '$plv8ify$',
+      fallbackReturnType: 'JSONB',
+    })
+    expect(sql).toContain('CREATE OR REPLACE FUNCTION test(val varchar(64)) RETURNS varchar(64) AS $plv8ify$')
+  })
+
   it('build and getPLV8SQLFunctions with satisfies keyword fixture', async () => {
     const plv8ify = new PLV8ifyCLI('esbuild')
     plv8ify.init('./src/test-fixtures/satisfies.fixture.ts')

@@ -13,6 +13,7 @@ import {
   TSFunction,
   TSFunctionParameter,
 } from 'src/interfaces/TSCompiler.js'
+import { parseCustomTypeMap } from '../helpers/CustomTypeMap.js'
 import { Project } from 'ts-morph'
 import { match } from 'ts-pattern'
 
@@ -76,7 +77,7 @@ export class PLV8ifyCLI implements PLV8ify {
     }
     this._typeMap = {
       ...this._typeMap,
-      ...this.getCustomTypeMap(typesFilePath),
+      ...parseCustomTypeMap(typesFilePath),
     }
   }
 
@@ -132,16 +133,7 @@ export class PLV8ifyCLI implements PLV8ify {
     this.writeFile(path, string)
   }
 
-  private getCustomTypeMap(typesFilePath: string) {
-    let customTypeMap = null
-    let typeMap = {}
-    if (fs.existsSync(typesFilePath)) {
-      customTypeMap = fs.readFileSync(typesFilePath, 'utf8')
-      eval(customTypeMap)
-      return typeMap
-    }
-    return {}
-  }
+
 
   private getScopedName(fn: TSFunction, scopePrefix: string) {
     const scopedName = scopePrefix + fn.name
