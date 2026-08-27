@@ -1,5 +1,15 @@
 # plv8ify
 
+## 0.0.69
+
+### Patch Changes
+
+- c25a3e4: Remove legacy dead string replacement in `PLV8ifyCLI.build()` and clean up unused `mode` and `scopePrefix` from `BuildArgs`.
+- 98be68e: Replace `eval()` with static `ts-morph` AST parsing for custom type maps, supporting TypeScript exports (`export const typeMap`, `export default`), CommonJS, and JSON configuration files securely.
+- 60c0e07: Add `--bundle-id` CLI option to allow custom/deterministic bundle identifier for reproducible builds in bundle mode.
+- 8d66821: Resolve type names using ts-morph AST symbol inspection instead of string splitting.
+- 1a0ea0f: Refactor JSDoc comment extraction to use `ts-morph` AST parsing instead of regular expressions for annotations (`@plv8ify_param`, `@plv8ify_return`, `@plv8ify_returns`, `@plv8ify_volatility`, `@plv8ify_parallel`, `@plv8ify_schema_name`, `@plv8ify_trigger`), providing more robust multiline and whitespace handling.
+
 ## 0.0.68
 
 ### Patch Changes
