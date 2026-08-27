@@ -165,8 +165,7 @@ export class PLV8ifyCLI implements PLV8ify {
     return `${outputFolder}/${scopedName}.plv8.sql`
   }
   private getTypeFromMap(type: string) {
-    const typeLocal = type.split('.').pop()
-    return this._typeMap[typeLocal ?? type]
+    return this._typeMap[type]
   }
 
   private getFunctions() {

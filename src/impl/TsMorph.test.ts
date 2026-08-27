@@ -91,4 +91,53 @@ export function multilineTest(amount: number): number {
       }
     }
   })
+
+  it('resolves basic types, arrays, custom types, namespaces, and unions', () => {
+    const tsMorph = new TsMorph()
+    tsMorph.createSourceFile('./src/test-fixtures/types-resolution.fixture.ts')
+    const functions = tsMorph.getFunctions()
+
+    const basicFn = functions.find((f) => f.name === 'testBasic')!
+    expect(basicFn).toBeDefined()
+    expect(basicFn.returnType).toEqual('void')
+    expect(basicFn.parameters).toEqual([
+      { name: 'a', type: 'number' },
+      { name: 'b', type: 'string' },
+      { name: 'c', type: 'boolean' },
+    ])
+
+    const arraysFn = functions.find((f) => f.name === 'testArrays')!
+    expect(arraysFn).toBeDefined()
+    expect(arraysFn.returnType).toEqual('number[]')
+    expect(arraysFn.parameters).toEqual([
+      { name: 'a', type: 'number[]' },
+      { name: 'b', type: 'string[]' },
+      { name: 'c', type: 'boolean[]' },
+    ])
+
+    const customTypesFn = functions.find((f) => f.name === 'testCustomTypes')!
+    expect(customTypesFn).toBeDefined()
+    expect(customTypesFn.returnType).toEqual('Point')
+    expect(customTypesFn.parameters).toEqual([
+      { name: 'p', type: 'Point' },
+      { name: 'points', type: 'Point[]' },
+      { name: 'pointsGeneric', type: 'Point[]' },
+    ])
+
+    const namespacesFn = functions.find((f) => f.name === 'testNamespaces')!
+    expect(namespacesFn).toBeDefined()
+    expect(namespacesFn.returnType).toEqual('Coord')
+    expect(namespacesFn.parameters).toEqual([
+      { name: 'c', type: 'Coord' },
+      { name: 'coords', type: 'Coord[]' },
+      { name: 'coordsGeneric', type: 'Coord[]' },
+    ])
+
+    const unionsFn = functions.find((f) => f.name === 'testUnions')!
+    expect(unionsFn).toBeDefined()
+    expect(unionsFn.returnType).toEqual('string | number')
+    expect(unionsFn.parameters).toEqual([
+      { name: 'u', type: 'string | number' },
+    ])
+  })
 })

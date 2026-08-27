@@ -402,4 +402,38 @@ function test() {
     expect(triggerFn).toBeDefined()
     expect(triggerFn!.sql).toContain('CREATE OR REPLACE FUNCTION test() RETURNS TRIGGER')
   })
+
+  it('resolves types with custom type mappings and ts-morph AST', async () => {
+    const plv8ify = new PLV8ifyCLI('esbuild')
+    plv8ify.init(
+      './src/test-fixtures/types-resolution.fixture.ts',
+      './src/test-fixtures/types-resolution-map.fixture.js'
+    )
+    const bundledJs = await plv8ify.build({
+      mode: 'inline',
+      inputFile: './src/test-fixtures/types-resolution.fixture.ts',
+      scopePrefix: '',
+    })
+    const fns = plv8ify.getPLV8SQLFunctions({
+      mode: 'inline',
+      scopePrefix: '',
+      fallbackReturnType: 'JSONB',
+      defaultVolatility: 'IMMUTABLE',
+      bundledJs,
+      pgFunctionDelimiter: '$plv8ify$',
+      outputFolder: 'plv8ify-dist',
+    })
+
+    const basicSql = fns.find((f) => f.filename.endsWith('testBasic.plv8.sql'))!.sql
+    expect(basicSql).toContain('CREATE OR REPLACE FUNCTION testBasic(a float8,b text,c boolean) RETURNS JSONB')
+
+    const customSql = fns.find((f) => f.filename.endsWith('testCustomTypes.plv8.sql'))!.sql
+    expect(customSql).toContain('CREATE OR REPLACE FUNCTION testCustomTypes(p point,points point[],pointsGeneric point[]) RETURNS point')
+
+    const namespacesSql = fns.find((f) => f.filename.endsWith('testNamespaces.plv8.sql'))!.sql
+    expect(namespacesSql).toContain('CREATE OR REPLACE FUNCTION testNamespaces(c coord,coords coord[],coordsGeneric coord[]) RETURNS coord')
+
+    const unionsSql = fns.find((f) => f.filename.endsWith('testUnions.plv8.sql'))!.sql
+    expect(unionsSql).toContain('CREATE OR REPLACE FUNCTION testUnions(u jsonb) RETURNS jsonb')
+  })
 })
