@@ -1,5 +1,4 @@
-// @ts-nocheck
-typeMap = {
+export const typeMap = {
   number: 'float8',
   string: 'text',
   boolean: 'boolean',
@@ -7,3 +6,4 @@ typeMap = {
   test_type: 'test_type',
   'test_type[]': 'test_type[]',
 }
+
