@@ -111,22 +111,14 @@ export class PLV8ifyCLI implements PLV8ify {
     return { exportMap, cleanJs }
   }
 
-  async build({ mode, inputFile, scopePrefix, esbuildDefine }: BuildArgs) {
+  async build({ inputFile, esbuildDefine }: BuildArgs) {
     const bundledJsR = await this._bundler.bundle({
       inputFile,
       define: esbuildDefine,
     })
     const { exportMap, cleanJs: bundledJs } = this.extractExports(bundledJsR)
     this._exportMap = exportMap
-    const modeAdjustedBundledJs = match(mode)
-      .with('inline', () => bundledJs)
-      .with('start_proc', () =>
-        // Remove var from var plv8ify to make it attach to the global scope in start_proc mode
-        bundledJs.replace(`var ${scopePrefix} =`, `this.${scopePrefix} =`)
-      )
-      .with('bundle', () => bundledJs)
-      .exhaustive()
-    return modeAdjustedBundledJs
+    return bundledJs
   }
 
   private writeFile(filePath: string, content: string) {

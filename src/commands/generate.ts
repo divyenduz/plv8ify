@@ -40,9 +40,7 @@ export async function generateCommand(CLI: {
   plv8ify.init(inputFilePath, typesFilePath)
 
   const bundledJs = await plv8ify.build({
-    mode,
     inputFile: inputFilePath,
-    scopePrefix,
     esbuildDefine,
   })
 
