@@ -3,9 +3,7 @@ export type Parallel = 'SAFE' | 'UNSAFE' | 'RESTRICTED'
 export type Mode = 'inline' | 'start_proc' | 'bundle'
 
 export interface BuildArgs {
-  mode: Mode
   inputFile: string
-  scopePrefix: string
   esbuildDefine?: Record<string, string>
 }
 

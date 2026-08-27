@@ -133,9 +133,7 @@ function test() {
     const plv8ify = new PLV8ifyCLI('esbuild')
     plv8ify.init('./src/test-fixtures/satisfies.fixture.ts')
     const bundledJs = await plv8ify.build({
-      mode: 'inline',
       inputFile: './src/test-fixtures/satisfies.fixture.ts',
-      scopePrefix: '',
     })
     const fns = plv8ify.getPLV8SQLFunctions({
       mode: 'inline',
@@ -155,9 +153,7 @@ function test() {
     const plv8ify = new PLV8ifyCLI('esbuild')
     plv8ify.init('./examples/mathjs/input.ts')
     const bundledJs = await plv8ify.build({
-      mode: 'inline',
       inputFile: './examples/mathjs/input.ts',
-      scopePrefix: '',
     })
     const fns = plv8ify.getPLV8SQLFunctions({
       mode: 'inline',
@@ -182,9 +178,7 @@ function test() {
     const plv8ify = new PLV8ifyCLI('esbuild')
     plv8ify.init('./examples/mathjs/input.ts')
     const bundledJs = await plv8ify.build({
-      mode: 'bundle',
       inputFile: './examples/mathjs/input.ts',
-      scopePrefix: 'myScope',
     })
     const fns = plv8ify.getPLV8SQLFunctions({
       mode: 'bundle',
@@ -220,9 +214,7 @@ function test() {
     const plv8ify = new PLV8ifyCLI('esbuild')
     plv8ify.init('./examples/mathjs/input.ts')
     const bundledJs = await plv8ify.build({
-      mode: 'start_proc',
       inputFile: './examples/mathjs/input.ts',
-      scopePrefix: 'myScope',
     })
     const fns = plv8ify.getPLV8SQLFunctions({
       mode: 'start_proc',
@@ -252,9 +244,7 @@ function test() {
     const plv8ify = new PLV8ifyCLI('esbuild')
     plv8ify.init('./src/test-fixtures/collision.fixture.ts')
     const bundledJs = await plv8ify.build({
-      mode: 'inline',
       inputFile: './src/test-fixtures/collision.fixture.ts',
-      scopePrefix: '',
     })
     const fns = plv8ify.getPLV8SQLFunctions({
       mode: 'inline',
@@ -282,9 +272,7 @@ function test() {
     const plv8ify = new PLV8ifyCLI('bun')
     plv8ify.init('./examples/mathjs/input.ts')
     const bundledJs = await plv8ify.build({
-      mode: 'inline',
       inputFile: './examples/mathjs/input.ts',
-      scopePrefix: '',
     })
     const fns = plv8ify.getPLV8SQLFunctions({
       mode: 'inline',
@@ -306,9 +294,7 @@ function test() {
     const plv8ify = new PLV8ifyCLI('esbuild', 123456789)
     plv8ify.init('./src/test-fixtures/input.fixture.ts')
     const bundledJs = await plv8ify.build({
-      mode: 'bundle',
       inputFile: './src/test-fixtures/input.fixture.ts',
-      scopePrefix: 'myScope',
     })
     const fns = plv8ify.getPLV8SQLFunctions({
       mode: 'bundle',
@@ -331,9 +317,7 @@ function test() {
     const plv8ify = new PLV8ifyCLI('esbuild')
     plv8ify.init('./examples/hello-custom-type/input.ts')
     const bundledJs = await plv8ify.build({
-      mode: 'inline',
       inputFile: './examples/hello-custom-type/input.ts',
-      scopePrefix: '',
     })
     const fns = plv8ify.getPLV8SQLFunctions({
       mode: 'inline',
@@ -354,9 +338,7 @@ function test() {
     const plv8ify = new PLV8ifyCLI('esbuild')
     plv8ify.init('./examples/parallel-annotations/input.ts')
     const bundledJs = await plv8ify.build({
-      mode: 'inline',
       inputFile: './examples/parallel-annotations/input.ts',
-      scopePrefix: '',
     })
     const fns = plv8ify.getPLV8SQLFunctions({
       mode: 'inline',
@@ -384,9 +366,7 @@ function test() {
     const plv8ify = new PLV8ifyCLI('esbuild')
     plv8ify.init('./examples/trigger/input.ts')
     const bundledJs = await plv8ify.build({
-      mode: 'inline',
       inputFile: './examples/trigger/input.ts',
-      scopePrefix: '',
     })
     const fns = plv8ify.getPLV8SQLFunctions({
       mode: 'inline',
@@ -410,9 +390,7 @@ function test() {
       './src/test-fixtures/types-resolution-map.fixture.js'
     )
     const bundledJs = await plv8ify.build({
-      mode: 'inline',
       inputFile: './src/test-fixtures/types-resolution.fixture.ts',
-      scopePrefix: '',
     })
     const fns = plv8ify.getPLV8SQLFunctions({
       mode: 'inline',
@@ -435,5 +413,19 @@ function test() {
 
     const unionsSql = fns.find((f) => f.filename.endsWith('testUnions.plv8.sql'))!.sql
     expect(unionsSql).toContain('CREATE OR REPLACE FUNCTION testUnions(u jsonb) RETURNS jsonb')
+  })
+
+  it('build returns bundled js directly without dead mode-based string replacements', async () => {
+    const plv8ify = new PLV8ifyCLI('esbuild')
+    plv8ify.init('./examples/hello-start_proc/input.ts')
+
+    const bundledJs = await plv8ify.build({
+      inputFile: './examples/hello-start_proc/input.ts',
+    })
+
+    expect(bundledJs).toContain('function hello()')
+    expect(bundledJs).toContain('function world()')
+    expect(bundledJs).not.toContain('var plv8ify =')
+    expect(bundledJs).not.toContain('this.plv8ify =')
   })
 })
