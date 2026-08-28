@@ -40,6 +40,7 @@ type FnSqlConfig = {
   volatility: Volatility | null,
   parallel: Parallel | null,
   security: Security | null,
+  searchPath: string | null,
   sqlReturnType: string | null,
   customSchema: string
   trigger: boolean
@@ -272,6 +273,7 @@ export class PLV8ifyCLI implements PLV8ify {
       volatility: fn.volatility ?? null,
       parallel: fn.parallel ?? null,
       security: fn.security ?? null,
+      searchPath: fn.searchPath ?? null,
       sqlReturnType:
         fn.sqlReturnType ?? (this.getTypeFromMap(fn.returnType) || null),
       customSchema: fn.customSchema ?? '',
@@ -308,6 +310,7 @@ export class PLV8ifyCLI implements PLV8ify {
       volatility,
       parallel,
       security,
+      searchPath,
       sqlReturnType,
       trigger,
       grants,
@@ -328,6 +331,11 @@ export class PLV8ifyCLI implements PLV8ify {
     const localFnName = this._exportMap[fn.name] || fn.name
     const targetCallName = mode === 'inline' ? localFnName : fn.name
 
+    const searchPathClause =
+      searchPath !== null && searchPath !== undefined
+        ? ` SET search_path = ${searchPath === '' || searchPath === '""' ? "''" : searchPath}`
+        : ''
+
     const sqlStatements = [
       `DROP FUNCTION IF EXISTS ${scopedName}(${sqlParametersString});`,
       `CREATE OR REPLACE FUNCTION ${scopedName}(${sqlParametersString}) RETURNS ${sqlReturnType} AS ${pgFunctionDelimiter}`,
@@ -343,7 +351,7 @@ export class PLV8ifyCLI implements PLV8ify {
         .with('void', () => '')
         .otherwise(() => `return ${targetCallName}(${jsParametersString})`),
       '',
-      `${pgFunctionDelimiter} LANGUAGE plv8 ${volatility}${parallel ? ` PARALLEL ${parallel}` : ''} STRICT${security ? ` SECURITY ${security}` : ''};`,
+      `${pgFunctionDelimiter} LANGUAGE plv8 ${volatility}${parallel ? ` PARALLEL ${parallel}` : ''} STRICT${security ? ` SECURITY ${security}` : ''}${searchPathClause};`,
     ]
 
     if (revokes.length > 0) {

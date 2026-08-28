@@ -20,6 +20,7 @@ export interface TSFunctionMetadata {
   volatility?: Volatility
   parallel?: Parallel
   security?: Security
+  searchPath?: string
   customSchema?: string
   isTrigger?: boolean
   grants?: string[]

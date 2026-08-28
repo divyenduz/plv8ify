@@ -216,6 +216,7 @@ $plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;
 | set the volatility of the generated Postgres function | `/** @plv8ify_volatility <STABLE,IMMUTABLE,VOLATILE> */` | `/** @plv8ify_volatility STABLE */` |
 | set the parallel safety of the generated Postgres function | `/** @plv8ify_parallel <SAFE,UNSAFE,RESTRICTED> */` | `/** @plv8ify_parallel SAFE */` |
 | set function security execution privileges | `/** @plv8ify_security_definer */` or `/** @plv8ify_security <DEFINER,INVOKER> */` | `/** @plv8ify_security_definer */` |
+| set the search_path of the generated Postgres function | `/** @plv8ify_search_path <schemas> */` or `/** @plv8ify_search_path */` | `/** @plv8ify_search_path */` or `/** @plv8ify_search_path public, extensions */` |
 | set the schema of the generated Postgres function | `/** @plv8ify_schema_name <schemaname> */` | `/** @plv8ify_schema_name my_schema */` |
 | set the TS->SQL type mapping for a parameter | `/** @plv8ify_param {<my_sql_type>} <my_param> */` | `/** @plv8ify_param {timestamptz} ts */` |
 | set the TS->SQL type mapping for the return type | `/** @plv8ify_returns {<SQL TYPE>} */` | `/** @plv8ify_returns {setof my_table} */` |

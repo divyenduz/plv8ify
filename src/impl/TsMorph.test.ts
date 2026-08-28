@@ -206,6 +206,76 @@ export function defaultSecurity(): void {}
     }
   })
 
+  it('parses search_path annotations correctly', () => {
+    const fixturePath = path.resolve('src/test-fixtures/search-path-test.fixture.ts')
+    fs.writeFileSync(
+      fixturePath,
+      `
+/**
+ * @plv8ify_search_path
+ */
+export function defaultEmptyPath(): void {}
+
+/**
+ * @plv8ify_search_path ''
+ */
+export function singleQuotedEmptyPath(): void {}
+
+/**
+ * @plv8ify_search_path ""
+ */
+export function doubleQuotedEmptyPath(): void {}
+
+/**
+ * @plv8ify_search_path = ''
+ */
+export function equalsEmptyPath(): void {}
+
+/**
+ * @plv8ify_search_path public
+ */
+export function singleSchemaPath(): void {}
+
+/**
+ * @plv8ify_search_path public, pg_temp
+ */
+export function multipleSchemasPath(): void {}
+
+/**
+ * @plv8ify_search_path 'public', 'pg_temp'
+ */
+export function quotedSchemasPath(): void {}
+
+/**
+ * @plv8ify_searchpath app, public
+ */
+export function aliasSearchpath(): void {}
+
+export function noSearchPath(): void {}
+`
+    )
+
+    try {
+      const tsMorph = new TsMorph()
+      tsMorph.createSourceFile(fixturePath)
+      const functions = tsMorph.getFunctions()
+
+      expect(functions.find((f) => f.name === 'defaultEmptyPath')?.searchPath).toBe("''")
+      expect(functions.find((f) => f.name === 'singleQuotedEmptyPath')?.searchPath).toBe("''")
+      expect(functions.find((f) => f.name === 'doubleQuotedEmptyPath')?.searchPath).toBe("''")
+      expect(functions.find((f) => f.name === 'equalsEmptyPath')?.searchPath).toBe("''")
+      expect(functions.find((f) => f.name === 'singleSchemaPath')?.searchPath).toBe('public')
+      expect(functions.find((f) => f.name === 'multipleSchemasPath')?.searchPath).toBe('public, pg_temp')
+      expect(functions.find((f) => f.name === 'quotedSchemasPath')?.searchPath).toBe("'public', 'pg_temp'")
+      expect(functions.find((f) => f.name === 'aliasSearchpath')?.searchPath).toBe('app, public')
+      expect(functions.find((f) => f.name === 'noSearchPath')?.searchPath).toBeUndefined()
+    } finally {
+      if (fs.existsSync(fixturePath)) {
+        fs.unlinkSync(fixturePath)
+      }
+    }
+  })
+
   it('resolves basic types, arrays, custom types, namespaces, and unions', () => {
     const tsMorph = new TsMorph()
     tsMorph.createSourceFile('./src/test-fixtures/types-resolution.fixture.ts')

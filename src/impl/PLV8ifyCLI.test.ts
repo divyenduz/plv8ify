@@ -716,6 +716,132 @@ export function defaultSecurityOp(y: number): number {
       }
     }
   })
+
+  it('generates SET search_path statements when configured on function', () => {
+    const plv8ify = new PLV8ifyCLI()
+    const emptyPathSql = plv8ify.getPLV8SQLFunction({
+      fn: {
+        name: 'secureFunc',
+        isExported: true,
+        parameters: [],
+        returnType: 'boolean',
+        security: 'DEFINER',
+        searchPath: "''",
+      },
+      scopePrefix: '',
+      mode: 'inline',
+      defaultVolatility: 'VOLATILE',
+      bundledJs: `function secureFunc() { return true; }`,
+      pgFunctionDelimiter: '$plv8ify$',
+      fallbackReturnType: 'boolean',
+    })
+
+    expect(emptyPathSql).toContain('LANGUAGE plv8 VOLATILE STRICT SECURITY DEFINER SET search_path = \'\';')
+
+    const customPathSql = plv8ify.getPLV8SQLFunction({
+      fn: {
+        name: 'customPathFunc',
+        isExported: true,
+        parameters: [],
+        returnType: 'boolean',
+        searchPath: 'public, pg_temp',
+      },
+      scopePrefix: '',
+      mode: 'inline',
+      defaultVolatility: 'IMMUTABLE',
+      bundledJs: `function customPathFunc() { return true; }`,
+      pgFunctionDelimiter: '$plv8ify$',
+      fallbackReturnType: 'boolean',
+    })
+
+    expect(customPathSql).toContain('LANGUAGE plv8 IMMUTABLE STRICT SET search_path = public, pg_temp;')
+
+    const noPathSql = plv8ify.getPLV8SQLFunction({
+      fn: {
+        name: 'normalFunc',
+        isExported: true,
+        parameters: [],
+        returnType: 'boolean',
+      },
+      scopePrefix: '',
+      mode: 'inline',
+      defaultVolatility: 'IMMUTABLE',
+      bundledJs: `function normalFunc() { return true; }`,
+      pgFunctionDelimiter: '$plv8ify$',
+      fallbackReturnType: 'boolean',
+    })
+
+    expect(noPathSql).toContain('LANGUAGE plv8 IMMUTABLE STRICT;')
+    expect(noPathSql).not.toContain('search_path')
+  })
+
+  it('correctly generates SET search_path from JSDoc annotations in source file', async () => {
+    const fixturePath = path.resolve('src/test-fixtures/search-path-sql.fixture.ts')
+    fs.writeFileSync(
+      fixturePath,
+      `
+/**
+ * @plv8ify_security_definer
+ * @plv8ify_search_path
+ * @plv8ify_volatility VOLATILE
+ * @plv8ify_revoke PUBLIC
+ * @plv8ify_grant authenticated
+ */
+export function secureAdminAction(userId: string): boolean {
+  return true;
+}
+
+/**
+ * @plv8ify_search_path public, extensions
+ * @plv8ify_volatility STABLE
+ */
+export function customSearchPathAction(x: number): number {
+  return x * 2;
+}
+
+export function defaultSearchPathAction(y: number): number {
+  return y + 1;
+}
+`
+    )
+
+    try {
+      const plv8ify = new PLV8ifyCLI('esbuild')
+      plv8ify.init(fixturePath)
+      const bundledJs = await plv8ify.build({
+        inputFile: fixturePath,
+      })
+      const fns = plv8ify.getPLV8SQLFunctions({
+        mode: 'inline',
+        scopePrefix: '',
+        fallbackReturnType: 'JSONB',
+        defaultVolatility: 'IMMUTABLE',
+        bundledJs,
+        pgFunctionDelimiter: '$plv8ify$',
+        outputFolder: 'plv8ify-dist',
+      })
+
+      const secureFn = fns.find((f) => f.filename.endsWith('secureAdminAction.plv8.sql'))
+      expect(secureFn).toBeDefined()
+      expect(secureFn!.sql).toContain('LANGUAGE plv8 VOLATILE STRICT SECURITY DEFINER SET search_path = \'\';')
+      expect(secureFn!.sql).toContain('REVOKE EXECUTE ON FUNCTION secureAdminAction(userId text) FROM PUBLIC;')
+      expect(secureFn!.sql).toContain('GRANT EXECUTE ON FUNCTION secureAdminAction(userId text) TO authenticated;')
+
+      const customPathFn = fns.find((f) => f.filename.endsWith('customSearchPathAction.plv8.sql'))
+      expect(customPathFn).toBeDefined()
+      expect(customPathFn!.sql).toContain('LANGUAGE plv8 STABLE STRICT SET search_path = public, extensions;')
+
+      const defaultFn = fns.find((f) => f.filename.endsWith('defaultSearchPathAction.plv8.sql'))
+      expect(defaultFn).toBeDefined()
+      expect(defaultFn!.sql).toContain('LANGUAGE plv8 IMMUTABLE STRICT;')
+      expect(defaultFn!.sql).not.toContain('search_path')
+    } finally {
+      if (fs.existsSync(fixturePath)) {
+        fs.unlinkSync(fixturePath)
+      }
+    }
+  })
 })
+
 
 

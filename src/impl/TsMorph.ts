@@ -72,6 +72,7 @@ export class TsMorph implements TSCompiler {
     volatility?: Volatility
     parallel?: Parallel
     security?: Security
+    searchPath?: string
     customSchema?: string
     isTrigger?: boolean
     grants?: string[]
@@ -83,6 +84,7 @@ export class TsMorph implements TSCompiler {
     let volatility: Volatility | undefined
     let parallel: Parallel | undefined
     let security: Security | undefined
+    let searchPath: string | undefined
     let customSchema: string | undefined
     let isTrigger: boolean | undefined
     const grants: string[] = []
@@ -112,6 +114,13 @@ export class TsMorph implements TSCompiler {
           security = 'DEFINER'
         } else if (upper === 'INVOKER' || upper === 'SECURITY INVOKER') {
           security = 'INVOKER'
+        }
+      } else if (tagName === 'plv8ify_search_path' || tagName === 'plv8ify_searchpath') {
+        const clean = comment.replace(/^=\s*/, '').trim()
+        if (!clean || clean === "''" || clean === '""') {
+          searchPath = "''"
+        } else {
+          searchPath = clean
         }
       } else if (tagName === 'plv8ify_schema_name') {
         if (comment) {
@@ -161,6 +170,7 @@ export class TsMorph implements TSCompiler {
       volatility,
       parallel,
       security,
+      searchPath,
       customSchema,
       isTrigger,
       grants: grants.length > 0 ? grants : undefined,
