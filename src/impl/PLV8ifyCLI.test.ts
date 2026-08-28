@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'bun:test'
+import fs from 'fs'
+import path from 'path'
 import { TSFunction } from 'src/interfaces/TSCompiler'
 
 import { PLV8ifyCLI } from './PLV8ifyCLI'
@@ -515,4 +517,99 @@ function test() {
     expect(bundledJs).not.toContain('var plv8ify =')
     expect(bundledJs).not.toContain('this.plv8ify =')
   })
+
+  it('generates REVOKE and GRANT statements when configured on function', async () => {
+    const plv8ify = new PLV8ifyCLI('esbuild')
+    const sql = plv8ify.getPLV8SQLFunction({
+      fn: {
+        name: 'secureOp',
+        isExported: true,
+        parameters: [{ name: 'val', type: 'text' }],
+        returnType: 'text',
+        revokes: ['PUBLIC', 'anon'],
+        grants: ['authenticated', 'service_role'],
+      },
+      scopePrefix: '',
+      mode: 'inline',
+      defaultVolatility: 'IMMUTABLE',
+      bundledJs: `function secureOp(val) { return val; }`,
+      pgFunctionDelimiter: '$plv8ify$',
+      fallbackReturnType: 'text',
+    })
+
+    expect(sql).toContain('REVOKE EXECUTE ON FUNCTION secureOp(val text) FROM PUBLIC, anon;')
+    expect(sql).toContain('GRANT EXECUTE ON FUNCTION secureOp(val text) TO authenticated, service_role;')
+  })
+
+  it('correctly generates REVOKE and GRANT from JSDoc annotations in source file', async () => {
+    const fixturePath = path.resolve('src/test-fixtures/grants-sql.fixture.ts')
+    fs.writeFileSync(
+      fixturePath,
+      `
+/**
+ * @plv8ify_revoke PUBLIC
+ * @plv8ify_grant authenticated
+ * @plv8ify_grant service_role
+ */
+export function processPayment(amount: number): number {
+  return amount
+}
+`
+    )
+
+    try {
+      const plv8ify = new PLV8ifyCLI('esbuild')
+      plv8ify.init(fixturePath)
+      const bundledJs = await plv8ify.build({
+        inputFile: fixturePath,
+      })
+      const fns = plv8ify.getPLV8SQLFunctions({
+        mode: 'inline',
+        scopePrefix: '',
+        fallbackReturnType: 'float8',
+        defaultVolatility: 'IMMUTABLE',
+        bundledJs,
+        pgFunctionDelimiter: '$plv8ify$',
+        outputFolder: 'plv8ify-dist',
+      })
+
+      const paymentFn = fns.find((f) => f.filename.endsWith('processPayment.plv8.sql'))
+      expect(paymentFn).toBeDefined()
+      expect(paymentFn!.sql).toContain('REVOKE EXECUTE ON FUNCTION processPayment(amount float8) FROM PUBLIC;')
+      expect(paymentFn!.sql).toContain('GRANT EXECUTE ON FUNCTION processPayment(amount float8) TO authenticated, service_role;')
+    } finally {
+      if (fs.existsSync(fixturePath)) {
+        fs.unlinkSync(fixturePath)
+      }
+    }
+  })
+
+  it('generates REVOKE and GRANT statements for triggers and custom schema', async () => {
+    const plv8ify = new PLV8ifyCLI('esbuild')
+    const sql = plv8ify.getPLV8SQLFunction({
+      fn: {
+        name: 'onUserUpdate',
+        isExported: true,
+        parameters: [],
+        returnType: 'trigger',
+        isTrigger: true,
+        customSchema: 'auth',
+        revokes: ['PUBLIC'],
+        grants: ['supabase_admin'],
+      },
+      scopePrefix: '',
+      mode: 'inline',
+      defaultVolatility: 'VOLATILE',
+      bundledJs: `function onUserUpdate() { return NEW; }`,
+      pgFunctionDelimiter: '$plv8ify$',
+      fallbackReturnType: 'JSONB',
+    })
+
+    expect(sql).toContain('DROP FUNCTION IF EXISTS auth.onUserUpdate();')
+    expect(sql).toContain('CREATE OR REPLACE FUNCTION auth.onUserUpdate() RETURNS TRIGGER AS $plv8ify$')
+    expect(sql).toContain('REVOKE EXECUTE ON FUNCTION auth.onUserUpdate() FROM PUBLIC;')
+    expect(sql).toContain('GRANT EXECUTE ON FUNCTION auth.onUserUpdate() TO supabase_admin;')
+  })
 })
+
+

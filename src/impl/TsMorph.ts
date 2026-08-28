@@ -73,6 +73,8 @@ export class TsMorph implements TSCompiler {
     parallel?: Parallel
     customSchema?: string
     isTrigger?: boolean
+    grants?: string[]
+    revokes?: string[]
   } {
     const tags = fn.getJsDocs().flatMap((jsdoc) => jsdoc.getTags())
     let sqlReturnType: string | undefined
@@ -81,6 +83,8 @@ export class TsMorph implements TSCompiler {
     let parallel: Parallel | undefined
     let customSchema: string | undefined
     let isTrigger: boolean | undefined
+    const grants: string[] = []
+    const revokes: string[] = []
 
     for (const tag of tags) {
       const tagName = tag.getTagName()
@@ -102,6 +106,16 @@ export class TsMorph implements TSCompiler {
         }
       } else if (tagName === 'plv8ify_trigger') {
         isTrigger = true
+      } else if (tagName === 'plv8ify_grant' || tagName === 'plv8ify_grants') {
+        if (comment) {
+          const roles = comment.split(',').map((r) => r.trim()).filter(Boolean)
+          grants.push(...roles)
+        }
+      } else if (tagName === 'plv8ify_revoke' || tagName === 'plv8ify_revokes') {
+        if (comment) {
+          const roles = comment.split(',').map((r) => r.trim()).filter(Boolean)
+          revokes.push(...roles)
+        }
       } else if (tagName === 'plv8ify_param') {
         const openBrace = comment.indexOf('{')
         const closeBrace = comment.indexOf('}', openBrace)
@@ -135,6 +149,8 @@ export class TsMorph implements TSCompiler {
       parallel,
       customSchema,
       isTrigger,
+      grants: grants.length > 0 ? grants : undefined,
+      revokes: revokes.length > 0 ? revokes : undefined,
     }
   }
 

@@ -218,6 +218,8 @@ $plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;
 | set the TS->SQL type mapping for a parameter | `/** @plv8ify_param {<my_sql_type>} <my_param> */` | `/** @plv8ify_param {timestamptz} ts */` |
 | set the TS->SQL type mapping for the return type | `/** @plv8ify_returns {<SQL TYPE>} */` | `/** @plv8ify_returns {setof my_table} */` |
 | designate the function is a TRIGGER | `/** @plv8ify_trigger */` | `/** @plv8ify_trigger */` |
+| grant execution permissions to roles | `/** @plv8ify_grant <roles> */` | `/** @plv8ify_grant authenticated, service_role */` |
+| revoke execution permissions from roles | `/** @plv8ify_revoke <roles> */` | `/** @plv8ify_revoke PUBLIC */` |
 
 ## Dead Code Elimination with `--esbuild-define`
 
