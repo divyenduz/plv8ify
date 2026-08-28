@@ -61,6 +61,7 @@ PLV8ify is a TypeScript/JavaScript bundler that generates PostgreSQL functions u
   - `@plv8ify_volatility` - Set function volatility
   - `@plv8ify_parallel` - Set function parallel safety
   - `@plv8ify_security_definer` / `@plv8ify_security` - Set function security execution privileges (SECURITY DEFINER / INVOKER)
+  - `@plv8ify_search_path` - Set function search_path (defaults to '' when specified with no value)
   - `@plv8ify_schema_name` - Deploy to custom schema
   - `@plv8ify_trigger` - Mark as trigger function
   - `@plv8ify_grant` - Grant execution rights to specific roles
