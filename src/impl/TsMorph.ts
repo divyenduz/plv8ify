@@ -1,4 +1,4 @@
-import { Parallel, Volatility } from 'src/interfaces/PLV8ify.js'
+import { Parallel, Security, Volatility } from 'src/interfaces/PLV8ify.js'
 import {
   TSCompiler,
   TSFunction,
@@ -71,6 +71,7 @@ export class TsMorph implements TSCompiler {
     paramTypeOverrides?: Record<string, string>
     volatility?: Volatility
     parallel?: Parallel
+    security?: Security
     customSchema?: string
     isTrigger?: boolean
     grants?: string[]
@@ -81,6 +82,7 @@ export class TsMorph implements TSCompiler {
     const paramTypeOverrides: Record<string, string> = {}
     let volatility: Volatility | undefined
     let parallel: Parallel | undefined
+    let security: Security | undefined
     let customSchema: string | undefined
     let isTrigger: boolean | undefined
     const grants: string[] = []
@@ -99,6 +101,17 @@ export class TsMorph implements TSCompiler {
         const upper = comment.toUpperCase()
         if (upper === 'SAFE' || upper === 'UNSAFE' || upper === 'RESTRICTED') {
           parallel = upper as Parallel
+        }
+      } else if (tagName === 'plv8ify_security_definer') {
+        security = 'DEFINER'
+      } else if (tagName === 'plv8ify_security_invoker') {
+        security = 'INVOKER'
+      } else if (tagName === 'plv8ify_security') {
+        const upper = comment.toUpperCase()
+        if (upper === 'DEFINER' || upper === 'SECURITY DEFINER') {
+          security = 'DEFINER'
+        } else if (upper === 'INVOKER' || upper === 'SECURITY INVOKER') {
+          security = 'INVOKER'
         }
       } else if (tagName === 'plv8ify_schema_name') {
         if (comment) {
@@ -147,6 +160,7 @@ export class TsMorph implements TSCompiler {
           : undefined,
       volatility,
       parallel,
+      security,
       customSchema,
       isTrigger,
       grants: grants.length > 0 ? grants : undefined,

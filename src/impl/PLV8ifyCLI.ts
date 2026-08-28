@@ -7,6 +7,7 @@ import {
   PLV8ify,
   Volatility,
   Parallel,
+  Security,
 } from 'src/interfaces/PLV8ify.js'
 import {
   TSCompiler,
@@ -38,6 +39,7 @@ type FnSqlConfig = {
   }
   volatility: Volatility | null,
   parallel: Parallel | null,
+  security: Security | null,
   sqlReturnType: string | null,
   customSchema: string
   trigger: boolean
@@ -269,6 +271,7 @@ export class PLV8ifyCLI implements PLV8ify {
       paramTypeMapping: {},
       volatility: fn.volatility ?? null,
       parallel: fn.parallel ?? null,
+      security: fn.security ?? null,
       sqlReturnType:
         fn.sqlReturnType ?? (this.getTypeFromMap(fn.returnType) || null),
       customSchema: fn.customSchema ?? '',
@@ -304,6 +307,7 @@ export class PLV8ifyCLI implements PLV8ify {
       paramTypeMapping,
       volatility,
       parallel,
+      security,
       sqlReturnType,
       trigger,
       grants,
@@ -339,7 +343,7 @@ export class PLV8ifyCLI implements PLV8ify {
         .with('void', () => '')
         .otherwise(() => `return ${targetCallName}(${jsParametersString})`),
       '',
-      `${pgFunctionDelimiter} LANGUAGE plv8 ${volatility}${parallel ? ` PARALLEL ${parallel}` : ''} STRICT;`,
+      `${pgFunctionDelimiter} LANGUAGE plv8 ${volatility}${parallel ? ` PARALLEL ${parallel}` : ''} STRICT${security ? ` SECURITY ${security}` : ''};`,
     ]
 
     if (revokes.length > 0) {

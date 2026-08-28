@@ -136,6 +136,76 @@ export function pluralSynonymFunction(): void {}
     }
   })
 
+  it('parses security annotations correctly', () => {
+    const fixturePath = path.resolve('src/test-fixtures/security-test.fixture.ts')
+    fs.writeFileSync(
+      fixturePath,
+      `
+/**
+ * @plv8ify_security_definer
+ */
+export function definerTagOnly(): void {}
+
+/**
+ * @plv8ify_security_invoker
+ */
+export function invokerTagOnly(): void {}
+
+/**
+ * @plv8ify_security DEFINER
+ */
+export function definerTagUpper(): void {}
+
+/**
+ * @plv8ify_security definer
+ */
+export function definerTagLower(): void {}
+
+/**
+ * @plv8ify_security INVOKER
+ */
+export function invokerTagUpper(): void {}
+
+/**
+ * @plv8ify_security invoker
+ */
+export function invokerTagLower(): void {}
+
+/**
+ * @plv8ify_security SECURITY DEFINER
+ */
+export function definerFullClause(): void {}
+
+/**
+ * @plv8ify_security SECURITY INVOKER
+ */
+export function invokerFullClause(): void {}
+
+export function defaultSecurity(): void {}
+`
+    )
+
+    try {
+      const tsMorph = new TsMorph()
+      tsMorph.createSourceFile(fixturePath)
+      const functions = tsMorph.getFunctions()
+
+      expect(functions.find((f) => f.name === 'definerTagOnly')?.security).toBe('DEFINER')
+      expect(functions.find((f) => f.name === 'invokerTagOnly')?.security).toBe('INVOKER')
+      expect(functions.find((f) => f.name === 'definerTagUpper')?.security).toBe('DEFINER')
+      expect(functions.find((f) => f.name === 'definerTagLower')?.security).toBe('DEFINER')
+      expect(functions.find((f) => f.name === 'invokerTagUpper')?.security).toBe('INVOKER')
+      expect(functions.find((f) => f.name === 'invokerTagLower')?.security).toBe('INVOKER')
+      expect(functions.find((f) => f.name === 'definerFullClause')?.security).toBe('DEFINER')
+      expect(functions.find((f) => f.name === 'invokerFullClause')?.security).toBe('INVOKER')
+      expect(functions.find((f) => f.name === 'defaultSecurity')?.security).toBeUndefined()
+    } finally {
+      if (fs.existsSync(fixturePath)) {
+        fs.unlinkSync(fixturePath)
+      }
+    }
+  })
+
   it('resolves basic types, arrays, custom types, namespaces, and unions', () => {
     const tsMorph = new TsMorph()
     tsMorph.createSourceFile('./src/test-fixtures/types-resolution.fixture.ts')
