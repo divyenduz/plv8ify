@@ -1,5 +1,16 @@
 # plv8ify
 
+## 0.1.0
+
+### Minor Changes
+
+- 9ea6fd3: Add support for `@plv8ify_grant` and `@plv8ify_revoke` JSDoc annotations to manage function execution permissions across roles
+- e2f32f1: Add `@plv8ify_search_path` JSDoc annotation to configure PostgreSQL function `search_path`.
+
+  - **Hardening `SECURITY DEFINER` functions**: Specifying `/** @plv8ify_search_path */` without arguments automatically defaults to `SET search_path = ''`, satisfying database security best practices and resolving Supabase linter warnings (`0011_function_search_path_mutable`).
+  - **Custom `search_path`**: Can be set to custom schemas (e.g. `/** @plv8ify_search_path public, extensions */`).
+  - **Alias support**: Also supports `/** @plv8ify_searchpath */`.
+
 ## 0.0.69
 
 ### Patch Changes
