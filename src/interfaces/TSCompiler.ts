@@ -21,6 +21,8 @@ export interface TSFunctionMetadata {
   parallel?: Parallel
   customSchema?: string
   isTrigger?: boolean
+  grants?: string[]
+  revokes?: string[]
 }
 
 export type TSFunction = TSFunctionMetadata

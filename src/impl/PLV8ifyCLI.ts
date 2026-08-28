@@ -39,8 +39,10 @@ type FnSqlConfig = {
   volatility: Volatility | null,
   parallel: Parallel | null,
   sqlReturnType: string | null,
-  customSchema: string,
-  trigger: boolean,
+  customSchema: string
+  trigger: boolean
+  grants: string[]
+  revokes: string[]
 }
 
 export class PLV8ifyCLI implements PLV8ify {
@@ -271,6 +273,8 @@ export class PLV8ifyCLI implements PLV8ify {
         fn.sqlReturnType ?? (this.getTypeFromMap(fn.returnType) || null),
       customSchema: fn.customSchema ?? '',
       trigger: fn.isTrigger ?? false,
+      grants: fn.grants ?? [],
+      revokes: fn.revokes ?? [],
     }
 
     // default param type mapping
@@ -301,7 +305,9 @@ export class PLV8ifyCLI implements PLV8ify {
       volatility,
       parallel,
       sqlReturnType,
-      trigger
+      trigger,
+      grants,
+      revokes,
     } = this.getFnSqlConfig(fn);
     if (!volatility) volatility = defaultVolatility
     if (!sqlReturnType) sqlReturnType = fallbackReturnType
@@ -318,7 +324,7 @@ export class PLV8ifyCLI implements PLV8ify {
     const localFnName = this._exportMap[fn.name] || fn.name
     const targetCallName = mode === 'inline' ? localFnName : fn.name
 
-    return [
+    const sqlStatements = [
       `DROP FUNCTION IF EXISTS ${scopedName}(${sqlParametersString});`,
       `CREATE OR REPLACE FUNCTION ${scopedName}(${sqlParametersString}) RETURNS ${sqlReturnType} AS ${pgFunctionDelimiter}`,
       match(mode)
@@ -334,7 +340,20 @@ export class PLV8ifyCLI implements PLV8ify {
         .otherwise(() => `return ${targetCallName}(${jsParametersString})`),
       '',
       `${pgFunctionDelimiter} LANGUAGE plv8 ${volatility}${parallel ? ` PARALLEL ${parallel}` : ''} STRICT;`,
-    ].join('\n')
+    ]
+
+    if (revokes.length > 0) {
+      sqlStatements.push(
+        `REVOKE EXECUTE ON FUNCTION ${scopedName}(${sqlParametersString}) FROM ${revokes.join(', ')};`
+      )
+    }
+    if (grants.length > 0) {
+      sqlStatements.push(
+        `GRANT EXECUTE ON FUNCTION ${scopedName}(${sqlParametersString}) TO ${grants.join(', ')};`
+      )
+    }
+
+    return sqlStatements.join('\n')
   }
 
   private getStartProcSQLScript = ({ scopePrefix }) =>

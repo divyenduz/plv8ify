@@ -92,6 +92,50 @@ export function multilineTest(amount: number): number {
     }
   })
 
+  it('parses grant and revoke JSDoc annotations correctly', () => {
+    const fixturePath = path.resolve('src/test-fixtures/grants-test.fixture.ts')
+    fs.writeFileSync(
+      fixturePath,
+      `
+/**
+ * @plv8ify_revoke PUBLIC
+ * @plv8ify_revoke anon
+ * @plv8ify_grant authenticated, service_role
+ * @plv8ify_grant admin
+ */
+export function secureFunction(id: string): string {
+  return id
+}
+
+/**
+ * @plv8ify_revokes anon, PUBLIC
+ * @plv8ify_grants authenticated
+ */
+export function pluralSynonymFunction(): void {}
+`
+    )
+
+    try {
+      const tsMorph = new TsMorph()
+      tsMorph.createSourceFile(fixturePath)
+      const functions = tsMorph.getFunctions()
+
+      const secureFn = functions.find((f) => f.name === 'secureFunction')
+      expect(secureFn).toBeDefined()
+      expect(secureFn!.revokes).toEqual(['PUBLIC', 'anon'])
+      expect(secureFn!.grants).toEqual(['authenticated', 'service_role', 'admin'])
+
+      const pluralFn = functions.find((f) => f.name === 'pluralSynonymFunction')
+      expect(pluralFn).toBeDefined()
+      expect(pluralFn!.revokes).toEqual(['anon', 'PUBLIC'])
+      expect(pluralFn!.grants).toEqual(['authenticated'])
+    } finally {
+      if (fs.existsSync(fixturePath)) {
+        fs.unlinkSync(fixturePath)
+      }
+    }
+  })
+
   it('resolves basic types, arrays, custom types, namespaces, and unions', () => {
     const tsMorph = new TsMorph()
     tsMorph.createSourceFile('./src/test-fixtures/types-resolution.fixture.ts')
