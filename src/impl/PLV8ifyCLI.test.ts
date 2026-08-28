@@ -610,6 +610,112 @@ export function processPayment(amount: number): number {
     expect(sql).toContain('REVOKE EXECUTE ON FUNCTION auth.onUserUpdate() FROM PUBLIC;')
     expect(sql).toContain('GRANT EXECUTE ON FUNCTION auth.onUserUpdate() TO supabase_admin;')
   })
+
+  it('generates SECURITY DEFINER and SECURITY INVOKER statements when configured', async () => {
+    const plv8ify = new PLV8ifyCLI('esbuild')
+    const definerSql = plv8ify.getPLV8SQLFunction({
+      fn: {
+        name: 'adminAction',
+        isExported: true,
+        parameters: [],
+        returnType: 'boolean',
+        security: 'DEFINER',
+      },
+      scopePrefix: '',
+      mode: 'inline',
+      defaultVolatility: 'VOLATILE',
+      bundledJs: `function adminAction() { return true; }`,
+      pgFunctionDelimiter: '$plv8ify$',
+      fallbackReturnType: 'boolean',
+    })
+
+    expect(definerSql).toContain('LANGUAGE plv8 VOLATILE STRICT SECURITY DEFINER;')
+
+    const invokerSql = plv8ify.getPLV8SQLFunction({
+      fn: {
+        name: 'userAction',
+        isExported: true,
+        parameters: [],
+        returnType: 'boolean',
+        security: 'INVOKER',
+      },
+      scopePrefix: '',
+      mode: 'inline',
+      defaultVolatility: 'STABLE',
+      bundledJs: `function userAction() { return true; }`,
+      pgFunctionDelimiter: '$plv8ify$',
+      fallbackReturnType: 'boolean',
+    })
+
+    expect(invokerSql).toContain('LANGUAGE plv8 STABLE STRICT SECURITY INVOKER;')
+  })
+
+  it('correctly generates SECURITY DEFINER from JSDoc annotations in source file', async () => {
+    const fixturePath = path.resolve('src/test-fixtures/security-sql.fixture.ts')
+    fs.writeFileSync(
+      fixturePath,
+      `
+/**
+ * @plv8ify_security_definer
+ * @plv8ify_volatility VOLATILE
+ * @plv8ify_parallel RESTRICTED
+ * @plv8ify_revoke PUBLIC
+ * @plv8ify_grant authenticated
+ */
+export function elevatePrivileges(role: string): boolean {
+  return true;
+}
+
+/**
+ * @plv8ify_security INVOKER
+ * @plv8ify_volatility IMMUTABLE
+ */
+export function normalOperation(x: number): number {
+  return x * 2;
+}
+
+export function defaultSecurityOp(y: number): number {
+  return y + 1;
+}
+`
+    )
+
+    try {
+      const plv8ify = new PLV8ifyCLI('esbuild')
+      plv8ify.init(fixturePath)
+      const bundledJs = await plv8ify.build({
+        inputFile: fixturePath,
+      })
+      const fns = plv8ify.getPLV8SQLFunctions({
+        mode: 'inline',
+        scopePrefix: '',
+        fallbackReturnType: 'JSONB',
+        defaultVolatility: 'IMMUTABLE',
+        bundledJs,
+        pgFunctionDelimiter: '$plv8ify$',
+        outputFolder: 'plv8ify-dist',
+      })
+
+      const elevateFn = fns.find((f) => f.filename.endsWith('elevatePrivileges.plv8.sql'))
+      expect(elevateFn).toBeDefined()
+      expect(elevateFn!.sql).toContain('LANGUAGE plv8 VOLATILE PARALLEL RESTRICTED STRICT SECURITY DEFINER;')
+      expect(elevateFn!.sql).toContain('REVOKE EXECUTE ON FUNCTION elevatePrivileges(role text) FROM PUBLIC;')
+      expect(elevateFn!.sql).toContain('GRANT EXECUTE ON FUNCTION elevatePrivileges(role text) TO authenticated;')
+
+      const normalFn = fns.find((f) => f.filename.endsWith('normalOperation.plv8.sql'))
+      expect(normalFn).toBeDefined()
+      expect(normalFn!.sql).toContain('LANGUAGE plv8 IMMUTABLE STRICT SECURITY INVOKER;')
+
+      const defaultFn = fns.find((f) => f.filename.endsWith('defaultSecurityOp.plv8.sql'))
+      expect(defaultFn).toBeDefined()
+      expect(defaultFn!.sql).toContain('LANGUAGE plv8 IMMUTABLE STRICT;')
+      expect(defaultFn!.sql).not.toContain('SECURITY')
+    } finally {
+      if (fs.existsSync(fixturePath)) {
+        fs.unlinkSync(fixturePath)
+      }
+    }
+  })
 })
 
 

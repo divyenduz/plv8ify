@@ -1,4 +1,4 @@
-import { Parallel, Volatility } from './PLV8ify.js'
+import { Parallel, Security, Volatility } from './PLV8ify.js'
 
 export interface TSFunctionParameter {
   name: string
@@ -19,6 +19,7 @@ export interface TSFunctionMetadata {
   paramTypeOverrides?: Record<string, string>
   volatility?: Volatility
   parallel?: Parallel
+  security?: Security
   customSchema?: string
   isTrigger?: boolean
   grants?: string[]
