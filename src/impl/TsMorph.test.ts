@@ -276,6 +276,70 @@ export function noSearchPath(): void {}
     }
   })
 
+  it('keeps literal parameter defaults and parses the strict annotation', () => {
+    const fixturePath = path.resolve('src/test-fixtures/defaults-test.fixture.ts')
+    fs.writeFileSync(
+      fixturePath,
+      `
+/**
+ * @plv8ify_strict false
+ */
+export function withDefaults(
+  purchase_option: string,
+  term_length: string = null,
+  sp_description: string = '%',
+  label: string = "it's",
+  retries: number = 3,
+  verbose: boolean = false,
+  computed: string = new Date().toISOString(),
+  copied: string = purchase_option,
+): string {
+  return purchase_option
+}
+
+export function strictByDefault(a: string): string {
+  return a
+}
+
+/**
+ * @plv8ify_strict true
+ */
+export function strictExplicit(a: string): string {
+  return a
+}
+`
+    )
+
+    try {
+      const tsMorph = new TsMorph()
+      tsMorph.createSourceFile(fixturePath)
+      const functions = tsMorph.getFunctions()
+
+      const withDefaultsFn = functions.find((f) => f.name === 'withDefaults')
+      expect(withDefaultsFn).toBeDefined()
+      expect(withDefaultsFn!.strict).toBe(false)
+      expect(withDefaultsFn!.parameters).toEqual([
+        { name: 'purchase_option', type: 'string' },
+        { name: 'term_length', type: 'string', defaultValue: null },
+        { name: 'sp_description', type: 'string', defaultValue: '%' },
+        { name: 'label', type: 'string', defaultValue: "it's" },
+        { name: 'retries', type: 'number', defaultValue: 3 },
+        { name: 'verbose', type: 'boolean', defaultValue: false },
+        { name: 'computed', type: 'string' },
+        { name: 'copied', type: 'string' },
+      ])
+      expect(withDefaultsFn!.parameters[6].defaultValue).toBeUndefined()
+      expect(withDefaultsFn!.parameters[7].defaultValue).toBeUndefined()
+
+      expect(functions.find((f) => f.name === 'strictByDefault')?.strict).toBeUndefined()
+      expect(functions.find((f) => f.name === 'strictExplicit')?.strict).toBe(true)
+    } finally {
+      if (fs.existsSync(fixturePath)) {
+        fs.unlinkSync(fixturePath)
+      }
+    }
+  })
+
   it('resolves basic types, arrays, custom types, namespaces, and unions', () => {
     const tsMorph = new TsMorph()
     tsMorph.createSourceFile('./src/test-fixtures/types-resolution.fixture.ts')

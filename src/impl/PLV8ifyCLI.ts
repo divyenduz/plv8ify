@@ -44,6 +44,7 @@ type FnSqlConfig = {
   sqlReturnType: string | null,
   customSchema: string
   trigger: boolean
+  strict: boolean
   grants: string[]
   revokes: string[]
 }
@@ -278,6 +279,7 @@ export class PLV8ifyCLI implements PLV8ify {
         fn.sqlReturnType ?? (this.getTypeFromMap(fn.returnType) || null),
       customSchema: fn.customSchema ?? '',
       trigger: fn.isTrigger ?? false,
+      strict: fn.strict ?? true,
       grants: fn.grants ?? [],
       revokes: fn.revokes ?? [],
     }
@@ -313,6 +315,7 @@ export class PLV8ifyCLI implements PLV8ify {
       searchPath,
       sqlReturnType,
       trigger,
+      strict,
       grants,
       revokes,
     } = this.getFnSqlConfig(fn);
@@ -322,6 +325,39 @@ export class PLV8ifyCLI implements PLV8ify {
     const sqlParametersString = trigger
       ? '' // triggers don't have parameters
       : fn.parameters.map(param => `${param.name} ${paramTypeMapping[param.name] || fallbackReturnType}`).join(',')
+
+    // a literal initializer is the parameter's DEFAULT on the CREATE line only: the DROP, REVOKE and
+    // GRANT signatures name types, never defaults
+    const sqlLiteral = (value: TSFunctionParameter['defaultValue']) => {
+      if (value === null) return 'NULL'
+      if (typeof value === 'string') {
+        const quoted = value.replace(/'/g, "''")
+        return value.includes('\\')
+          ? `E'${quoted.replace(/\\/g, '\\\\')}'`
+          : `'${quoted}'`
+      }
+      if (typeof value === 'number' && !Number.isFinite(value)) return `'${value}'`
+      return String(value)
+    }
+    // PostgreSQL requires every input after a defaulted parameter to have a default.
+    // Keep earlier literals required when a later parameter cannot have a SQL default.
+    let firstDefault = fn.parameters.length
+    while (firstDefault > 0 && fn.parameters[firstDefault - 1].defaultValue !== undefined) {
+      firstDefault--
+    }
+    const sqlParametersWithDefaults = trigger
+      ? ''
+      : fn.parameters
+          .map(
+            (param, index) =>
+              `${param.name} ${paramTypeMapping[param.name] || fallbackReturnType}${
+                index >= firstDefault ? ` DEFAULT ${sqlLiteral(param.defaultValue)}` : ''
+              }`
+          )
+          .join(',')
+
+    // `@plv8ify_strict false` renders CALLED ON NULL INPUT; STRICT otherwise, as before
+    const nullInputClause = strict ? 'STRICT' : 'CALLED ON NULL INPUT'
 
     const jsParametersString = fn.parameters.map(param => param.name).join(',')
 
@@ -338,7 +374,7 @@ export class PLV8ifyCLI implements PLV8ify {
 
     const sqlStatements = [
       `DROP FUNCTION IF EXISTS ${scopedName}(${sqlParametersString});`,
-      `CREATE OR REPLACE FUNCTION ${scopedName}(${sqlParametersString}) RETURNS ${sqlReturnType} AS ${pgFunctionDelimiter}`,
+      `CREATE OR REPLACE FUNCTION ${scopedName}(${sqlParametersWithDefaults}) RETURNS ${sqlReturnType} AS ${pgFunctionDelimiter}`,
       match(mode)
         .with('inline', () => bundledJs)
         .with(
@@ -351,7 +387,7 @@ export class PLV8ifyCLI implements PLV8ify {
         .with('void', () => '')
         .otherwise(() => `return ${targetCallName}(${jsParametersString})`),
       '',
-      `${pgFunctionDelimiter} LANGUAGE plv8 ${volatility}${parallel ? ` PARALLEL ${parallel}` : ''} STRICT${security ? ` SECURITY ${security}` : ''}${searchPathClause};`,
+      `${pgFunctionDelimiter} LANGUAGE plv8 ${volatility}${parallel ? ` PARALLEL ${parallel}` : ''} ${nullInputClause}${security ? ` SECURITY ${security}` : ''}${searchPathClause};`,
     ]
 
     if (revokes.length > 0) {

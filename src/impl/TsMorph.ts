@@ -4,7 +4,7 @@ import {
   TSFunction,
   TSFunctionParameter,
 } from 'src/interfaces/TSCompiler.js'
-import { FunctionDeclaration, Project, SourceFile, Type } from 'ts-morph'
+import { FunctionDeclaration, Node, Project, SourceFile, SyntaxKind, Type } from 'ts-morph'
 
 export class TsMorph implements TSCompiler {
   private sourceFile: SourceFile
@@ -59,10 +59,29 @@ export class TsMorph implements TSCompiler {
   private getFunctionParameters(fn: FunctionDeclaration): TSFunctionParameter[] {
     const params = fn.getParameters()
     return params.map((p) => {
-      return {
+      const parameter: TSFunctionParameter = {
         name: p.getName(),
         type: this.getTypeName(p.getType()),
       }
+      const initializer = p.getInitializer()
+      if (!initializer) return parameter
+      if (Node.isStringLiteral(initializer)) {
+        parameter.defaultValue = initializer.getLiteralValue()
+      } else if (Node.isNumericLiteral(initializer)) {
+        parameter.defaultValue = Number(initializer.getLiteralText())
+      } else if (Node.isPrefixUnaryExpression(initializer)) {
+        const operand = initializer.getOperand()
+        const operator = initializer.getOperatorToken()
+        if (Node.isNumericLiteral(operand) &&
+            (operator === SyntaxKind.MinusToken || operator === SyntaxKind.PlusToken)) {
+          parameter.defaultValue = Number(operand.getLiteralText()) * (operator === SyntaxKind.MinusToken ? -1 : 1)
+        }
+      } else if (initializer.getKind() === SyntaxKind.NullKeyword) {
+        parameter.defaultValue = null
+      } else if (initializer.getKind() === SyntaxKind.TrueKeyword || initializer.getKind() === SyntaxKind.FalseKeyword) {
+        parameter.defaultValue = initializer.getKind() === SyntaxKind.TrueKeyword
+      }
+      return parameter
     })
   }
 
@@ -75,6 +94,7 @@ export class TsMorph implements TSCompiler {
     searchPath?: string
     customSchema?: string
     isTrigger?: boolean
+    strict?: boolean
     grants?: string[]
     revokes?: string[]
   } {
@@ -87,6 +107,7 @@ export class TsMorph implements TSCompiler {
     let searchPath: string | undefined
     let customSchema: string | undefined
     let isTrigger: boolean | undefined
+    let strict: boolean | undefined
     const grants: string[] = []
     const revokes: string[] = []
 
@@ -104,6 +125,9 @@ export class TsMorph implements TSCompiler {
         if (upper === 'SAFE' || upper === 'UNSAFE' || upper === 'RESTRICTED') {
           parallel = upper as Parallel
         }
+      } else if (tagName === 'plv8ify_strict') {
+        // `@plv8ify_strict false` renders CALLED ON NULL INPUT; any other value keeps STRICT, the default
+        strict = comment.toLowerCase() !== 'false'
       } else if (tagName === 'plv8ify_security_definer') {
         security = 'DEFINER'
       } else if (tagName === 'plv8ify_security_invoker') {
@@ -173,6 +197,7 @@ export class TsMorph implements TSCompiler {
       searchPath,
       customSchema,
       isTrigger,
+      strict,
       grants: grants.length > 0 ? grants : undefined,
       revokes: revokes.length > 0 ? revokes : undefined,
     }
