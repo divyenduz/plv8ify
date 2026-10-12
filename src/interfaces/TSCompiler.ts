@@ -3,6 +3,8 @@ import { Parallel, Security, Volatility } from './PLV8ify.js'
 export interface TSFunctionParameter {
   name: string
   type: string
+  /** the TypeScript initializer when it is a literal (null, a string, a number, true or false): rendered as the SQL DEFAULT */
+  defaultLiteral?: string
 }
 
 export interface TSFunctionParamOverride {
@@ -23,6 +25,8 @@ export interface TSFunctionMetadata {
   searchPath?: string
   customSchema?: string
   isTrigger?: boolean
+  /** false renders CALLED ON NULL INPUT instead of STRICT (`@plv8ify_strict false`) */
+  strict?: boolean
   grants?: string[]
   revokes?: string[]
 }

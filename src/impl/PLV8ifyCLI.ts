@@ -323,6 +323,28 @@ export class PLV8ifyCLI implements PLV8ify {
       ? '' // triggers don't have parameters
       : fn.parameters.map(param => `${param.name} ${paramTypeMapping[param.name] || fallbackReturnType}`).join(',')
 
+    // a literal initializer is the parameter's DEFAULT on the CREATE line only: the DROP, REVOKE and
+    // GRANT signatures name types, never defaults
+    const sqlLiteral = (text: string) =>
+      text === 'null'
+        ? 'NULL'
+        : /^["']/.test(text)
+          ? `'${text.slice(1, -1).replace(/'/g, "''")}'`
+          : text
+    const sqlParametersWithDefaults = trigger
+      ? ''
+      : fn.parameters
+          .map(
+            (param) =>
+              `${param.name} ${paramTypeMapping[param.name] || fallbackReturnType}${
+                param.defaultLiteral !== undefined ? ` DEFAULT ${sqlLiteral(param.defaultLiteral)}` : ''
+              }`
+          )
+          .join(',')
+
+    // `@plv8ify_strict false` renders CALLED ON NULL INPUT; STRICT otherwise, as before
+    const nullInputClause = fn.strict === false ? 'CALLED ON NULL INPUT' : 'STRICT'
+
     const jsParametersString = fn.parameters.map(param => param.name).join(',')
 
     const scopedName =
@@ -338,7 +360,7 @@ export class PLV8ifyCLI implements PLV8ify {
 
     const sqlStatements = [
       `DROP FUNCTION IF EXISTS ${scopedName}(${sqlParametersString});`,
-      `CREATE OR REPLACE FUNCTION ${scopedName}(${sqlParametersString}) RETURNS ${sqlReturnType} AS ${pgFunctionDelimiter}`,
+      `CREATE OR REPLACE FUNCTION ${scopedName}(${sqlParametersWithDefaults}) RETURNS ${sqlReturnType} AS ${pgFunctionDelimiter}`,
       match(mode)
         .with('inline', () => bundledJs)
         .with(
@@ -351,7 +373,7 @@ export class PLV8ifyCLI implements PLV8ify {
         .with('void', () => '')
         .otherwise(() => `return ${targetCallName}(${jsParametersString})`),
       '',
-      `${pgFunctionDelimiter} LANGUAGE plv8 ${volatility}${parallel ? ` PARALLEL ${parallel}` : ''} STRICT${security ? ` SECURITY ${security}` : ''}${searchPathClause};`,
+      `${pgFunctionDelimiter} LANGUAGE plv8 ${volatility}${parallel ? ` PARALLEL ${parallel}` : ''} ${nullInputClause}${security ? ` SECURITY ${security}` : ''}${searchPathClause};`,
     ]
 
     if (revokes.length > 0) {

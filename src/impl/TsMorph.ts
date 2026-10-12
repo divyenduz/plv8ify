@@ -6,6 +6,9 @@ import {
 } from 'src/interfaces/TSCompiler.js'
 import { FunctionDeclaration, Project, SourceFile, Type } from 'ts-morph'
 
+/** a literal default only: null, a string, a number, true or false; anything else is not a SQL DEFAULT */
+const LITERAL_DEFAULT = /^(null|'[^']*'|"[^"]*"|-?\d+(\.\d+)?|true|false)$/
+
 export class TsMorph implements TSCompiler {
   private sourceFile: SourceFile
 
@@ -59,10 +62,16 @@ export class TsMorph implements TSCompiler {
   private getFunctionParameters(fn: FunctionDeclaration): TSFunctionParameter[] {
     const params = fn.getParameters()
     return params.map((p) => {
-      return {
+      const parameter: TSFunctionParameter = {
         name: p.getName(),
         type: this.getTypeName(p.getType()),
       }
+      // a literal initializer becomes the SQL DEFAULT; any other expression stays in the JavaScript body, as before
+      const initializer = p.getInitializer()?.getText()
+      if (initializer !== undefined && LITERAL_DEFAULT.test(initializer)) {
+        parameter.defaultLiteral = initializer
+      }
+      return parameter
     })
   }
 
@@ -75,6 +84,7 @@ export class TsMorph implements TSCompiler {
     searchPath?: string
     customSchema?: string
     isTrigger?: boolean
+    strict?: boolean
     grants?: string[]
     revokes?: string[]
   } {
@@ -87,6 +97,7 @@ export class TsMorph implements TSCompiler {
     let searchPath: string | undefined
     let customSchema: string | undefined
     let isTrigger: boolean | undefined
+    let strict: boolean | undefined
     const grants: string[] = []
     const revokes: string[] = []
 
@@ -104,6 +115,9 @@ export class TsMorph implements TSCompiler {
         if (upper === 'SAFE' || upper === 'UNSAFE' || upper === 'RESTRICTED') {
           parallel = upper as Parallel
         }
+      } else if (tagName === 'plv8ify_strict') {
+        // `@plv8ify_strict false` renders CALLED ON NULL INPUT; any other value keeps STRICT, the default
+        strict = comment.toLowerCase() !== 'false'
       } else if (tagName === 'plv8ify_security_definer') {
         security = 'DEFINER'
       } else if (tagName === 'plv8ify_security_invoker') {
@@ -173,6 +187,7 @@ export class TsMorph implements TSCompiler {
       searchPath,
       customSchema,
       isTrigger,
+      strict,
       grants: grants.length > 0 ? grants : undefined,
       revokes: revokes.length > 0 ? revokes : undefined,
     }

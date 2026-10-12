@@ -223,6 +223,27 @@ $plv8ify$ LANGUAGE plv8 IMMUTABLE STRICT;
 | designate the function is a TRIGGER | `/** @plv8ify_trigger */` | `/** @plv8ify_trigger */` |
 | grant execution permissions to roles | `/** @plv8ify_grant <roles> */` | `/** @plv8ify_grant authenticated, service_role */` |
 | revoke execution permissions from roles | `/** @plv8ify_revoke <roles> */` | `/** @plv8ify_revoke PUBLIC */` |
+| declare the function `CALLED ON NULL INPUT` instead of `STRICT` | `/** @plv8ify_strict false */` | `/** @plv8ify_strict false */` |
+
+### Parameter defaults
+
+A parameter whose TypeScript initializer is a literal (`null`, a string, a number, `true` or `false`) is declared with the same value as its SQL `DEFAULT`, so a caller may omit it and `CREATE OR REPLACE` can replace an existing function that already carries those defaults:
+
+```typescript
+/** @plv8ify_strict false */
+export function resolveTermKeys(purchaseOption: string, termLength: string = null, spDescription: string = '%'): string {
+  // ...
+}
+```
+
+```sql
+DROP FUNCTION IF EXISTS resolveTermKeys(purchaseOption text,termLength text,spDescription text);
+CREATE OR REPLACE FUNCTION resolveTermKeys(purchaseOption text,termLength text DEFAULT NULL,spDescription text DEFAULT '%') RETURNS text AS $plv8ify$
+...
+$plv8ify$ LANGUAGE plv8 IMMUTABLE CALLED ON NULL INPUT;
+```
+
+The `DROP FUNCTION`, `REVOKE` and `GRANT` signatures name types only, never defaults. Any other initializer (an expression, a variable) stays in the JavaScript body and the parameter has no SQL default. Functions are `STRICT` unless tagged `@plv8ify_strict false`: a `NULL` default is only useful when the function runs on `NULL` arguments.
 
 ## Dead Code Elimination with `--esbuild-define`
 

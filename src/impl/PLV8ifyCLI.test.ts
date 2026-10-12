@@ -841,6 +841,137 @@ export function defaultSearchPathAction(y: number): number {
       }
     }
   })
+
+  it('renders parameter defaults on the CREATE line only and CALLED ON NULL INPUT when strict is false', () => {
+    const plv8ify = new PLV8ifyCLI()
+    const signature = 'resolveTerms(purchase_option text,term_length text,sp_description text,label text,retries float8,verbose boolean)'
+    const sql = plv8ify.getPLV8SQLFunction({
+      fn: {
+        name: 'resolveTerms',
+        isExported: true,
+        parameters: [
+          { name: 'purchase_option', type: 'string' },
+          { name: 'term_length', type: 'string', defaultLiteral: 'null' },
+          { name: 'sp_description', type: 'string', defaultLiteral: "'%'" },
+          { name: 'label', type: 'string', defaultLiteral: '"it\'s"' },
+          { name: 'retries', type: 'number', defaultLiteral: '3' },
+          { name: 'verbose', type: 'boolean', defaultLiteral: 'false' },
+        ],
+        returnType: 'string',
+        strict: false,
+        revokes: ['PUBLIC'],
+        grants: ['authenticated'],
+      },
+      scopePrefix: '',
+      mode: 'inline',
+      defaultVolatility: 'IMMUTABLE',
+      bundledJs: `function resolveTerms(purchase_option, term_length, sp_description, label, retries, verbose) { return purchase_option; }`,
+      pgFunctionDelimiter: '$plv8ify$',
+      fallbackReturnType: 'text',
+    })
+
+    expect(sql).toContain(`DROP FUNCTION IF EXISTS ${signature};`)
+    expect(sql).toContain(
+      "CREATE OR REPLACE FUNCTION resolveTerms(purchase_option text,term_length text DEFAULT NULL,sp_description text DEFAULT '%',label text DEFAULT 'it''s',retries float8 DEFAULT 3,verbose boolean DEFAULT false) RETURNS text AS $plv8ify$"
+    )
+    expect(sql).toContain('LANGUAGE plv8 IMMUTABLE CALLED ON NULL INPUT;')
+    expect(sql).not.toContain('STRICT')
+    expect(sql).toContain(`REVOKE EXECUTE ON FUNCTION ${signature} FROM PUBLIC;`)
+    expect(sql).toContain(`GRANT EXECUTE ON FUNCTION ${signature} TO authenticated;`)
+
+    const strictSql = plv8ify.getPLV8SQLFunction({
+      fn: {
+        name: 'strictOp',
+        isExported: true,
+        parameters: [{ name: 'a', type: 'string' }],
+        returnType: 'string',
+        strict: true,
+      },
+      scopePrefix: '',
+      mode: 'inline',
+      defaultVolatility: 'IMMUTABLE',
+      bundledJs: `function strictOp(a) { return a; }`,
+      pgFunctionDelimiter: '$plv8ify$',
+      fallbackReturnType: 'text',
+    })
+    expect(strictSql).toContain('CREATE OR REPLACE FUNCTION strictOp(a text) RETURNS text AS $plv8ify$')
+    expect(strictSql).toContain('LANGUAGE plv8 IMMUTABLE STRICT;')
+  })
+
+  it('correctly generates parameter defaults and CALLED ON NULL INPUT from a source file', async () => {
+    const fixturePath = path.resolve('src/test-fixtures/defaults-sql.fixture.ts')
+    fs.writeFileSync(
+      fixturePath,
+      `
+/**
+ * A null length or payment option means "any", so the function must run on NULL arguments.
+ * @plv8ify_strict false
+ * @plv8ify_volatility IMMUTABLE
+ */
+export function resolveTermKeys(
+  purchaseOption: string,
+  termLength: string = null,
+  paymentOption: string = null,
+  spDescription: string = '%',
+): string {
+  return [purchaseOption, termLength ?? '', paymentOption ?? '', spDescription].join('|')
+}
+
+/**
+ * Numbers and booleans are literals too; STRICT stays the default.
+ */
+export function paginate(page: number = 1, pageSize: number = 25, descending: boolean = false): string {
+  return \`\${page}/\${pageSize}/\${descending}\`
+}
+
+/**
+ * Only a literal initializer becomes a DEFAULT: an expression stays in the JavaScript body.
+ */
+export function stamp(label: string, at: string = new Date().toISOString()): string {
+  return label + at
+}
+`
+    )
+
+    try {
+      const plv8ify = new PLV8ifyCLI('esbuild')
+      plv8ify.init(fixturePath)
+      const bundledJs = await plv8ify.build({
+        inputFile: fixturePath,
+      })
+      const fns = plv8ify.getPLV8SQLFunctions({
+        mode: 'inline',
+        scopePrefix: '',
+        fallbackReturnType: 'JSONB',
+        defaultVolatility: 'IMMUTABLE',
+        bundledJs,
+        pgFunctionDelimiter: '$plv8ify$',
+        outputFolder: 'plv8ify-dist',
+      })
+
+      const resolveFn = fns.find((f) => f.filename.endsWith('resolveTermKeys.plv8.sql'))
+      expect(resolveFn).toBeDefined()
+      expect(resolveFn!.sql).toContain('DROP FUNCTION IF EXISTS resolveTermKeys(purchaseOption text,termLength text,paymentOption text,spDescription text);')
+      expect(resolveFn!.sql).toContain(
+        "CREATE OR REPLACE FUNCTION resolveTermKeys(purchaseOption text,termLength text DEFAULT NULL,paymentOption text DEFAULT NULL,spDescription text DEFAULT '%') RETURNS text AS $plv8ify$"
+      )
+      expect(resolveFn!.sql).toContain('LANGUAGE plv8 IMMUTABLE CALLED ON NULL INPUT;')
+
+      const paginateFn = fns.find((f) => f.filename.endsWith('paginate.plv8.sql'))
+      expect(paginateFn).toBeDefined()
+      expect(paginateFn!.sql).toContain('CREATE OR REPLACE FUNCTION paginate(page float8 DEFAULT 1,pageSize float8 DEFAULT 25,descending boolean DEFAULT false) RETURNS text AS $plv8ify$')
+      expect(paginateFn!.sql).toContain('LANGUAGE plv8 IMMUTABLE STRICT;')
+
+      const stampFn = fns.find((f) => f.filename.endsWith('stamp.plv8.sql'))
+      expect(stampFn).toBeDefined()
+      expect(stampFn!.sql).toContain('CREATE OR REPLACE FUNCTION stamp(label text,at text) RETURNS text AS $plv8ify$')
+      expect(stampFn!.sql).not.toContain('DEFAULT')
+    } finally {
+      if (fs.existsSync(fixturePath)) {
+        fs.unlinkSync(fixturePath)
+      }
+    }
+  })
 })
 
 
