@@ -320,16 +320,16 @@ export function strictExplicit(a: string): string {
       expect(withDefaultsFn!.strict).toBe(false)
       expect(withDefaultsFn!.parameters).toEqual([
         { name: 'purchase_option', type: 'string' },
-        { name: 'term_length', type: 'string', defaultLiteral: 'null' },
-        { name: 'sp_description', type: 'string', defaultLiteral: "'%'" },
-        { name: 'label', type: 'string', defaultLiteral: '"it\'s"' },
-        { name: 'retries', type: 'number', defaultLiteral: '3' },
-        { name: 'verbose', type: 'boolean', defaultLiteral: 'false' },
+        { name: 'term_length', type: 'string', defaultValue: null },
+        { name: 'sp_description', type: 'string', defaultValue: '%' },
+        { name: 'label', type: 'string', defaultValue: "it's" },
+        { name: 'retries', type: 'number', defaultValue: 3 },
+        { name: 'verbose', type: 'boolean', defaultValue: false },
         { name: 'computed', type: 'string' },
         { name: 'copied', type: 'string' },
       ])
-      expect(withDefaultsFn!.parameters[6].defaultLiteral).toBeUndefined()
-      expect(withDefaultsFn!.parameters[7].defaultLiteral).toBeUndefined()
+      expect(withDefaultsFn!.parameters[6].defaultValue).toBeUndefined()
+      expect(withDefaultsFn!.parameters[7].defaultValue).toBeUndefined()
 
       expect(functions.find((f) => f.name === 'strictByDefault')?.strict).toBeUndefined()
       expect(functions.find((f) => f.name === 'strictExplicit')?.strict).toBe(true)

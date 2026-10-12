@@ -3,8 +3,8 @@ import { Parallel, Security, Volatility } from './PLV8ify.js'
 export interface TSFunctionParameter {
   name: string
   type: string
-  /** the TypeScript initializer when it is a literal (null, a string, a number, true or false): rendered as the SQL DEFAULT */
-  defaultLiteral?: string
+  /** Decoded literal initializer; undefined means no supported SQL default. */
+  defaultValue?: string | number | boolean | null
 }
 
 export interface TSFunctionParamOverride {
