@@ -851,11 +851,11 @@ export function defaultSearchPathAction(y: number): number {
         isExported: true,
         parameters: [
           { name: 'purchase_option', type: 'string' },
-          { name: 'term_length', type: 'string', defaultLiteral: 'null' },
-          { name: 'sp_description', type: 'string', defaultLiteral: "'%'" },
-          { name: 'label', type: 'string', defaultLiteral: '"it\'s"' },
-          { name: 'retries', type: 'number', defaultLiteral: '3' },
-          { name: 'verbose', type: 'boolean', defaultLiteral: 'false' },
+          { name: 'term_length', type: 'string', defaultValue: null },
+          { name: 'sp_description', type: 'string', defaultValue: '%' },
+          { name: 'label', type: 'string', defaultValue: "it's" },
+          { name: 'retries', type: 'number', defaultValue: 3 },
+          { name: 'verbose', type: 'boolean', defaultValue: false },
         ],
         returnType: 'string',
         strict: false,
@@ -972,7 +972,32 @@ export function stamp(label: string, at: string = new Date().toISOString()): str
       }
     }
   })
-})
 
+  it('preserves literal values and promotes only trailing defaults from source', () => {
+    const fixturePath = path.resolve('src/test-fixtures/default-values.fixture.ts')
+    fs.writeFileSync(fixturePath, String.raw`
+export function required(a: number = 1, b: number): number { return a + b }
+export function computed(a: number = 1, b: number = Math.random(), c: number = 0): number { return a + b + c }
+export function literals(a: string = 'it\'s', b: string = '\n\u0041\x42', c: string = 'C:\\tmp', d: number = 1e-8, e: number = 0x10, f: number = 1_000, g: number = -.5, h: number = +1., i: string = '', j: boolean = false, k: string = null): string { return a }
+`)
+    try {
+      const plv8ify = new PLV8ifyCLI()
+      plv8ify.init(fixturePath)
+      const functions = plv8ify.getPLV8SQLFunctions({
+        mode: 'inline', scopePrefix: '', fallbackReturnType: 'JSONB',
+        defaultVolatility: 'IMMUTABLE', bundledJs: '',
+        pgFunctionDelimiter: '$plv8ify$', outputFolder: 'plv8ify-dist',
+      })
+      expect(functions.find((f) => f.filename.endsWith('/required.plv8.sql'))!.sql)
+        .toContain('CREATE OR REPLACE FUNCTION required(a float8,b float8)')
+      expect(functions.find((f) => f.filename.endsWith('/computed.plv8.sql'))!.sql)
+        .toContain('CREATE OR REPLACE FUNCTION computed(a float8,b float8,c float8 DEFAULT 0)')
+      expect(functions.find((f) => f.filename.endsWith('/literals.plv8.sql'))!.sql)
+        .toContain("CREATE OR REPLACE FUNCTION literals(a text DEFAULT 'it''s',b text DEFAULT '\nAB',c text DEFAULT E'C:\\\\tmp',d float8 DEFAULT 1e-8,e float8 DEFAULT 16,f float8 DEFAULT 1000,g float8 DEFAULT -0.5,h float8 DEFAULT 1,i text DEFAULT '',j boolean DEFAULT false,k text DEFAULT NULL)")
+    } finally {
+      fs.unlinkSync(fixturePath)
+    }
+  })
+})
 
 

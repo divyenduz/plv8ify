@@ -4,10 +4,7 @@ import {
   TSFunction,
   TSFunctionParameter,
 } from 'src/interfaces/TSCompiler.js'
-import { FunctionDeclaration, Project, SourceFile, Type } from 'ts-morph'
-
-/** a literal default only: null, a string, a number, true or false; anything else is not a SQL DEFAULT */
-const LITERAL_DEFAULT = /^(null|'[^']*'|"[^"]*"|-?\d+(\.\d+)?|true|false)$/
+import { FunctionDeclaration, Node, Project, SourceFile, SyntaxKind, Type } from 'ts-morph'
 
 export class TsMorph implements TSCompiler {
   private sourceFile: SourceFile
@@ -66,10 +63,23 @@ export class TsMorph implements TSCompiler {
         name: p.getName(),
         type: this.getTypeName(p.getType()),
       }
-      // a literal initializer becomes the SQL DEFAULT; any other expression stays in the JavaScript body, as before
-      const initializer = p.getInitializer()?.getText()
-      if (initializer !== undefined && LITERAL_DEFAULT.test(initializer)) {
-        parameter.defaultLiteral = initializer
+      const initializer = p.getInitializer()
+      if (!initializer) return parameter
+      if (Node.isStringLiteral(initializer)) {
+        parameter.defaultValue = initializer.getLiteralValue()
+      } else if (Node.isNumericLiteral(initializer)) {
+        parameter.defaultValue = Number(initializer.getLiteralText())
+      } else if (Node.isPrefixUnaryExpression(initializer)) {
+        const operand = initializer.getOperand()
+        const operator = initializer.getOperatorToken()
+        if (Node.isNumericLiteral(operand) &&
+            (operator === SyntaxKind.MinusToken || operator === SyntaxKind.PlusToken)) {
+          parameter.defaultValue = Number(operand.getLiteralText()) * (operator === SyntaxKind.MinusToken ? -1 : 1)
+        }
+      } else if (initializer.getKind() === SyntaxKind.NullKeyword) {
+        parameter.defaultValue = null
+      } else if (initializer.getKind() === SyntaxKind.TrueKeyword || initializer.getKind() === SyntaxKind.FalseKeyword) {
+        parameter.defaultValue = initializer.getKind() === SyntaxKind.TrueKeyword
       }
       return parameter
     })
